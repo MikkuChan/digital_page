@@ -1,0 +1,76 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle with Gradient -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="shieldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4ade80;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#22c55e;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Main Background -->
+  <circle cx="64" cy="64" r="64" fill="url(#bgGradient)"/>
+  
+  <!-- Outer Ring -->
+  <circle cx="64" cy="64" r="56" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+  
+  <!-- Shield Shape (VPN Security Symbol) -->
+  <path d="M64 20 L52 28 L52 48 C52 60 58 70 64 74 C70 70 76 60 76 48 L76 28 Z" 
+        fill="url(#shieldGradient)" 
+        filter="url(#glow)"
+        stroke="rgba(255,255,255,0.3)" 
+        stroke-width="1"/>
+  
+  <!-- Network Connection Lines -->
+  <g stroke="#ffffff" stroke-width="2.5" opacity="0.9">
+    <!-- Connection nodes -->
+    <circle cx="32" cy="64" r="4" fill="#4ade80"/>
+    <circle cx="96" cy="64" r="4" fill="#4ade80"/>
+    <circle cx="64" cy="96" r="4" fill="#4ade80"/>
+    
+    <!-- Connection lines -->
+    <line x1="36" y1="64" x2="60" y2="64" stroke-dasharray="4,4"/>
+    <line x1="68" y1="64" x2="92" y2="64" stroke-dasharray="4,4"/>
+    <line x1="64" y1="78" x2="64" y2="92" stroke-dasharray="4,4"/>
+  </g>
+  
+  <!-- VPN Lock Icon -->
+  <g transform="translate(64,45)">
+    <rect x="-6" y="0" width="12" height="8" rx="2" fill="#ffffff" opacity="0.9"/>
+    <path d="M-3 0 L-3 -3 C-3 -5 -1 -7 3 -7 C7 -7 9 -5 9 -3 L9 0" 
+          fill="none" 
+          stroke="#ffffff" 
+          stroke-width="2" 
+          opacity="0.9"/>
+    <circle cx="0" cy="4" r="1.5" fill="url(#bgGradient)"/>
+  </g>
+  
+  <!-- Speed/Signal Bars -->
+  <g transform="translate(45,85)" opacity="0.8">
+    <rect x="0" y="8" width="3" height="4" fill="#4ade80"/>
+    <rect x="5" y="6" width="3" height="6" fill="#4ade80"/>
+    <rect x="10" y="4" width="3" height="8" fill="#4ade80"/>
+    <rect x="15" y="2" width="3" height="10" fill="#4ade80"/>
+  </g>
+  
+  <!-- Modern Accent Elements -->
+  <g opacity="0.6">
+    <circle cx="32" cy="32" r="2" fill="#4ade80"/>
+    <circle cx="96" cy="32" r="2" fill="#4ade80"/>
+    <circle cx="32" cy="96" r="2" fill="#4ade80"/>
+    <circle cx="96" cy="96" r="2" fill="#4ade80"/>
+  </g>
+  
+  <!-- Subtle Inner Glow -->
+  <circle cx="64" cy="64" r="45" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+</svg>

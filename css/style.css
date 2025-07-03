@@ -1,0 +1,655 @@
+/* === VARIABEL CSS UNTUK KONSISTENSI DESAIN === */
+:root {
+  --primary-50: #eff6ff;
+  --primary-100: #dbeafe;
+  --primary-500: #3b82f6;
+  --primary-600: #2563eb;
+  --primary-700: #1d4ed8;
+  --primary-900: #1e3a8a;
+  
+  --success-500: #10b981;
+  --success-600: #059669;
+  
+  --warning-500: #f59e0b;
+  --warning-600: #d97706;
+  
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --gray-800: #1f2937;
+  --gray-900: #111827;
+  
+  /* Typography */
+  --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+  
+  /* Spacing - DIKURANGI UNTUK DESKTOP */
+  --section-padding: 1.5rem 0;
+  --container-padding: 1.3rem;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  
+  /* Border Radius */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-full: 9999px;
+  
+  /* Transitions */
+  --transition-fast: 0.15s ease-out;
+  --transition-normal: 0.3s ease-out;
+  --transition-slow: 0.5s ease-out;
+}
+
+/* Responsive spacing variable - DIPERBAIKI */
+@media (min-width: 992px) {
+  :root {
+    --section-padding: 2rem 0; /* Dikurangi dari 4rem ke 2rem */
+    --container-padding: 2.1rem;
+  }
+}
+@media (max-width: 768px) {
+  :root {
+    --section-padding: 2.1rem 0;
+    --container-padding: 0.8rem;
+  }
+}
+
+/* Dark Mode Variables */
+[data-theme="dark"] {
+  --gray-50: #111827;
+  --gray-100: #1f2937;
+  --gray-200: #374151;
+  --gray-300: #4b5563;
+  --gray-400: #6b7280;
+  --gray-500: #9ca3af;
+  --gray-600: #d1d5db;
+  --gray-700: #e5e7eb;
+  --gray-800: #f3f4f6;
+  --gray-900: #ffffff;
+}
+
+/* === BASE STYLES === */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  scroll-padding-top: 100px;
+}
+
+body {
+  font-family: var(--font-primary);
+  line-height: 1.6;
+  color: var(--gray-900);
+  background-color: var(--gray-50);
+  transition: background-color var(--transition-normal), color var(--transition-normal);
+  overflow-x: hidden;
+}
+
+/* === TYPOGRAPHY === */
+.font-display {
+  font-family: var(--font-display);
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, var(--primary-600) 0%, var(--success-500) 50%, var(--warning-500) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+}
+
+.text-hero {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.text-lead {
+  font-size: clamp(1.1rem, 2vw, 1.25rem);
+  font-weight: 400;
+  line-height: 1.7;
+  color: var(--gray-600);
+}
+
+/* === COMPONENTS === */
+
+/* Buttons */
+.btn {
+  font-weight: 600;
+  border-radius: var(--radius-lg);
+  padding: 0.75rem 2rem;
+  font-size: 0.95rem;
+  transition: all var(--transition-fast);
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  transition: left 0.6s;
+}
+
+.btn:hover::before {
+  left: 100%;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
+  color: white;
+  box-shadow: var(--shadow-md);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-xl);
+  background: linear-gradient(135deg, var(--primary-700), var(--primary-900));
+}
+
+.btn-success {
+  background: linear-gradient(135deg, var(--success-500), var(--success-600));
+  color: white;
+  box-shadow: var(--shadow-md);
+}
+
+.btn-success:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-xl);
+}
+
+.btn-warning {
+  background: linear-gradient(135deg, var(--warning-500), var(--warning-600));
+  color: white;
+  box-shadow: var(--shadow-md);
+}
+
+.btn-warning:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-xl);
+}
+
+.btn-outline {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--gray-900);
+}
+
+.btn-outline:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+/* Cards */
+.card {
+  border: none;
+  border-radius: var(--radius-2xl);
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  box-shadow: var(--shadow-lg);
+  transition: all var(--transition-normal);
+  overflow: hidden;
+  position: relative;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary-500), var(--success-500), var(--warning-500));
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+}
+
+.card:hover::before {
+  opacity: 1;
+}
+
+.card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-2xl);
+}
+
+/* Navbar Styles */
+.navbar {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  transition: all var(--transition-normal);
+  padding: 1rem 0;
+}
+
+.navbar-brand {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.5rem;
+  text-decoration: none;
+}
+
+.nav-link {
+  font-weight: 500;
+  color: var(--gray-700);
+  transition: all var(--transition-fast);
+  position: relative;
+  margin: 0 0.5rem;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 2px;
+  background: var(--primary-500);
+  transition: width var(--transition-fast);
+}
+
+.nav-link:hover::after,
+.nav-link.active::after {
+  width: 100%;
+}
+
+/* Hero Section - DIKURANGI PADDING */
+.hero-section {
+  min-height: 70vh; /* Dikurangi dari 80vh */
+  display: flex;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--gray-50) 0%, var(--primary-50) 100%);
+  padding: 2rem 0; /* Dikurangi dari 4rem */
+}
+
+.hero-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.1;
+  background-image: 
+    radial-gradient(circle at 25% 25%, var(--primary-500) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, var(--success-500) 0%, transparent 50%);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  padding: 1rem 0; /* Dikurangi dari 2rem */
+}
+
+/* Feature Icons */
+.feature-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius-2xl);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--primary-500), var(--success-500));
+  margin-bottom: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.feature-icon::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+  transform: rotate(45deg);
+  animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+  100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+}
+
+/* Testimonial Styling */
+.testimonial-card {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(20px);
+  border-radius: var(--radius-2xl);
+  padding: 2rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.testimonial-card::before {
+  content: '"';
+  position: absolute;
+  top: 1rem;
+  left: 1.5rem;
+  font-size: 4rem;
+  color: var(--primary-200);
+  font-family: Georgia, serif;
+  line-height: 1;
+}
+
+/* Stats Section */
+.stats-section {
+  background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
+  color: white;
+  padding: var(--section-padding);
+  position: relative;
+  overflow: hidden;
+}
+
+.stats-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+.stat-item {
+  text-align: center;
+  position: relative;
+  z-index: 2;
+}
+
+.stat-number {
+  font-size: 3rem;
+  font-weight: 800;
+  font-family: var(--font-display);
+  color: white;
+  display: block;
+}
+
+.stat-label {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  font-weight: 500;
+}
+
+/* Badge Styles */
+.badge-premium {
+  background: linear-gradient(135deg, var(--primary-500), var(--success-500));
+  color: white;
+  padding: 0.5rem 1.5rem;
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Floating Elements */
+.floating {
+  animation: floating 3s ease-in-out infinite;
+}
+
+@keyframes floating {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+
+/* Theme Toggle */
+.theme-toggle {
+  width: 50px;
+  height: 26px;
+  background: var(--gray-300);
+  border-radius: var(--radius-full);
+  position: relative;
+  cursor: pointer;
+  transition: background var(--transition-normal);
+  border: none;
+  padding: 0;
+}
+
+.theme-toggle::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 22px;
+  height: 22px;
+  background: white;
+  border-radius: 50%;
+  transition: transform var(--transition-normal);
+  box-shadow: var(--shadow-sm);
+}
+
+.theme-toggle.active {
+  background: var(--primary-500);
+}
+
+.theme-toggle.active::before {
+  transform: translateX(24px);
+}
+
+/* Dark Mode Styles */
+[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+[data-theme="dark"] body {
+  background: var(--gray-900);
+  color: var(--gray-100);
+}
+
+[data-theme="dark"] .navbar {
+  background: rgba(17, 24, 39, 0.95);
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .card {
+  background: rgba(31, 41, 55, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .hero-section {
+  background: linear-gradient(135deg, var(--gray-900) 0%, var(--gray-800) 100%);
+}
+
+[data-theme="dark"] .testimonial-card {
+  background: rgba(31, 41, 55, 0.9);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .hero-section {
+    min-height: 70vh; /* Disesuaikan */
+    padding-top: 80px; /* Dikurangi dari 100px */
+    text-align: center;
+  }
+  .text-hero {
+    font-size: 2.5rem;
+  }
+  .btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+  }
+  .feature-icon {
+    width: 60px;
+    height: 60px;
+  }
+  .stat-number {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 575px) {
+  .navbar-brand img {
+    height: 30px;
+  }
+  .hero-section {
+    padding-top: 80px; /* Dikurangi dari 100px */
+  }
+}
+
+/* Loading Animation */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--gray-50);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  transition: opacity 0.5s ease-out;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid var(--gray-200);
+  border-top: 4px solid var(--primary-500);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Utility Classes */
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.section-padding {
+  padding: var(--section-padding);
+}
+.container-padding {
+  padding-left: var(--container-padding);
+  padding-right: var(--container-padding);
+}
+
+/* Hover Effects */
+.hover-lift {
+  transition: transform var(--transition-normal);
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+}
+
+/* Scroll Indicator */
+.scroll-indicator {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: var(--gray-200);
+  z-index: 1000;
+}
+
+.scroll-progress {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary-500), var(--success-500));
+  width: 0%;
+  transition: width 0.1s ease-out;
+}
+
+.navbar-brand img {
+  margin-top: 0;
+  margin-bottom: 0;
+  vertical-align: middle;
+}
+
+/** css untuk produk.html **/
+.produk-card:hover {
+  transform: translateY(-7px) scale(1.03);
+  box-shadow: 0 10px 28px 0 rgba(59,130,246,0.13), 0 2px 4px 0 rgba(0,0,0,0.04);
+  transition: .18s cubic-bezier(.4,0,.2,1);
+}
+@media (max-width: 768px) {
+  .produk-card { margin-bottom: 2rem; }
+}
+
+/* === FIX JARAK SECTION UNTUK HOMEPAGE === */
+/* Mengurangi jarak antar section di homepage */
+.homepage section {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+/* Khusus untuk section pertama setelah hero */
+.homepage .hero-section + section {
+  margin-top: 1rem !important;
+}
+
+/* Mengurangi jarak internal section */
+.homepage section .container {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+/* Override section padding untuk homepage */
+.homepage .section-padding {
+  padding: 1rem 0 !important;
+}
+
+/* Untuk elemen yang memiliki class khusus stats */
+.homepage .stats-section {
+  padding: 1.5rem 0 !important;
+}
+
+/* Khusus untuk area illustration/gambar */
+.homepage .illustration-section {
+  padding: 0.5rem 0 !important;
+  margin: 0 !important;
+}
+
+/* === FIX JARAK SECTION AGAR TIDAK MENJORAK DI PRODUK === */
+section + section {
+  margin-top: 0 !important;
+}
+
+@media (max-width: 768px) {
+  .hero-section {
+    padding-top: 4.9rem;
+    margin-top: 1.5rem;
+  }
+}

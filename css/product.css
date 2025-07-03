@@ -1,0 +1,171 @@
+/* ===== HERO SECTION - FIXED ===== */
+.produk-hero-section {
+  min-height: auto; /* Remove fixed height completely */
+  border-radius: 0 0 2rem 2rem;
+  box-shadow: 0 8px 28px 0 rgba(59,130,246,0.07);
+  position: relative;
+  padding: 2rem 0 1.5rem 0; /* Reduced padding */
+  background: linear-gradient(120deg,#eff6ff 0,#f3f4f6 70%);
+  margin-bottom: 1.5rem; /* Add margin bottom to connect with content */
+}
+
+/* ===== SECTION PRODUK GRID ===== */
+.produk-grid-section {
+  margin-top: -1rem !important; /* Negative margin to pull content up */
+  padding-top: 0;
+  background: var(--gray-50);
+}
+
+/* ===== JUDUL, IKON, BADGE ===== */
+.produk-section-title {
+  font-size: 2.1rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--primary-700);
+  margin-bottom: .35rem;
+  gap: .7rem;
+}
+.produk-ikon-lg {
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  background: linear-gradient(120deg, var(--primary-600), var(--success-500));
+  color: #fff;
+  box-shadow: 0 1px 8px 0 rgba(59,130,246,0.14);
+}
+.bg-gradient-primary {
+  background: linear-gradient(90deg,var(--primary-600),var(--success-500))!important;
+  color: #fff!important;
+}
+.bg-gradient-info {
+  background: linear-gradient(90deg,var(--primary-500),#0ea5e9)!important;
+  color: #fff!important;
+}
+.bg-gradient-warning {
+  background: linear-gradient(90deg,var(--warning-500),var(--primary-500))!important;
+  color: #fff!important;
+}
+.bg-gradient-success {
+  background: linear-gradient(90deg,var(--success-600),var(--primary-500))!important;
+  color: #fff!important;
+}
+.produk-badge {
+  font-size: .93rem;
+  font-family: var(--font-display);
+  border-radius: 1.3em;
+  padding: .24em 1em;
+  font-weight: 600;
+  margin-bottom: .3em;
+  box-shadow: 0 2px 8px 0 rgba(59,130,246,0.04);
+  display: inline-block;
+  letter-spacing:.01em;
+}
+
+/* ===== CARD PRODUK ===== */
+.produk-feature-card {
+  border-radius: var(--radius-2xl);
+  background: rgba(255,255,255,0.99);
+  box-shadow: 0 3px 18px 0 rgba(59,130,246,0.12);
+  padding: 1.7rem 1.2rem 1.4rem 1.2rem;
+  text-align: center;
+  transition: box-shadow .18s, transform .16s;
+  position: relative;
+  min-height: 340px;
+  margin-bottom: 0.6rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: visible;
+}
+.produk-feature-card:hover {
+  box-shadow: 0 18px 46px 0 rgba(59,130,246,0.13), 0 2px 12px 0 rgba(16,185,129,0.06);
+  transform: translateY(-7px) scale(1.025);
+  border:1.2px solid var(--primary-500);
+}
+
+/* ===== IKON DI DALAM CARD ===== */
+.produk-feature-ikon {
+  width: 44px;
+  height: 44px;
+  margin: 0 auto 1.05rem auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  font-size: 1.5rem;
+  color: #fff;
+  box-shadow: 0 2px 12px 0 rgba(59,130,246,0.12);
+  background: linear-gradient(120deg, var(--primary-600), var(--success-500));
+}
+
+/* ===== TEKS HARGA DAN FITUR ===== */
+.produk-harga {
+  font-size: 1.13rem;
+  font-weight: 800;
+  color: var(--primary-700);
+  letter-spacing:-.5px;
+}
+.produk-harga span {
+  font-size: 1.01rem;
+  color: var(--gray-500);
+  font-family: var(--font-primary);
+}
+.produk-list {margin: .7rem auto 1.1rem auto;max-width:240px;}
+.produk-list li {margin-bottom:.28rem;}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 991px) {
+  .produk-section-title {font-size:1.19rem;}
+  .produk-feature-card {padding: 1.1rem 0.7rem 1rem 0.7rem;}
+  .produk-feature-ikon {font-size: 1.12rem;width: 32px;height: 32px;}
+  .produk-hero-section {
+    padding: 2rem 0 1rem 0;
+    margin-bottom: 1rem;
+  }
+  .produk-grid-section {
+    margin-top: -0.5rem !important;
+  }
+}
+@media (max-width: 767px) {
+  .produk-hero-section {
+    border-radius: 0 0 1rem 1rem;
+    padding: 1.5rem 0 1.5rem 0;
+    min-height: unset;
+    margin-bottom: 1.5rem;
+  }
+  .produk-grid-section {
+    margin-top: 1rem !important;
+  }
+  .produk-section-title {
+    font-size: 1.08rem;
+    gap: .6rem;
+  }
+  .produk-feature-card {
+    padding: 0.9rem 0.5rem 0.7rem 0.5rem;
+    min-height: unset;
+  }
+  .produk-feature-ikon {font-size: .98rem;width: 28px;height: 28px;}
+  .produk-list {max-width:100%;}
+  .produk-badge {font-size:.83rem;}
+  .produk-harga {font-size:.98rem;}
+  /* grid 1 kolom di mobile */
+  .row.g-4 > [class*="col-"] {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+}
+
+/* ===== DARK MODE ===== */
+[data-theme="dark"] .produk-feature-card {
+  background: rgba(31,41,55,0.98);
+  color: var(--gray-100);
+  border: 1.5px solid var(--gray-700);
+}
+[data-theme="dark"] .produk-section-title {color:var(--gray-100);}
+[data-theme="dark"] .produk-hero-section {
+  background: linear-gradient(120deg,#111827 0,#1f2937 80%);
+}
