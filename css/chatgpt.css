@@ -1,0 +1,32 @@
+.chatgpt-card {
+  background: #fff;
+  border: 1.5px solid #e3eaf6;
+  box-shadow: 0 3px 18px #c7e1fd22;
+  transition: box-shadow .17s;
+}
+.chatgpt-card:focus-within {
+  box-shadow: 0 0 0 2px #a7f3d0;
+}
+.chatgpt-response-card {
+  border-left: 6px solid #60a5fa;
+  background: linear-gradient(92deg,#f8fafc,#f1f5fd 85%);
+  word-break: break-word;
+  white-space: pre-line;
+  transition: box-shadow .16s;
+}
+#sessionTag {
+  letter-spacing: 0.03em;
+  font-size: 1em;
+}
+#chatResult {
+  min-height: 2.6em;
+}
+textarea#textInput:focus,
+input#promptInput:focus,
+input#sessionInput:focus {
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 2px #bae6fd;
+}
+@media (max-width:600px) {
+  .chatgpt-card { padding: 1.1em!important; }
+}
