@@ -54,13 +54,3 @@ body {
   .result-json { padding: 1em 0.6em; font-size: 0.95em; }
   textarea.form-control { font-size: .97em; padding: .95em .7em; }
 }
-
-.navbar {
-  padding: 1rem 0 !important;
-  height: 95px !important;
-  min-height: 95px !important;
-}
-.navbar-brand img {
-  height: 38px !important;
-  max-height: 100%;
-}

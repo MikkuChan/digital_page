@@ -1,0 +1,18 @@
+{
+  "vmess": {
+    "endpoint": "http://bot.vpnluxury.web.id:5888/createvmess",
+    "auth": "fadzvpn"
+  },
+  "vless": {
+    "endpoint": "http://bot.vpnluxury.web.id:5888/createvless",
+    "auth": "fadzvpn"
+  },
+  "trojan": {
+    "endpoint": "http://bot.vpnluxury.web.id:5888/createtrojan",
+    "auth": "fadzvpn"
+  },
+  "ssh": {
+    "endpoint": "http://bot.vpnluxury.web.id:5888/createssh",
+    "auth": "fadzvpn"
+  }
+}

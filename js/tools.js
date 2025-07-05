@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const tools = [
     {
       title: "Clash Config Converter",
-      desc: "Konversi file config Clash (.yaml) ke V2Ray, SSR, Shadowsocks, OpenVPN, dsb. Drag & drop, mudah & cepat.",
+      desc: "Converter v2ray ke Format OpenClash, Tanpa Ribet & cepat.",
       icon: "bi bi-shuffle",
       url: "clash-converter.html",
       badge: "Populer",
@@ -10,24 +10,25 @@ document.addEventListener('DOMContentLoaded', function () {
     },
     {
       title: "Auto Configuration Generator",
-      desc: "Buat file config VPN (V2Ray, SSH, SSR) otomatis. Parameter lengkap, support multi device.",
+      desc: "Konfigurasikan Akun VPN (VMESS, VLESS, TROJAN) secara otomatis untuk berbagai kebutuhan dengan mudah!",
       icon: "bi bi-lightning-charge-fill",
-      url: "auto-config.html",
-      badge: "Baru",
+      url: "autoconfiguration.html",
+      badge: "Config",
       gradient: "green"
     },
     {
-      title: "Base64 Encoder / Decoder",
-      desc: "Encode/decode string ke/dari Base64. Praktis untuk config, password, atau script.",
+      title: "Json Converter",
+      desc: "Konversi link VMESS, VLESS, atau TROJAN ke format JSON config Sing-box sekali klik. Praktis!",
       icon: "bi bi-file-earmark-code-fill",
-      url: "base64.html",
+      url: "json-converter.html",
+      badge: "NekoBox",
       gradient: "orange"
     },
     {
       title: "UUID Generator",
       desc: "Generate UUID unik untuk V2Ray, SSH, database, dsb. Bisa copy otomatis.",
       icon: "bi bi-123",
-      url: "uuid-gen.html",
+      url: "uuid.html",
       badge: "Gratis",
       gradient: "purple"
     },
