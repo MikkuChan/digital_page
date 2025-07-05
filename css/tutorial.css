@@ -1,0 +1,257 @@
+.tutorial-hero-section {
+  padding: 2.3rem 0 1.2rem 0;
+  border-radius: 0 0 2rem 2rem;
+  background: linear-gradient(120deg,#eff6ff 0,#f3f4f6 70%);
+  margin-bottom: 0;
+}
+.badge-tutorial {
+  background: linear-gradient(90deg,var(--primary-600),var(--success-500));
+  color: #fff;
+  border-radius: 2em;
+  font-weight: 600;
+  font-family: var(--font-display);
+  letter-spacing: .01em;
+  box-shadow: 0 2px 8px 0 rgba(59,130,246,0.07);
+  display: inline-flex;
+  align-items: center;
+  gap: .5em;
+}
+.tutorial-toc-bar {
+  border-bottom: 1px solid var(--gray-200);
+  background: #fff;
+  z-index: 10;
+}
+/* --- TOC Bar Responsive --- */
+.tutorial-toc-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary-100) var(--gray-100);
+  gap: 10px !important;
+  padding-bottom: 0.1rem;
+  padding-top: 0.1rem;
+}
+.tutorial-toc-scroll::-webkit-scrollbar {
+  height: 6px;
+  background: var(--gray-100);
+}
+.tutorial-toc-scroll::-webkit-scrollbar-thumb {
+  background: var(--primary-100);
+  border-radius: 4px;
+}
+.btn-toc {
+  background: var(--primary-50);
+  color: var(--primary-700);
+  border: none;
+  font-family: var(--font-display);
+  font-weight: 600;
+  padding: .45em 1.05em;
+  font-size: 1.04rem;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  border-radius: 100px;
+  min-width: 0;
+  transition: background .13s,color .13s;
+  box-shadow: 0 2px 9px 0 rgba(59,130,246,0.06);
+  white-space: nowrap;
+}
+.btn-toc i {
+  font-size: 1.12em;
+  flex-shrink: 0;
+  margin-right: 5px;
+}
+.btn-toc.active, .btn-toc:focus, .btn-toc:hover {
+  background: linear-gradient(90deg,#0ea5e9,#22c55e);
+  color: #fff !important;
+  box-shadow: 0 4px 18px 0 rgba(59,130,246,0.13);
+}
+@media (max-width: 600px) {
+  .btn-toc {
+    font-size: .98rem;
+    padding: .43em .86em;
+    min-width: 95px;
+    max-width: 94vw;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+  .btn-toc i {
+    margin-right: 4px;
+    font-size: 1em;
+  }
+}
+
+/* --- Card, Step, Accordion --- */
+.tutorial-accordion .accordion-item {
+  border-radius: 1.2rem;
+  overflow: hidden;
+  border: none;
+  background: none;
+}
+.tutorial-accordion .accordion-button {
+  font-family: var(--font-display);
+  font-size: 1.13rem;
+  border: none;
+  border-radius: 1.1rem 1.1rem 0 0;
+  background: linear-gradient(90deg, var(--primary-50), #fff 60%);
+  box-shadow: none;
+  transition: background .18s;
+  padding-top: 1.15em;
+  padding-bottom: 1.15em;
+  align-items: center;
+}
+.tutorial-icon {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: .9em;
+  font-size: 1.4rem;
+  color: #fff;
+  margin-right: 1px;
+  box-shadow: 0 2px 10px 0 rgba(59,130,246,0.10);
+}
+/* --- Perbedaan Nekobox & HTTP Custom --- */
+.tutorial-nekobox .tutorial-icon,
+.tutorial-nekobox .step-badge {
+  background: linear-gradient(90deg, #3b82f6 0%, #06d6a0 100%) !important;
+  color: #fff;
+}
+.tutorial-nekobox .badge {
+  background: #22c55e !important;
+  color: #fff;
+}
+.tutorial-httpcustom .tutorial-icon,
+.tutorial-httpcustom .step-badge {
+  background: linear-gradient(90deg, #06d6a0 0%, #3b82f6 100%) !important;
+  color: #fff;
+}
+.tutorial-httpcustom .badge {
+  background: #2563eb !important;
+  color: #fff;
+}
+/* --- Step Badge Style --- */
+.step-badge {
+  min-width: 38px;
+  height: 38px;
+  border-radius: 1em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.23rem;
+  margin-right: .5em;
+  color: #fff;
+  box-shadow: 0 1px 7px 0 rgba(59,130,246,0.15);
+  margin-top: 2px;
+}
+.tutorial-step-card {
+  display: flex;
+  align-items: flex-start;
+  background: #fff;
+  border-radius: 1.1rem;
+  box-shadow: 0 3px 13px 0 rgba(59,130,246,0.07);
+  padding: 1.1rem 1rem .7rem 1.2rem;
+  margin-bottom: .7rem;
+  gap: 1.1rem;
+  position: relative;
+  transition: box-shadow .14s;
+}
+.tutorial-step-card:hover, .tutorial-step-card.active {
+  box-shadow: 0 10px 34px 0 rgba(59,130,246,0.14), 0 2px 8px 0 rgba(16,185,129,0.06);
+  border:1.2px solid var(--primary-500);
+  z-index: 2;
+}
+.step-content {
+  flex: 1;
+}
+.step-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.07rem;
+  color: var(--primary-700);
+  margin-bottom: .13em;
+  letter-spacing: -.01em;
+}
+.step-desc {
+  color: var(--gray-600);
+  font-size: .98rem;
+  margin-bottom: .28em;
+}
+.tutorial-step-card img {
+  border-radius: .7em;
+  box-shadow: 0 2px 9px 0 rgba(59,130,246,0.08);
+  margin-top: .35em;
+  max-width: 160px;
+  max-height: 90px;
+}
+.tutorial-step-card .ratio {
+  margin-top: .7em;
+}
+.tutorial-img {
+  display: block;
+  margin: 0.7em auto 0.2em auto;
+  max-width: 98%;
+  width: 420px;
+  border-radius: 1em;
+  box-shadow: 0 4px 16px 0 rgba(59,130,246,0.13);
+}
+.tutorial-video-wrap {
+  margin: 0.5em auto 0 auto;
+  width: 100%;
+  max-width: 700px;
+}
+
+/* --- Responsive --- */
+@media (max-width: 991px) {
+  .tutorial-hero-section {padding: 1.4rem 0 .5rem 0;}
+  .tutorial-accordion .accordion-button {font-size: 1.03rem;}
+  .btn-toc {font-size: .99rem;}
+  .tutorial-step-card {padding: .7rem .5rem .5rem .7rem;}
+  .step-badge {font-size: 1.05rem; min-width: 30px; height: 30px;}
+}
+@media (max-width: 575px) {
+  .tutorial-accordion .accordion-button {font-size: .99rem;}
+  .tutorial-step-card img {max-width: 100px; max-height: 68px;}
+  .tutorial-img { width: 100%; max-width: 99vw; }
+  .tutorial-video-wrap { max-width: 99vw; }
+}
+@media (max-width: 600px) {
+  .tutorial-nekobox .step-badge,
+  .tutorial-httpcustom .step-badge {
+    min-width: 28px;
+    height: 28px;
+    font-size: .95rem;
+  }
+}
+/* --- Dark Mode Support --- */
+[data-theme="dark"] .badge-tutorial {background: linear-gradient(90deg,var(--primary-900),var(--success-500));}
+[data-theme="dark"] .tutorial-toc-bar,
+[data-theme="dark"] .tutorial-step-card,
+[data-theme="dark"] .tutorial-accordion .accordion-button,
+[data-theme="dark"] .accordion-body {
+  background: #181f31;
+  color: var(--gray-100);
+}
+[data-theme="dark"] .step-title {color: var(--gray-100);}
+[data-theme="dark"] .tutorial-step-card:hover, 
+[data-theme="dark"] .tutorial-step-card.active {
+  border:1.2px solid var(--primary-500);
+  background: #1e293b;
+}
+
+/* --- Wrap List Download Agar Tidak Overflow di Mobile --- */
+.tutorial-step-card .download-list {
+  padding-left: 1.1em;
+  margin-bottom: 0.6em;
+  margin-top: 0.3em;
+  font-size: .97rem;
+  max-width: 100%;
+}
+.tutorial-step-card .download-list li,
+.tutorial-step-card .download-list a {
+  word-break: break-all;
+  overflow-wrap: anywhere;
+  white-space: normal !important;
+  font-weight: 500;
+}

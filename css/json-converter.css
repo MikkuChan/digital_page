@@ -1,0 +1,66 @@
+:root {
+  --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body {
+  background: #f8f9fa;
+}
+
+.json-converter-hero {
+  background: linear-gradient(180deg, rgba(249,250,251,1) 65%, rgba(224,242,254,0.6) 100%);
+}
+.json-converter-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  border: 1px solid #e9ecef;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+.json-converter-card:hover {
+  box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+  transform: translateY(-2px);
+}
+.form-control {
+  border-radius: 12px;
+  border: 2px solid #e9ecef;
+  font-size: 0.97rem;
+}
+.result-json {
+  background: #f8f9fa;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  padding: 20px;
+  font-family: 'JetBrains Mono', 'Fira Mono', 'Space Grotesk', monospace;
+  font-size: 1em;
+  max-height: 400px;
+  overflow-y: auto;
+}
+.json-actions .btn {
+  border-radius: 1.5em;
+  font-weight: 600;
+  letter-spacing: 0;
+  margin-bottom: 5px;
+}
+.error-list {
+  color: #d94d4d;
+  font-size: 1.01em;
+  margin-top: -0.8em;
+}
+@media (max-width: 600px) {
+  .json-converter-card { padding: 1.2em 0.7em; }
+  .result-json { padding: 1em 0.6em; font-size: 0.95em; }
+  textarea.form-control { font-size: .97em; padding: .95em .7em; }
+}
+
+.navbar {
+  padding: 1rem 0 !important;
+  height: 95px !important;
+  min-height: 95px !important;
+}
+.navbar-brand img {
+  height: 38px !important;
+  max-height: 100%;
+}

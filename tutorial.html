@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="id" class="light-mode">
+<head>
+  <meta charset="UTF-8">
+  <title>Tutorial Digital – fadzdigital</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Panduan step by step produk fadzdigital: VPN, Bot, VPS, dsb. Lengkap gambar & video, font sama dengan homepage.">
+  <link rel="icon" href="https://raw.githubusercontent.com/fadzdigital/image/main/favicon.ico">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="css/style.css" rel="stylesheet">
+  <link href="css/tutorial.css" rel="stylesheet">
+  <style>
+    :root {
+      --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-display: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    body { font-family: var(--font-primary);}
+    .font-display { font-family: var(--font-display);}
+    .modal-img-zoom {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(20,20,20,0.88);
+    }
+    .modal-img-zoom img {
+      max-width: 98vw;
+      max-height: 90vh;
+      border-radius: 1.1em;
+      box-shadow: 0 4px 32px 0 rgba(30,58,138,0.18);
+      object-fit: contain;
+    }
+    /* Perbedaan Nekobox dan HTTP Custom step badge & icon */
+    .tutorial-nekobox .tutorial-icon, .tutorial-nekobox .step-badge {
+      background: linear-gradient(90deg, #3b82f6 0%, #06d6a0 100%) !important;
+      color: #fff;
+    }
+    .tutorial-nekobox .badge {
+      background: #22c55e !important;
+      color: #fff;
+    }
+    .tutorial-httpcustom .tutorial-icon, .tutorial-httpcustom .step-badge {
+      background: linear-gradient(90deg, #06d6a0 0%, #3b82f6 100%) !important;
+      color: #fff;
+    }
+    .tutorial-httpcustom .badge {
+      background: #2563eb !important;
+      color: #fff;
+    }
+    @media (max-width: 600px) {
+      .tutorial-nekobox .step-badge,
+      .tutorial-httpcustom .step-badge {
+        min-width: 28px;
+        height: 28px;
+        font-size: .95rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar copy homepage -->
+  <nav class="navbar navbar-expand-lg fixed-top">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
+        <img src="https://raw.githubusercontent.com/fadzdigital/image/main/fadzdigital.png" alt="fadzdigital Logo" style="height:38px; width:auto; object-fit:contain;" />
+        <span class="text-gradient" style="font-size:2rem; font-weight:700;">fadzdigital</span>
+      </a>
+      <button class="navbar-toggler border-0 p-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav mx-auto">
+          <li class="nav-item"><a class="nav-link" href="index.html">Beranda</a></li>
+          <li class="nav-item"><a class="nav-link" href="index.html#features">Fitur</a></li>
+          <li class="nav-item"><a class="nav-link" href="produk.html">Produk</a></li>
+          <li class="nav-item"><a class="nav-link active" href="tutorial.html">Tutorial</a></li>
+          <li class="nav-item"><a class="nav-link" href="tools.html">Tools</a></li>
+          <li class="nav-item"><a class="nav-link" href="index.html#contact">Kontak</a></li>
+        </ul>
+        <div class="d-flex align-items-center gap-3">
+          <button class="theme-toggle" id="themeToggle" aria-label="Toggle tema"></button>
+          <a href="https://wa.me/6285727035336" class="btn btn-success d-none d-lg-inline-flex">WhatsApp</a>
+          <a href="https://t.me/fadzdigital" class="btn btn-primary">Telegram</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main style="margin-top:90px;min-height:100vh;">
+    <!-- HERO TUTORIAL -->
+    <section class="tutorial-hero-section text-center font-display">
+  <div class="container position-relative" style="z-index:1;">
+    <span class="badge-tutorial mb-3 px-3 py-2" style="font-size:1rem;">
+      <i class="bi bi-journal-bookmark-fill me-2"></i>Pusat Tutorial Step by Step
+    </span>
+    <h1 class="display-5 fw-bold mb-3" style="line-height:1.12;">
+      <span class="text-gradient">Tutorial Digital</span> fadzdigital
+    </h1>
+    <p class="lead" style="max-width:680px;margin:auto;font-family:var(--font-primary);font-size:1.18rem;">
+      Temukan panduan <b>step-by-step</b> lengkap untuk semua produk <span class="text-gradient" style="font-weight:600;">fadzdigital</span>.<br>
+      Klik salah satu tutorial di bawah untuk melihat detail langkahnya.<br>
+      <span class="d-inline-block mt-1">
+        <i class="bi bi-image me-1 text-primary"></i>
+        Setiap langkah bisa <b>klik gambar</b> untuk memperbesar.
+        <span class="mx-2">|</span>
+        <i class="bi bi-camera-reels text-success"></i>
+        <b>Dukungan video tutorial</b> juga tersedia!
+      </span>
+    </p>
+    <div class="mt-2 small text-secondary" style="font-family:var(--font-primary);">
+      Panduan selalu diupdate. <span class="text-success">Support pemula & user advance</span>.<br>
+      Butuh bantuan? <a href="https://t.me/fadzdigital" class="text-primary text-decoration-underline">Chat Admin</a> langsung.
+    </div>
+  </div>
+</section>
+
+
+    <!-- TOC Bar -->
+    <nav class="tutorial-toc-bar sticky-top bg-white shadow-sm">
+  <div class="container px-0">
+    <div class="d-flex flex-nowrap overflow-auto gap-2 py-2 tutorial-toc-scroll">
+      <a href="#tutorial_nekoboxRun" class="btn btn-toc rounded-pill active"><i class="bi bi-shield-lock-fill"></i><span>Nekobox VPN</span></a>
+      <a href="#tutorial_httpcustomRun" class="btn btn-toc rounded-pill"><i class="bi bi-puzzle-fill"></i><span>HTTP Custom</span></a>
+      <a href="#tutorial_v2boxRun" class="btn btn-toc rounded-pill"><i class="bi bi-box"></i><span>V2Box</span></a>
+      <a href="#tutorial_karingRun" class="btn btn-toc rounded-pill"><i class="bi bi-link-45deg"></i><span>Karing</span></a>
+    </div>
+  </div>
+</nav>
+
+
+    <!-- ACCORDION TUTORIAL -->
+    <section class="container" style="max-width:900px;">
+      <div class="accordion tutorial-accordion mt-4 mb-5" id="accordionTutorial">
+
+        <!-- Tutorial 1: Nekobox VPN Android -->
+        <div class="accordion-item tutorial-nekobox mb-4">
+          <h2 class="accordion-header" id="headingNekobox">
+            <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#tutorial_nekoboxRun" aria-expanded="false" aria-controls="tutorial_nekoboxRun">
+              <span class="me-2 tutorial-icon"><i class="bi bi-shield-lock-fill"></i></span>
+              Nekobox VPN Android <span class="badge ms-2">Tutorial Lengkap</span>
+            </button>
+          </h2>
+          <div id="tutorial_nekoboxRun" class="accordion-collapse collapse" aria-labelledby="headingNekobox" data-bs-parent="#accordionTutorial">
+            <div class="accordion-body">
+              <div class="tutorial-desc mb-3">
+                <b>Apa itu tutorial ini?</b><br>
+                Panduan lengkap step-by-step untuk memasukkan akun <b>V2ray</b> ke aplikasi <b>Nekobox</b> di Android.<br>
+                <span style="color:var(--gray-700);">Ikuti setiap langkah agar VPN bisa langsung terkoneksi tanpa error!</span>
+              </div>
+              <div class="row g-3 tutorial-steps-list">
+                <!-- STEP 1 -->
+                <div class="col-12">
+                  <div class="tutorial-step-card">
+                    <div class="step-badge">1</div>
+                    <div class="step-content">
+                      <div class="step-title">Download Nekobox APK</div>
+                      <div class="step-desc">
+                        Download aplikasi Nekobox versi terbaru melalui link berikut:<br>
+                        <a href="https://sfile.mobi/37tioKULVmJ" target="_blank" rel="noopener" class="fw-bold text-primary">Nekopoi</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- STEP 2 -->
+                <div class="col-12">
+                  <div class="tutorial-step-card">
+                    <div class="step-badge">2</div>
+                    <div class="step-content">
+                      <div class="step-title">Salin Akun VPN dari Admin</div>
+                      <div class="step-desc">
+                        Setelah pembelian, <b>admin akan mengirim akun VPN</b> (biasanya berupa kode panjang).<br>
+                        <span class="text-success">Copy seluruh teks akun tersebut sampai selesai, tanpa terpotong.</span>
+                      </div>
+                      <img class="tutorial-img img-zoom" src="https://raw.githubusercontent.com/fadzdigital/imagine/main/nekobox_1.png" alt="Salin Akun VPN" loading="lazy">
+                      <div class="small text-muted">Contoh tampilan akun V2ray dari admin</div>
+                    </div>
+                  </div>
+                </div>
+                <!-- STEP 3 -->
+                <div class="col-12">
+                  <div class="tutorial-step-card">
+                    <div class="step-badge">3</div>
+                    <div class="step-content">
+                      <div class="step-title">Buka Nekobox & Klik Ikon (+)</div>
+                      <div class="step-desc">
+                        Jalankan aplikasi Nekobox di HP Anda, lalu tap ikon <b>+</b> di kanan atas.<br>
+                        Ini untuk menambah akun baru ke aplikasi.
+                      </div>
+                      <img class="tutorial-img img-zoom" src="https://raw.githubusercontent.com/fadzdigital/imagine/refs/heads/main/nekobox_2.png" alt="Tambah Profil Nekobox" loading="lazy">
+                    </div>
+                  </div>
+                </div>
+                <!-- STEP 4 -->
+                <div class="col-12">
+                  <div class="tutorial-step-card">
+                    <div class="step-badge">4</div>
+                    <div class="step-content">
+                      <div class="step-title">Import Akun dari Clipboard</div>
+                      <div class="step-desc">
+                        Pilih menu <b>"Import from clipboard"</b>.<br>
+                        Akun VPN yang tadi Anda copy akan otomatis masuk ke daftar.
+                      </div>
+                      <img class="tutorial-img img-zoom" src="https://raw.githubusercontent.com/fadzdigital/imagine/refs/heads/main/nekobox_3.png" alt="Import from Clipboard" loading="lazy">
+                    </div>
+                  </div>
+                </div>
+                <!-- STEP 5 -->
+                <div class="col-12">
+                  <div class="tutorial-step-card">
+                    <div class="step-badge">5</div>
+                    <div class="step-content">
+                      <div class="step-title">Pilih Nama Akun VPN Anda</div>
+                      <div class="step-desc">
+                        Setelah muncul di daftar, <b>tap sekali pada nama akun VPN</b> yang sudah terimport.<br>
+                        Nama akun biasanya sesuai detail yang diberikan admin.
+                      </div>
+                      <img class="tutorial-img img-zoom" src="https://raw.githubusercontent.com/fadzdigital/imagine/refs/heads/main/nekobox_4.png" alt="Pilih nama akun VPN" loading="lazy">
+                    </div>
+                  </div>
+                </div>
+                <!-- STEP 6 -->
+                <div class="col-12">
+                  <div class="tutorial-step-card">
+                    <div class="step-badge">6</div>
+                    <div class="step-content">
+                      <div class="step-title">Klik Ikon Pesawat Kertas (Connect)</div>
+                      <div class="step-desc">
+                        Untuk mulai koneksi, tap ikon <b>pesawat kertas</b> di bagian bawah aplikasi.<br>
+                        Tunggu sampai status berubah “Terhubung / Connected”.
+                      </div>
+                      <img class="tutorial-img img-zoom" src="https://raw.githubusercontent.com/fadzdigital/imagine/refs/heads/main/nekobox_5.png" alt="Connect Nekobox" loading="lazy">
+                    </div>
+                  </div>
+                </div>
+                <!-- STEP 7 VIDEO -->
+                <div class="col-12">
+                  <div class="tutorial-step-card">
+                    <div class="step-badge"><i class="bi bi-play-btn-fill"></i></div>
+                    <div class="step-content">
+                      <div class="step-title">Video Panduan Lengkap (Jika Masih Bingung)</div>
+                      <div class="step-desc mb-2">Lihat video tutorial agar makin jelas langkah-langkahnya:</div>
+                      <div class="tutorial-video-wrap">
+                        <video controls style="width:100%;max-width:700px;border-radius:1em;box-shadow:0 2px 20px 0 rgba(59,130,246,.12);background:#000;" poster="https://raw.githubusercontent.com/fadzdigital/imagine/main/nekobox_4.png">
+                          <source src="https://appetiser-dev-space.sgp1.digitaloceanspaces.com/357bb15a85daf526409818ba.mp4" type="video/mp4">
+                          Video tidak didukung browser Anda.
+                        </video>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- CATATAN -->
+                <div class="col-12">
+                  <div class="alert alert-info shadow-sm p-3" style="border-radius:.8em;">
+                    <b>Catatan:</b><br>
+                    <ul class="mb-0" style="padding-left:1.4em;">
+                      <li>Untuk tes apakah sudah connect, buka aplikasi YouTube. Jika bisa streaming, berarti sudah terhubung!</li>
+                      <li>Jika belum connect, ulangi langkah di atas atau aktifkan mode pesawat sebentar lalu matikan lagi.</li>
+                      <li class="text-danger fw-bold">Dilarang multi device! Satu akun hanya boleh dipakai di satu HP. Akun yang dipakai di beberapa perangkat akan langsung diblokir permanen.</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tutorial 2: HTTP Custom Android -->
+        <div class="accordion-item tutorial-httpcustom mb-4">
+          <h2 class="accordion-header" id="headingHttpCustom">
+            <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#tutorial_httpcustomRun" aria-expanded="false" aria-controls="tutorial_httpcustomRun">
+              <span class="me-2 tutorial-icon"><i class="bi bi-puzzle-fill"></i></span>
+              HTTP Custom Android <span class="badge ms-2">Tutorial Lengkap</span>
+            </button>
+          </h2>
+          <div id="tutorial_httpcustomRun" class="accordion-collapse collapse" aria-labelledby="headingHttpCustom" data-bs-parent="#accordionTutorial">
+            <div class="accordion-body">
+              <div class="tutorial-desc mb-3">
+                <b>Apa itu tutorial ini?</b><br>
+                Panduan lengkap <b>pasang akun V2ray</b> di aplikasi <b>HTTP Custom</b> Android.<br>
+                Ikuti setiap langkah sampai VPN aktif tanpa error.
+              </div>
+              <div class="row g-3 tutorial-steps-list">
+                <!-- STEP 1 -->
+                <div class="col-12">
+                  <div class="tutorial-step-card">
+                    <div class="step-badge"><i class="bi bi-download"></i></div>
+                    <div class="step-content">
+                      <div class="step-title">Download HTTP Custom APK</div>
+                      <div class="step-desc">
+                        Unduh aplikasi HTTP Custom resmi dari Play Store:<br>
+                        <a href="https://play.google.com/store/apps/details?id=xyz.easypro.httpcustom" target="_blank" rel="noopener" class="fw-bold text-success">Http Custom</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- STEP 2 -->
+                <div class="col-12">
+                  <div class="tutorial-step-card">
+                    <div class="step-badge"><i class="bi bi-clipboard"></i></div>
+                    <div class="step-content">
+                      <div class="step-title">Salin Akun VPN dari Admin</div>
+                      <div class="step-desc">
+                        Setelah membeli akun, <b>admin akan mengirimkan detail akun VPN</b>.<br>
+                        <span class="text-success">Copy seluruh kode akun, jangan ada yang terlewat.</span>
+                      </div>
+                      <img class="tutorial-img img-zoom" src="https://raw.githubusercontent.com/fadzdigital/imagine/main/nekobox_1.png" alt="Salin Akun VPN" loading="lazy">
+                      <div class="small text-muted">Contoh tampilan akun V2ray</div>
+                    </div>
+                  </div>
+                </div>
+                <!-- STEP 3 -->
+                <div class="col-12">
+                  <div class="tutorial-step-card">
+                    <div class="step-badge"><i class="bi bi-three-dots"></i></div>
+                    <div class="step-content">
+                      <div class="step-title">Buka HTTP Custom & Klik Ikon Titik 3</div>
+                      <div class="step-desc">
+                        Jalankan aplikasi, lalu tap ikon <b>tiga titik di kanan atas</b>.<br>
+                        Lihat contoh gambar berikut.
+                      </div>
+                      <img class="tutorial-img img-zoom" src="https://raw.githubusercontent.com/fadzdigital/imagine/refs/heads/main/httpcustom_2.png" alt="Titik 3 HTTP Custom" loading="lazy">
+                    </div>
+                  </div>
+                </div>
+                <!-- STEP 4 -->
+                <div class="col-12">
+                  <div class="tutorial-step-card">
+                    <div class="step-badge"><i class="bi bi-x-circle"></i></div>
+                    <div class="step-content">
+                      <div class="step-title">Reset/Clear Config Lama</div>
+                      <div class="step-desc">
+                        Pilih menu <b>Clear/Reset Config</b> agar pengaturan lama terhapus.<br>
+                        Tujuannya agar akun baru tidak bentrok config sebelumnya.
+                      </div>
+                      <img class="tutorial-img img-zoom" src="https://raw.githubusercontent.com/fadzdigital/imagine/refs/heads/main/httpcustom_3.png" alt="Reset Config HTTP Custom" loading="lazy">
+                    </div>
+                  </div>
+                </div>
+                <!-- STEP 5 -->
+                <div class="col-12">
+                  <div class="tutorial-step-card">
+                    <div class="step-badge"><i class="bi bi-puzzle-fill"></i></div>
+                    <div class="step-content">
+                      <div class="step-title">Klik Ikon Puzzle</div>
+                      <div class="step-desc">
+                        Tap ikon <b>puzzle</b> untuk membuka pengaturan V2ray.<br>
+                        Contohnya seperti di bawah ini:
+                      </div>
+                      <img class="tutorial-img img-zoom" src="https://raw.githubusercontent.com/fadzdigital/imagine/refs/heads/main/httpcustom_4.png" alt="Ikon Puzzle HTTP Custom" loading="lazy">
+                    </div>
+                  </div>
+                </div>
+                <!-- STEP 6 -->
+                <div class="col-12">
+                  <div class="tutorial-step-card">
+                    <div class="step-badge"><i class="bi bi-gear-fill"></i></div>
+                    <div class="step-content">
+                      <div class="step-title">Masuk ke V2ray Settings</div>
+                      <div class="step-desc">
+                        Pilih menu <b>V2ray Settings</b> di dalam aplikasi.
+                      </div>
+                      <img class="tutorial-img img-zoom" src="https://raw.githubusercontent.com/fadzdigital/imagine/refs/heads/main/httpcustom_5.png" alt="V2ray Settings HTTP Custom" loading="lazy">
+                    </div>
+                  </div>
+                </div>
+                <!-- STEP 7 -->
+                <div class="col-12">
+                  <div class="tutorial-step-card">
+                    <div class="step-badge"><i class="bi bi-clipboard-plus"></i></div>
+                    <div class="step-content">
+                      <div class="step-title">Tempel Akun VPN</div>
+                      <div class="step-desc">
+                        Tekan ikon <b>tempel/paste</b> untuk memasukkan akun yang sudah disalin.
+                      </div>
+                      <img class="tutorial-img img-zoom" src="https://raw.githubusercontent.com/fadzdigital/imagine/refs/heads/main/httpcustom_6.png" alt="Tempel Akun VPN" loading="lazy">
+                    </div>
+                  </div>
+                </div>
+                <!-- STEP 8 -->
+                <div class="col-12">
+                  <div class="tutorial-step-card">
+                    <div class="step-badge"><i class="bi bi-arrow-left-circle-fill"></i></div>
+                    <div class="step-content">
+                      <div class="step-title">Kembali ke Halaman Awal</div>
+                      <div class="step-desc">
+                        Jika akun sudah tertambahkan, klik tombol <b>back/kembali</b> di pojok atas.<br>
+                        Lihat contoh gambar berikut.
+                      </div>
+                      <img class="tutorial-img img-zoom" src="https://raw.githubusercontent.com/fadzdigital/imagine/refs/heads/main/httpcustom_7.png" alt="Back HTTP Custom" loading="lazy">
+                    </div>
+                  </div>
+                </div>
+                <!-- STEP 9 -->
+                <div class="col-12">
+                  <div class="tutorial-step-card">
+                    <div class="step-badge"><i class="bi bi-check2-square"></i></div>
+                    <div class="step-content">
+                      <div class="step-title">Centang Opsi yang Dibutuhkan</div>
+                      <div class="step-desc">
+                        Centang <b>V2ray</b> dan <b>Enable DNS</b> sesuai gambar.<br>
+                        Pastikan kedua opsi ini aktif agar koneksi lancar.
+                      </div>
+                      <img class="tutorial-img img-zoom" src="https://raw.githubusercontent.com/fadzdigital/imagine/refs/heads/main/httpcustom_8.png" alt="Centang V2ray Enable DNS" loading="lazy">
+                    </div>
+                  </div>
+                </div>
+                <!-- STEP 10 -->
+                <div class="col-12">
+                  <div class="tutorial-step-card">
+                    <div class="step-badge"><i class="bi bi-play-btn-fill"></i></div>
+                    <div class="step-content">
+                      <div class="step-title">Klik Tombol Connect</div>
+                      <div class="step-desc">
+                        Tekan tombol <b>Connect</b> hingga muncul notifikasi "<b>HTTP Custom ready to use</b>".
+                      </div>
+                      <img class="tutorial-img img-zoom" src="https://raw.githubusercontent.com/fadzdigital/imagine/refs/heads/main/httpcustom_9.png" alt="Connect HTTP Custom" loading="lazy">
+                    </div>
+                  </div>
+                </div>
+                <!-- VIDEO -->
+                <div class="col-12">
+                  <div class="tutorial-step-card">
+                    <div class="step-badge"><i class="bi bi-camera-reels"></i></div>
+                    <div class="step-content">
+                      <div class="step-title">Video Panduan Lengkap (Jika Masih Bingung)</div>
+                      <div class="step-desc mb-2">Lihat video tutorial agar makin jelas langkah-langkahnya:</div>
+                      <div class="tutorial-video-wrap">
+                        <video controls style="width:100%;max-width:700px;border-radius:1em;box-shadow:0 2px 20px 0 rgba(59,130,246,.12);background:#000;" poster="https://raw.githubusercontent.com/fadzdigital/imagine/refs/heads/main/httpcustom_8.png">
+                          <source src="https://appetiser-dev-space.sgp1.digitaloceanspaces.com/40117f9bb01fc9cf39fc4f3e.mp4" type="video/mp4">
+                          Video tidak didukung browser Anda.
+                        </video>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- CATATAN -->
+                <div class="col-12">
+                  <div class="alert alert-info shadow-sm p-3" style="border-radius:.8em;">
+                    <b>Catatan:</b><br>
+                    <ul class="mb-0" style="padding-left:1.4em;">
+                      <li>Untuk tes apakah sudah connect, buka aplikasi YouTube. Jika bisa streaming, berarti sudah terhubung!</li>
+                      <li>Jika belum connect, ulangi langkah di atas atau aktifkan mode pesawat sebentar lalu matikan lagi.</li>
+                      <li class="text-danger fw-bold">Dilarang multi device! Satu akun hanya boleh dipakai di satu HP. Akun yang dipakai di beberapa perangkat akan langsung diblokir permanen.</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+     <!-- Tutorial 3: V2Box Android & iOS -->
+<div class="accordion-item tutorial-v2box mb-4">
+  <h2 class="accordion-header" id="headingV2Box">
+    <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#tutorial_v2boxRun" aria-expanded="false" aria-controls="tutorial_v2boxRun">
+      <span class="me-2 tutorial-icon" style="background:linear-gradient(90deg,#8b5cf6,#06b6d4)!important;">
+        <i class="bi bi-box"></i>
+      </span>
+      V2Box Android & iOS <span class="badge ms-2" style="background:#8b5cf6;">Tutorial Lengkap</span>
+    </button>
+  </h2>
+  <div id="tutorial_v2boxRun" class="accordion-collapse collapse" aria-labelledby="headingV2Box" data-bs-parent="#accordionTutorial">
+    <div class="accordion-body">
+      <div class="tutorial-desc mb-3">
+        <b>Apa itu tutorial ini?</b><br>
+        Panduan lengkap untuk memasang dan menjalankan akun <b>V2ray</b> di aplikasi <b>V2Box</b> pada perangkat Android & iOS.<br>
+        Ikuti langkah-langkah di bawah agar VPN berjalan lancar tanpa error!
+      </div>
+      <div class="row g-3 tutorial-steps-list">
+        <!-- STEP 1 -->
+        <div class="col-12">
+          <div class="tutorial-step-card">
+            <div class="step-badge" style="background:linear-gradient(90deg,#8b5cf6,#06b6d4)!important;">1</div>
+            <div class="step-content">
+              <div class="step-title">Download Aplikasi V2Box</div>
+              <div class="step-desc">
+                Unduh aplikasi V2Box sesuai perangkat kamu:
+                <ul class="mb-1" style="margin-top:.5em;">
+                  <li><b>iOS/iPhone:</b> 
+                    <a href="https://apps.apple.com/us/app/v2box-v2ray-client/id6446814690" target="_blank" class="fw-bold text-primary">App Store (V2Box iOS)</a>
+                  </li>
+                  <li><b>Android:</b> 
+                    <a href="https://play.google.com/store/apps/details?id=dev.hexasoftware.v2box" target="_blank" class="fw-bold text-success">Google Play (V2Box Android)</a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- STEP 2 -->
+        <div class="col-12">
+          <div class="tutorial-step-card">
+            <div class="step-badge" style="background:linear-gradient(90deg,#8b5cf6,#06b6d4)!important;">2</div>
+            <div class="step-content">
+              <div class="step-title">Salin Akun VPN dari Admin</div>
+              <div class="step-desc">
+                Setelah pembelian, <b>admin/seller akan mengirimkan akun VPN</b>.<br>
+                <span class="text-success">Copy seluruh detail akun dengan benar agar tidak terjadi kesalahan.</span>
+              </div>
+              <img class="tutorial-img img-zoom" src="https://raw.githubusercontent.com/fadzdigital/imagine/main/v2box_1.png" alt="Salin Akun VPN V2Box" loading="lazy">
+            </div>
+          </div>
+        </div>
+        <!-- STEP 3 -->
+        <div class="col-12">
+          <div class="tutorial-step-card">
+            <div class="step-badge" style="background:linear-gradient(90deg,#8b5cf6,#06b6d4)!important;">3</div>
+            <div class="step-content">
+              <div class="step-title">Buka Aplikasi V2Box</div>
+              <div class="step-desc">
+                Jalankan aplikasi V2Box.<br>
+                Tekan ikon <b>menu (burger)</b> di bagian bawah tengah, seperti gambar berikut:
+              </div>
+              <img class="tutorial-img img-zoom" src="https://raw.githubusercontent.com/fadzdigital/imagine/refs/heads/main/v2box_2.png" alt="Menu Burger V2Box" loading="lazy">
+            </div>
+          </div>
+        </div>
+        <!-- STEP 4 -->
+        <div class="col-12">
+          <div class="tutorial-step-card">
+            <div class="step-badge" style="background:linear-gradient(90deg,#8b5cf6,#06b6d4)!important;">4</div>
+            <div class="step-content">
+              <div class="step-title">Tambah Akun VPN Baru</div>
+              <div class="step-desc">
+                Klik ikon <b>+</b> di bagian atas kanan untuk menambah akun VPN baru. Lihat contoh berikut:
+              </div>
+              <img class="tutorial-img img-zoom" src="https://raw.githubusercontent.com/fadzdigital/imagine/refs/heads/main/v2box_3.png" alt="Tambah Akun V2Box" loading="lazy">
+            </div>
+          </div>
+        </div>
+        <!-- STEP 5 -->
+        <div class="col-12">
+          <div class="tutorial-step-card">
+            <div class="step-badge" style="background:linear-gradient(90deg,#8b5cf6,#06b6d4)!important;">5</div>
+            <div class="step-content">
+              <div class="step-title">Import Akun dari Clipboard</div>
+              <div class="step-desc">
+                Pilih menu <b>"Import v2ray URI from clipboard"</b> untuk menambahkan akun VPN dari data yang sudah kamu salin tadi.
+              </div>
+              <img class="tutorial-img img-zoom" src="https://raw.githubusercontent.com/fadzdigital/imagine/refs/heads/main/v2box_4.png" alt="Import Akun V2Box" loading="lazy">
+            </div>
+          </div>
+        </div>
+        <!-- STEP 6 -->
+        <div class="col-12">
+          <div class="tutorial-step-card">
+            <div class="step-badge" style="background:linear-gradient(90deg,#8b5cf6,#06b6d4)!important;">6</div>
+            <div class="step-content">
+              <div class="step-title">Pilih Nama Akun VPN</div>
+              <div class="step-desc">
+                Jika akun sudah tertambah, klik/tap sekali pada <b>nama akun VPN</b> yang sesuai dengan detail dari admin.<br>
+                Lihat contoh di gambar:
+              </div>
+              <img class="tutorial-img img-zoom" src="https://raw.githubusercontent.com/fadzdigital/imagine/refs/heads/main/v2box_5.png" alt="Pilih Nama Akun V2Box" loading="lazy">
+            </div>
+          </div>
+        </div>
+        <!-- STEP 7 -->
+        <div class="col-12">
+          <div class="tutorial-step-card">
+            <div class="step-badge" style="background:linear-gradient(90deg,#8b5cf6,#06b6d4)!important;">7</div>
+            <div class="step-content">
+              <div class="step-title">Mulai Koneksi VPN</div>
+              <div class="step-desc">
+                <b>Android:</b> Klik tombol <b>Connect</b> untuk mulai menghubungkan VPN.<br>
+                <b>iOS:</b> Geser tombol switch <b>Connect</b> hingga status berubah menjadi aktif.
+              </div>
+              <img class="tutorial-img img-zoom" src="https://raw.githubusercontent.com/fadzdigital/imagine/refs/heads/main/v2box_6.png" alt="Connect V2Box" loading="lazy">
+            </div>
+          </div>
+        </div>
+        <!-- STEP VIDEO -->
+        <div class="col-12">
+          <div class="tutorial-step-card">
+            <div class="step-badge" style="background:linear-gradient(90deg,#8b5cf6,#06b6d4)!important;">
+              <i class="bi bi-camera-reels"></i>
+            </div>
+            <div class="step-content">
+              <div class="step-title">Video Panduan Lengkap</div>
+              <div class="step-desc mb-2">
+                Masih bingung atau ingin melihat cara langsung? Tonton video berikut:
+              </div>
+              <div class="tutorial-video-wrap">
+                <video controls style="width:100%;max-width:700px;border-radius:1em;box-shadow:0 2px 20px 0 rgba(139,92,246,.10);background:#000;" poster="https://raw.githubusercontent.com/fadzdigital/imagine/refs/heads/main/v2box_5.png">
+                  <source src="https://appetiser-dev-space.sgp1.digitaloceanspaces.com/b4400bf96466f9c93c09c293.mp4" type="video/mp4">
+                  Video tidak didukung browser Anda.
+                </video>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- CATATAN -->
+        <div class="col-12">
+          <div class="alert alert-info shadow-sm p-3" style="border-radius:.8em;">
+            <b>Catatan:</b><br>
+            <ul class="mb-0" style="padding-left:1.4em;">
+              <li>Untuk tes koneksi, buka aplikasi YouTube. Jika bisa streaming, berarti sudah terhubung!</li>
+              <li>Jika belum connect, ulangi langkah di atas atau aktifkan mode pesawat sebentar lalu matikan lagi.</li>
+              <li class="text-danger fw-bold">Dilarang multi device! Satu akun hanya boleh dipakai di satu perangkat. Akun yang dipakai di beberapa device akan langsung diblokir permanen.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Tutorial 4: Karing Android & iOS -->
+<div class="accordion-item tutorial-karing mb-4">
+  <h2 class="accordion-header" id="headingKaring">
+    <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#tutorial_karingRun" aria-expanded="false" aria-controls="tutorial_karingRun">
+      <span class="me-2 tutorial-icon" style="background:linear-gradient(90deg,#0ea5e9,#3b82f6)!important;">
+        <i class="bi bi-link-45deg"></i>
+      </span>
+      Karing Android & iOS <span class="badge ms-2" style="background:#0ea5e9;">Tutorial Lengkap</span>
+    </button>
+  </h2>
+  <div id="tutorial_karingRun" class="accordion-collapse collapse" aria-labelledby="headingKaring" data-bs-parent="#accordionTutorial">
+    <div class="accordion-body">
+      <div class="tutorial-desc mb-3">
+        <b>Apa itu tutorial ini?</b><br>
+        Panduan lengkap instalasi dan import akun <b>V2ray</b> ke aplikasi <b>Karing</b> untuk Android & iOS.<br>
+        Ikuti semua langkah di bawah supaya VPN langsung aktif dan tanpa error.
+      </div>
+      <div class="row g-3 tutorial-steps-list">
+        <!-- STEP 1 -->
+<div class="col-12">
+  <div class="tutorial-step-card">
+    <div class="step-badge" style="background:linear-gradient(90deg,#0ea5e9,#3b82f6)!important;">1</div>
+    <div class="step-content">
+      <div class="step-title">Download Aplikasi Karing</div>
+      <div class="step-desc">
+        Silakan unduh aplikasi Karing sesuai perangkat yang kamu gunakan:
+        <ul class="download-list">
+          <li>
+            <b>iOS / iPhone:</b>
+            <a href="https://apps.apple.com/us/app/karing/id6472431552" target="_blank" rel="noopener" class="fw-bold text-primary">Karing iphone</a>
+          </li>
+          <li>
+            <b>Android Universal:</b>
+            <a href="https://github.com/KaringX/karing/releases/download/v1.2.0.810/karing_1.2.0.810_android_arm.apk" target="_blank" rel="noopener" class="fw-bold text-success">karing_Universal</a>
+          </li>
+          <li>
+            <b>Android 64-bit:</b>
+            <a href="https://github.com/KaringX/karing/releases/download/v1.2.0.810/karing_1.2.0.810_android_arm64-v8a.apk" target="_blank" rel="noopener" class="fw-bold text-success">karing_64</a>
+          </li>
+          <li>
+            <b>Android 32-bit:</b>
+            <a href="https://github.com/KaringX/karing/releases/download/v1.2.0.810/karing_1.2.0.810_android_armeabi-v7a.apk" target="_blank" rel="noopener" class="fw-bold text-success">karing_32</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+        <!-- STEP 2 -->
+        <div class="col-12">
+          <div class="tutorial-step-card">
+            <div class="step-badge" style="background:linear-gradient(90deg,#0ea5e9,#3b82f6)!important;">2</div>
+            <div class="step-content">
+              <div class="step-title">Salin Akun VPN dari Admin</div>
+              <div class="step-desc">
+                Setelah pembelian, <b>admin atau seller akan mengirimkan detail akun VPN</b>.<br>
+                <span class="text-success">Copy seluruh akun VPN dengan benar agar tidak terjadi error.</span>
+              </div>
+              <img class="tutorial-img img-zoom" src="https://raw.githubusercontent.com/fadzdigital/imagine/main/karing_1.png" alt="Salin Akun VPN Karing" loading="lazy">
+            </div>
+          </div>
+        </div>
+        <!-- STEP 3 -->
+        <div class="col-12">
+          <div class="tutorial-step-card">
+            <div class="step-badge" style="background:linear-gradient(90deg,#0ea5e9,#3b82f6)!important;">3</div>
+            <div class="step-content">
+              <div class="step-title">Buka Aplikasi Karing</div>
+              <div class="step-desc">
+                Jalankan aplikasi Karing, lalu klik ikon <b>+</b> di bagian kiri atas untuk menambah akun baru.<br>
+                Lihat contoh pada gambar berikut:
+              </div>
+              <img class="tutorial-img img-zoom" src="https://raw.githubusercontent.com/fadzdigital/imagine/refs/heads/main/karing_2.png" alt="Tambah Akun Karing" loading="lazy">
+            </div>
+          </div>
+        </div>
+        <!-- STEP 4 -->
+        <div class="col-12">
+          <div class="tutorial-step-card">
+            <div class="step-badge" style="background:linear-gradient(90deg,#0ea5e9,#3b82f6)!important;">4</div>
+            <div class="step-content">
+              <div class="step-title">Import Akun dari Clipboard</div>
+              <div class="step-desc">
+                Pilih menu <b>"Import From Clipboard"</b> agar akun VPN yang telah kamu copy otomatis masuk ke daftar.
+              </div>
+              <img class="tutorial-img img-zoom" src="https://raw.githubusercontent.com/fadzdigital/imagine/refs/heads/main/karing_3.png" alt="Import Akun Karing" loading="lazy">
+            </div>
+          </div>
+        </div>
+        <!-- STEP 5 -->
+        <div class="col-12">
+          <div class="tutorial-step-card">
+            <div class="step-badge" style="background:linear-gradient(90deg,#0ea5e9,#3b82f6)!important;">5</div>
+            <div class="step-content">
+              <div class="step-title">Beri Nama Akun di Kolom Remark</div>
+              <div class="step-desc">
+                Setelah akun masuk, isikan <b>nama akun VPN</b> di bagian <b>"Remark"</b> agar mudah dikenali.
+              </div>
+              <img class="tutorial-img img-zoom" src="https://raw.githubusercontent.com/fadzdigital/imagine/refs/heads/main/karing_4.png" alt="Isi Remark Karing" loading="lazy">
+            </div>
+          </div>
+        </div>
+        <!-- STEP 6 -->
+        <div class="col-12">
+          <div class="tutorial-step-card">
+            <div class="step-badge" style="background:linear-gradient(90deg,#0ea5e9,#3b82f6)!important;">6</div>
+            <div class="step-content">
+              <div class="step-title">Simpan Akun VPN</div>
+              <div class="step-desc">
+                Klik ikon <b>centang</b> untuk menyimpan akun VPN yang sudah diisi. Lihat contoh di gambar:
+              </div>
+              <img class="tutorial-img img-zoom" src="https://raw.githubusercontent.com/fadzdigital/imagine/refs/heads/main/karing_5.png" alt="Save Akun Karing" loading="lazy">
+            </div>
+          </div>
+        </div>
+        <!-- STEP 7 -->
+        <div class="col-12">
+          <div class="tutorial-step-card">
+            <div class="step-badge" style="background:linear-gradient(90deg,#0ea5e9,#3b82f6)!important;">7</div>
+            <div class="step-content">
+              <div class="step-title">Akun Berhasil Ditambahkan</div>
+              <div class="step-desc">
+                Jika muncul popup "<b>Added successfully</b>", klik <b>OK</b> untuk melanjutkan.
+              </div>
+              <img class="tutorial-img img-zoom" src="https://raw.githubusercontent.com/fadzdigital/imagine/refs/heads/main/karing_6.png" alt="Added Successfully Karing" loading="lazy">
+            </div>
+          </div>
+        </div>
+        <!-- STEP 8 -->
+        <div class="col-12">
+          <div class="tutorial-step-card">
+            <div class="step-badge" style="background:linear-gradient(90deg,#0ea5e9,#3b82f6)!important;">8</div>
+            <div class="step-content">
+              <div class="step-title">Kembali ke Halaman Utama</div>
+              <div class="step-desc">
+                Tekan tombol <b>Back</b> untuk kembali ke halaman utama aplikasi.
+              </div>
+              <img class="tutorial-img img-zoom" src="https://raw.githubusercontent.com/fadzdigital/imagine/refs/heads/main/karing_7.png" alt="Back Karing" loading="lazy">
+            </div>
+          </div>
+        </div>
+        <!-- STEP 9 -->
+        <div class="col-12">
+          <div class="tutorial-step-card">
+            <div class="step-badge" style="background:linear-gradient(90deg,#0ea5e9,#3b82f6)!important;">9</div>
+            <div class="step-content">
+              <div class="step-title">Pilih Akun di Daftar Grid</div>
+              <div class="step-desc">
+                Klik ikon <b>grid</b> untuk melihat daftar akun VPN.<br>
+                Pastikan akun yang barusan kamu tambahkan sudah tampil di daftar, dengan nama sesuai Remark.
+              </div>
+              <img class="tutorial-img img-zoom" src="https://raw.githubusercontent.com/fadzdigital/imagine/refs/heads/main/karing_8.png" alt="Grid Karing" loading="lazy">
+            </div>
+          </div>
+        </div>
+        <!-- STEP 10 -->
+        <div class="col-12">
+          <div class="tutorial-step-card">
+            <div class="step-badge" style="background:linear-gradient(90deg,#0ea5e9,#3b82f6)!important;">10</div>
+            <div class="step-content">
+              <div class="step-title">Pastikan Akun Sudah Terpilih</div>
+              <div class="step-desc">
+                Pastikan hanya akun VPN yang barusan ditambahkan (nama sesuai Remark) yang kamu pilih sebelum konek.
+              </div>
+              <img class="tutorial-img img-zoom" src="https://raw.githubusercontent.com/fadzdigital/imagine/refs/heads/main/karing_9.png" alt="Pilih Akun Karing" loading="lazy">
+            </div>
+          </div>
+        </div>
+        <!-- STEP 11 -->
+        <div class="col-12">
+          <div class="tutorial-step-card">
+            <div class="step-badge" style="background:linear-gradient(90deg,#0ea5e9,#3b82f6)!important;">11</div>
+            <div class="step-content">
+              <div class="step-title">Mulai Koneksi VPN</div>
+              <div class="step-desc">
+                Klik tombol <b>Connect</b> untuk mulai menjalankan VPN.<br>
+                Jika berhasil, status akan berubah terkoneksi.
+              </div>
+              <img class="tutorial-img img-zoom" src="https://raw.githubusercontent.com/fadzdigital/imagine/refs/heads/main/karing_10.png" alt="Connect Karing" loading="lazy">
+            </div>
+          </div>
+        </div>
+        <!-- STEP VIDEO AWAL SETUP -->
+        <div class="col-12">
+          <div class="tutorial-step-card">
+            <div class="step-badge" style="background:linear-gradient(90deg,#0ea5e9,#3b82f6)!important;">
+              <i class="bi bi-camera-reels"></i>
+            </div>
+            <div class="step-content">
+              <div class="step-title">Video Setup Awal Karing</div>
+              <div class="step-desc mb-2">
+                Masih bingung saat instalasi awal aplikasi Karing? Tonton video ini:
+              </div>
+              <div class="tutorial-video-wrap">
+                <video controls style="width:100%;max-width:700px;border-radius:1em;box-shadow:0 2px 20px 0 rgba(14,165,233,.10);background:#000;" poster="https://raw.githubusercontent.com/fadzdigital/imagine/refs/heads/main/karing_1.png">
+                  <source src="https://appetiser-dev-space.sgp1.digitaloceanspaces.com/572612a2a0d64dba816f0354.mp4" type="video/mp4">
+                  Video tidak didukung browser Anda.
+                </video>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- STEP VIDEO TAMBAH AKUN & START -->
+        <div class="col-12">
+          <div class="tutorial-step-card">
+            <div class="step-badge" style="background:linear-gradient(90deg,#0ea5e9,#3b82f6)!important;">
+              <i class="bi bi-camera-reels"></i>
+            </div>
+            <div class="step-content">
+              <div class="step-title">Video Tambah Akun & Start VPN</div>
+              <div class="step-desc mb-2">
+                Masih belum jelas cara menambahkan akun VPN dan menjalankannya? Tonton video berikut:
+              </div>
+              <div class="tutorial-video-wrap">
+                <video controls style="width:100%;max-width:700px;border-radius:1em;box-shadow:0 2px 20px 0 rgba(14,165,233,.10);background:#000;" poster="https://raw.githubusercontent.com/fadzdigital/imagine/refs/heads/main/karing_10.png">
+                  <source src="https://appetiser-dev-space.sgp1.digitaloceanspaces.com/35e606e5679881ff4ec78198.mp4" type="video/mp4">
+                  Video tidak didukung browser Anda.
+                </video>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- CATATAN -->
+        <div class="col-12">
+          <div class="alert alert-info shadow-sm p-3" style="border-radius:.8em;">
+            <b>Catatan:</b><br>
+            <ul class="mb-0" style="padding-left:1.4em;">
+              <li>Untuk tes koneksi, buka aplikasi YouTube. Jika bisa streaming, berarti sudah terhubung!</li>
+              <li>Jika belum connect, ulangi langkah di atas atau aktifkan mode pesawat sebentar lalu matikan lagi.</li>
+              <li class="text-danger fw-bold">Dilarang multi device! Satu akun hanya boleh dipakai di satu perangkat. Akun yang dipakai di beberapa device akan langsung diblokir permanen.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+        <!-- Tambahkan accordion-item baru di sini jika ada tutorial lain -->
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal Gambar Zoom -->
+  <div class="modal fade" id="modalImgZoom" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-img-zoom">
+      <img src="" alt="Preview Gambar Tutorial" id="imgModalSrc" class="img-fluid">
+    </div>
+  </div>
+
+  <!-- Footer (copy homepage) -->
+  <footer class="py-4" style="background: var(--gray-900); color:var(--gray-100)">
+    <div class="container text-center">
+      <div class="mb-2">
+        <span class="fw-bold font-display text-gradient" style="font-size:1.3rem;">fadzdigital</span>
+      </div>
+      <div class="mb-2 small">
+        &copy; 2025 fadzdigital. All rights reserved.<br>
+        Made with 💙 in Indonesia
+      </div>
+      <div>
+        <a href="index.html" class="text-primary small text-decoration-none mx-2">Beranda</a>
+        <a href="produk.html" class="text-primary small text-decoration-none mx-2">Produk</a>
+        <a href="tutorial.html" class="text-primary small text-decoration-none mx-2">Tutorial</a>
+        <a href="tools.html" class="text-primary small text-decoration-none mx-2">Tools</a>
+        <a href="index.html#contact" class="text-primary small text-decoration-none mx-2">Kontak</a>
+      </div>
+    </div>
+  </footer>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/tutorial.js"></script>
+  <script>
+    AOS.init({ once: true, duration: 900, offset: 80 });
+    // Gambar zoom modal
+    document.addEventListener('DOMContentLoaded', function () {
+      document.querySelectorAll('.img-zoom').forEach(function(img) {
+        img.style.cursor = 'zoom-in';
+        img.addEventListener('click', function() {
+          document.getElementById('imgModalSrc').src = img.src;
+          var modal = new bootstrap.Modal(document.getElementById('modalImgZoom'));
+          modal.show();
+        });
+      });
+      document.getElementById('modalImgZoom').addEventListener('hidden.bs.modal', function() {
+        document.getElementById('imgModalSrc').src = '';
+      });
+    });
+  </script>
+</body>
+</html>

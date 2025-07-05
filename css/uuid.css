@@ -1,0 +1,140 @@
+.uuid-hero-section {
+  background: linear-gradient(135deg, #f9fafb 70%, #e7f7fa 100%);
+  padding-top: 0.6rem;
+  padding-bottom: 1.6rem;
+}
+.uuid-badge-gradient {
+  background: linear-gradient(90deg,#2062f7,#0bbd88 70%,#f3af16 100%);
+  color: #fff;
+  border-radius: 1.5em;
+  font-weight: 600;
+  box-shadow: 0 4px 18px 0 rgba(43,123,255,0.11);
+  font-size: 1.06rem;
+  letter-spacing: 0.01em;
+  display: inline-flex;
+  align-items: center;
+  gap: .5em;
+}
+.gradient-headline {
+  background: linear-gradient(92deg, #2062f7 10%, #19c37d 55%, #f3af16 80%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+.uuid-card {
+  border-radius: 1.55rem;
+  background: rgba(255,255,255,0.99);
+  box-shadow: 0 4px 28px 0 rgba(59,130,246,0.09);
+  border: 1.5px solid #e2e8f0;
+  min-height: 405px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  transition: box-shadow .18s, border-color .18s, transform .18s;
+  position: relative;
+  overflow: hidden;
+}
+.uuid-card:focus-within, .uuid-card:hover {
+  box-shadow: 0 10px 54px 0 rgba(43,155,255,0.14),0 1.5px 2.5px 0 rgba(39,68,108,.07);
+  border-color: #3b82f6;
+  transform: translateY(-6px) scale(1.018);
+  z-index: 1;
+}
+.uuid-card-glow {
+  position: absolute;
+  z-index: 0;
+  top: -30px; left: -35px;
+  width: 170px; height: 170px;
+  background: radial-gradient(circle at 40% 20%, #46b0fb33 0%, transparent 75%);
+  opacity: .6;
+  filter: blur(2px);
+  pointer-events: none;
+  transition: opacity .22s;
+}
+.uuid-v1-card .uuid-card-glow { background: radial-gradient(circle at 40% 20%, #59a5fb33 0%, transparent 80%);}
+.uuid-v4-card .uuid-card-glow { background: radial-gradient(circle at 50% 30%, #19c37d3a 0%, transparent 80%);}
+.uuid-v7-card .uuid-card-glow { background: radial-gradient(circle at 60% 20%, #ffba0833 0%, transparent 80%);}
+
+.uuid-card-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--primary-700,#2563eb);
+  letter-spacing: -.01em;
+  z-index:1;
+}
+.uuid-card-desc {
+  font-size: 1.02rem;
+  color: var(--gray-600,#4b5563);
+  z-index:1;
+}
+.uuid-card-icon {
+  font-size: 2.85rem;
+  margin-bottom: 2px;
+  line-height: 1;
+  display: inline-block;
+  z-index:1;
+  transition: transform .12s;
+}
+.uuid-v1-card .uuid-card-icon { color: var(--primary-600,#2563eb);}
+.uuid-v4-card .uuid-card-icon { color: var(--success-500,#10b981);}
+.uuid-v7-card .uuid-card-icon { color: var(--warning-500,#f59e0b);}
+.uuid-card:hover .uuid-card-icon, .uuid-card:focus-within .uuid-card-icon {
+  transform: scale(1.15) rotate(-6deg);
+}
+
+.uuid-generate-btn {
+  font-weight: 700;
+  letter-spacing: .02em;
+  font-size: 1.02rem;
+  border-radius: 999px;
+  box-shadow: 0 2px 16px 0 rgba(39, 120, 255, .10);
+  transition: transform .11s, box-shadow .17s;
+}
+.uuid-generate-btn:active { transform: scale(0.97);}
+.uuid-v1-card .btn-primary {
+  background: linear-gradient(90deg, #2563eb, #3b82f6 80%);
+  border: none;
+}
+.uuid-v4-card .btn-success {
+  background: linear-gradient(90deg,#10b981,#059669 80%);
+  border:none;
+}
+.uuid-v7-card .btn-warning {
+  background: linear-gradient(90deg,#fbbf24,#f59e0b 80%);
+  border:none;
+  color:#333;
+}
+
+.uuid-input {
+  font-size: 1.15rem;
+  background: rgba(243,244,246,.78);
+  font-family: var(--font-mono,monospace);
+  letter-spacing: .8px;
+  border-radius: .7em 0 0 .7em;
+  z-index:1;
+}
+.input-group .btn {
+  border-radius: 0 .7em .7em 0;
+  z-index:1;
+}
+[data-theme="dark"] .uuid-card {
+  background: rgba(31,41,55,0.99);
+  color: var(--gray-100,#f9fafb);
+  border-color: var(--gray-700,#374151);
+}
+[data-theme="dark"] .uuid-input {
+  background: rgba(31,41,55,.90);
+  color: #fff;
+}
+[data-theme="dark"] .uuid-card-title { color: var(--primary-100,#dbeafe);}
+[data-theme="dark"] .uuid-card-desc { color: var(--gray-300,#d1d5db);}
+@media (max-width:900px) {
+  .uuid-card { min-height: 0; }
+}
+@media (max-width: 767px) {
+  .uuid-card { margin-bottom: 1.2rem; }
+  .uuid-card-title { font-size: 1.16rem; }
+  .uuid-card-icon { font-size: 2.2rem; }
+}
