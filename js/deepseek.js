@@ -1,6 +1,6 @@
 // --- Load API config
 let apiCfg = {};
-fetch('json/api.json')
+fetch('https://mikkuchans.techfadz02.workers.dev')
   .then(r => r.json())
   .then(cfg => apiCfg = cfg);
 
