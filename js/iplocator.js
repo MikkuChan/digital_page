@@ -15,7 +15,7 @@ function showToast(msg) {
 }
 
 // --- Endpoint proxy worker (ganti jika endpoint Worker-mu beda)
-const endpoint = "https://mikkuchans.techfadz02.workers.dev/iplocator?ip=";
+const endpoint = "https://api.fadzdigital.dpdns.org/iplocator?ip=";
 
 const ipForm = document.getElementById('ipForm');
 const ipInput = document.getElementById('ipInput');

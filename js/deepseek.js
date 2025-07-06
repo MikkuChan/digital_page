@@ -1,5 +1,5 @@
 // --- Konfigurasi Endpoint Proxy Worker (ganti dengan Worker-mu jika perlu)
-const API_DEEPSEEK = "https://mikkuchans.techfadz02.workers.dev/deepseek";
+const API_DEEPSEEK = "https://api.fadzdigital.dpdns.org/deepseek";
 
 // --- Unique ID Generator
 function randomSessionId() {
