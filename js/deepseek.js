@@ -1,4 +1,4 @@
-// --- Konfigurasi Endpoint Proxy Worker
+// --- Konfigurasi Endpoint Proxy Worker (ganti dengan Worker-mu jika perlu)
 const API_DEEPSEEK = "https://mikkuchans.techfadz02.workers.dev/deepseek";
 
 // --- Unique ID Generator
@@ -45,7 +45,7 @@ document.getElementById("deepseekForm").onsubmit = async function(e) {
     if (data.status && data.answer) {
       document.getElementById("resultSection").style.display = "block";
       document.getElementById("deepseekResult").innerText = data.answer;
-      document.getElementById("sessionTag").textContent = "Session: " + (data.session||session);
+      document.getElementById("sessionTag").textContent = "Session: " + (data.session || session);
       document.getElementById("errorSection").style.display = "none";
     } else {
       showError(data.answer || "Gagal mendapatkan jawaban dari DeepSeek!");
