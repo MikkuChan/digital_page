@@ -1,53 +1,63 @@
 document.addEventListener('DOMContentLoaded', function () {
   const tools = [
-    {
-      title: "Clash Config Converter",
-      desc: "Converter v2ray ke Format OpenClash, Tanpa Ribet & cepat.",
-      icon: "bi bi-shuffle",
-      url: "clash-converter.html",
-      badge: "Populer",
-      gradient: "blue"
-    },
-    {
-      title: "Auto Configuration Generator",
-      desc: "Konfigurasikan Akun VPN (VMESS, VLESS, TROJAN) secara otomatis untuk berbagai kebutuhan dengan mudah!",
-      icon: "bi bi-lightning-charge-fill",
-      url: "autoconfiguration.html",
-      badge: "Config",
-      gradient: "green"
-    },
-    {
-      title: "Json Converter",
-      desc: "Konversi link VMESS, VLESS, atau TROJAN ke format JSON config Sing-box sekali klik. Praktis!",
-      icon: "bi bi-file-earmark-code-fill",
-      url: "json-converter.html",
-      badge: "NekoBox",
-      gradient: "orange"
-    },
-    {
-      title: "UUID Generator",
-      desc: "Generate UUID unik untuk V2Ray, SSH, database, dsb. Bisa copy otomatis.",
-      icon: "bi bi-123",
-      url: "uuid.html",
-      badge: "Gratis",
-      gradient: "purple"
-    },
-    {
-      title: "YAML Validator",
-      desc: "Cek validasi syntax YAML, langsung tampilkan error bila salah format.",
-      icon: "bi bi-list-check",
-      url: "yaml-validator.html",
-      gradient: "gray"
-    },
-    {
-      title: "Config Beautifier",
-      desc: "Rapikan config YAML/JSON supaya lebih enak dibaca & edit.",
-      icon: "bi bi-magic",
-      url: "beautifier.html",
-      badge: "Favorit",
-      gradient: "pink"
-    }
-  ];
+  {
+    title: "Clash Config Converter",
+    desc: "Converter v2ray ke Format OpenClash, Tanpa Ribet & cepat.",
+    icon: "bi bi-shuffle",
+    url: "clash-converter.html",
+    badge: "Populer",
+    gradient: "blue"
+  },
+  {
+    title: "Auto Configuration Generator",
+    desc: "Konfigurasikan Akun VPN (VMESS, VLESS, TROJAN) secara otomatis untuk berbagai kebutuhan dengan mudah!",
+    icon: "bi bi-lightning-charge-fill",
+    url: "autoconfiguration.html",
+    badge: "Config",
+    gradient: "green"
+  },
+  {
+    title: "Json Converter",
+    desc: "Konversi link VMESS, VLESS, atau TROJAN ke format JSON config Sing-box sekali klik. Praktis!",
+    icon: "bi bi-file-earmark-code-fill",
+    url: "json-converter.html",
+    badge: "NekoBox",
+    gradient: "orange"
+  },
+  {
+    title: "IP Locator",
+    desc: "Cari lokasi, kota, negara, ASN, provider, dan detail lengkap dari sebuah IP publik.",
+    icon: "bi bi-geo-alt-fill",
+    url: "iplocator.html",
+    badge: "Gratis",
+    gradient: "sky"
+  },
+  {
+    title: "ChatGPT AI",
+    desc: "Ngobrol, tanya apapun ke ChatGPT, bisa multi sesi, mudah di-copy dan responsif.",
+    icon: "bi bi-chat-dots-fill",
+    url: "chatgpt.html",
+    badge: "AI",
+    gradient: "purple"
+  },
+  {
+    title: "DeepSeek AI",
+    desc: "Tanya DeepSeek AI. Jawaban super cepat, siap bantu segala kebutuhan kamu!",
+    icon: "bi bi-robot",
+    url: "deepseek.html",
+    badge: "AI",
+    gradient: "cyan"
+  },
+  {
+    title: "UUID Generator",
+    desc: "Generate UUID unik untuk V2Ray, SSH, database, dsb. Bisa copy otomatis.",
+    icon: "bi bi-123",
+    url: "uuid.html",
+    badge: "Gratis",
+    gradient: "purple"
+  }
+];
+
 
   const toolsList = document.getElementById('toolsList');
   const toolsEmpty = document.getElementById('toolsEmptyResult');

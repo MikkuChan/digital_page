@@ -2,11 +2,11 @@
 <html lang="id" class="light-mode">
 <head>
   <meta charset="UTF-8">
-  <title>ChatGPT AI – fadzdigital</title>
+  <title>DeepSeek AI – fadzdigital</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="ChatGPT AI Web Tools. Ngobrol dan bertanya ke ChatGPT langsung dari browser dengan mudah!">
+  <meta name="description" content="Ngobrol & tanya ke DeepSeek AI, lebih cepat & responsif!">
   <link rel="icon" href="https://raw.githubusercontent.com/fadzdigital/image/main/favicon.ico">
-
+  
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -52,16 +52,16 @@
   </nav>
 
   <main style="margin-top:90px;min-height:100vh;">
-    <section class="chatgpt-hero text-center font-display py-5 mb-0" style="background: linear-gradient(180deg, #f9fafb 60%, #e0f2fe 100%);">
+    <section class="deepseek-hero text-center font-display py-5 mb-0" style="background: linear-gradient(180deg, #f9fafb 60%, #e0f2fe 100%);">
       <div class="container">
         <span class="badge-tools mb-4 px-4 py-2 fs-6 d-inline-flex align-items-center">
-          <i class="bi bi-chat-dots me-2"></i>ChatGPT Web
+          <i class="bi bi-robot me-2"></i>DeepSeek AI
         </span>
         <h1 class="display-5 fw-bold mb-3" style="letter-spacing:-1px; color: #333;">
-          Chat <span class="text-gradient" style="background: linear-gradient(90deg, #4285f4, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">ChatGPT</span> Indonesia
+          Tanya <span class="text-gradient" style="background: linear-gradient(90deg, #6366f1, #0ea5e9); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">DeepSeek</span> AI Web
         </h1>
         <p class="lead mx-auto mb-4" style="max-width:700px; font-size:1.1rem; color: #666;">
-          Ngobrol dengan ChatGPT langsung dari browser, lengkap dengan session ID unik, history percakapan, dan fitur copy!
+          AI canggih untuk bantu menjawab pertanyaanmu. Respons cepat, multi sesi, mudah di-copy!
         </p>
       </div>
     </section>
@@ -69,21 +69,13 @@
     <section class="container py-5">
       <div class="row justify-content-center">
         <div class="col-lg-8 col-md-10">
-          <div class="chatgpt-card p-4 mb-4 shadow rounded-4">
-            <form id="chatForm" autocomplete="off">
+          <div class="deepseek-card p-4 mb-4 shadow rounded-4">
+            <form id="deepseekForm" autocomplete="off">
               <div class="mb-3">
                 <label for="textInput" class="fw-semibold font-display mb-2" style="font-size:1.1em;">
-                  <i class="bi bi-chat-square-text text-primary me-1"></i> Pesan ke ChatGPT
+                  <i class="bi bi-chat-square-text text-primary me-1"></i> Pesan ke DeepSeek
                 </label>
                 <textarea id="textInput" rows="2" class="form-control shadow-sm" placeholder="Tulis pertanyaan atau pesan di sini..." required style="font-size:1.14em"></textarea>
-              </div>
-              <div class="mb-3">
-                <a class="text-primary small" data-bs-toggle="collapse" href="#promptArea" role="button" aria-expanded="false" aria-controls="promptArea">
-                  <i class="bi bi-chevron-down small"></i> Tambah Prompt/Konteks (Opsional)
-                </a>
-                <div class="collapse" id="promptArea">
-                  <input type="text" class="form-control mt-2" id="promptInput" placeholder="Contoh: Jawab sebagai guru kimia.">
-                </div>
               </div>
               <div class="row g-3 mb-3 align-items-center">
                 <div class="col-sm-7">
@@ -100,19 +92,19 @@
               </div>
               <div class="d-grid">
                 <button type="submit" class="btn btn-primary px-4 py-2 fw-bold" id="askBtn">
-                  <i class="bi bi-send me-2"></i>Tanya ChatGPT
+                  <i class="bi bi-send me-2"></i>Tanya DeepSeek
                 </button>
               </div>
             </form>
 
             <div class="mt-4" id="resultSection" style="display:none;">
               <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
-                <button class="btn btn-outline-success" id="copyChat">
+                <button class="btn btn-outline-success" id="copyDeepSeek">
                   <i class="bi bi-clipboard me-1"></i>Copy Jawaban
                 </button>
                 <span id="sessionTag" class="badge bg-info text-dark ms-auto"></span>
               </div>
-              <div class="chatgpt-response-card rounded-4 shadow-sm p-4 mb-2" id="chatResult" style="font-size:1.15em; background:#f5f8fb;"></div>
+              <div class="deepseek-response-card rounded-4 shadow-sm p-4 mb-2" id="deepseekResult" style="font-size:1.15em; background:#f5f8fb;"></div>
               <div id="errorSection" class="error-list mt-2" style="display:none;"></div>
             </div>
           </div>
@@ -140,6 +132,6 @@
     </div>
   </footer>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="js/chatgpt.js"></script>
+  <script src="js/deepseek.js"></script>
 </body>
 </html>

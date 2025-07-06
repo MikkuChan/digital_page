@@ -4,5 +4,8 @@
   },
   "chatgpt": {
     "endpoint": "https://apidl.asepharyana.cloud/api/ai/chatgpt"
+  },
+  "deepseek": {
+    "endpoint": "https://apidl.asepharyana.cloud/api/ai/deepseek"
   }
 }
