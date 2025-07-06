@@ -14,6 +14,9 @@ function showToast(msg) {
   setTimeout(() => { document.body.removeChild(toast); }, 1750);
 }
 
+// --- Endpoint proxy worker (ganti jika endpoint Worker-mu beda)
+const endpoint = "https://mikkuchans.techfadz02.workers.dev/iplocator?ip=";
+
 const ipForm = document.getElementById('ipForm');
 const ipInput = document.getElementById('ipInput');
 const lookupBtn = document.getElementById('lookupBtn');
@@ -22,11 +25,6 @@ const ipCardInfo = document.getElementById('ipCardInfo');
 const errorSection = document.getElementById('errorSection');
 const copyBtn = document.getElementById('copyResult');
 const mapsBtn = document.getElementById('mapsBtn');
-let endpoint = "";
-
-fetch('json/api.json')
-  .then(res => res.json())
-  .then(json => { endpoint = json.iplocator.endpoint; });
 
 ipForm.addEventListener('submit', function(e) {
   e.preventDefault();
