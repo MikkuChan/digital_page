@@ -1,13 +1,14 @@
-// --- Load API config
-let apiCfg = {};
-fetch('https://mikkuchans.techfadz02.workers.dev')
-  .then(r => r.json())
-  .then(cfg => apiCfg = cfg);
+// --- Konfigurasi Endpoint Proxy Worker
+const API_DEEPSEEK = "https://mikkuchans.techfadz02.workers.dev/deepseek";
 
 // --- Unique ID Generator
 function randomSessionId() {
-  return (Date.now().toString(36) + Math.random().toString(36).substring(2,14)).toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,16);
+  return (Date.now().toString(36) + Math.random().toString(36).substring(2,14))
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g,'')
+    .slice(0,16);
 }
+
 document.getElementById("generateSession").onclick = function(){
   document.getElementById("sessionInput").value = randomSessionId();
 };
@@ -33,8 +34,8 @@ document.getElementById("deepseekForm").onsubmit = async function(e) {
   document.getElementById("resultSection").style.display = "none";
   document.getElementById("errorSection").style.display = "none";
 
-  // Build url
-  let url = apiCfg.deepseek.endpoint + "?text=" + encodeURIComponent(text) + "&session=" + encodeURIComponent(session);
+  // Build URL ke Worker Proxy
+  let url = API_DEEPSEEK + "?text=" + encodeURIComponent(text) + "&session=" + encodeURIComponent(session);
 
   try {
     const resp = await fetch(url);
