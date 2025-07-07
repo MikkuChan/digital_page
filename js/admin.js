@@ -1,360 +1,380 @@
-const API_BASE = "https://apifadz-worker.YOURDOMAIN.workers.dev"; // GANTI ke worker-mu!
+// js/admin.js
+const API_BASE = "https://api-v1.fadzdigital.dpdns.org";
 const ADMIN_TOKEN_KEY = "fadzdigital_admin_token";
 
-// --- Alert Helper
-function showAlert(msg, type="info", target="#adminAlert", timeout=2300) {
-  const alert = document.createElement("div");
-  alert.className = `alert alert-${type} fw-bold`;
-  alert.innerHTML = msg;
-  document.querySelector(target).innerHTML = "";
-  document.querySelector(target).appendChild(alert);
-  if (timeout) setTimeout(()=>alert.remove(), timeout);
+// --- UTILS ---
+function showNotif(msg, type = "success") {
+  const c = document.createElement("div");
+  c.className = `alert alert-${type} fade show position-fixed`;
+  c.style = "top: 90px; right: 20px; min-width: 240px; z-index: 1999; box-shadow:0 8px 32px #0001";
+  c.innerHTML = msg;
+  document.body.appendChild(c);
+  setTimeout(() => c.remove(), 3000);
 }
 
-// --- Save Token Helper
+// --- LOGIN HANDLER ---
+const loginSection = document.getElementById("adminLoginSection");
+const panelSection = document.getElementById("adminPanelSection");
+const loginForm = document.getElementById("adminLoginForm");
+const loginError = document.getElementById("adminLoginError");
+const logoutBtn = document.getElementById("adminLogoutBtn");
+
 function saveAdminToken(token) {
   localStorage.setItem(ADMIN_TOKEN_KEY, token);
 }
 function getAdminToken() {
-  return localStorage.getItem(ADMIN_TOKEN_KEY);
+  return localStorage.getItem(ADMIN_TOKEN_KEY) || "";
 }
 function clearAdminToken() {
   localStorage.removeItem(ADMIN_TOKEN_KEY);
 }
 
-// --- LOGIN FORM HANDLER
-document.getElementById("adminLoginForm")?.addEventListener("submit", async e => {
+// --- ON LOAD, CEK LOGIN ---
+if (getAdminToken()) {
+  showPanel();
+} else {
+  showLogin();
+}
+
+function showLogin() {
+  loginSection.style.display = "";
+  panelSection.style.display = "none";
+}
+function showPanel() {
+  loginSection.style.display = "none";
+  panelSection.style.display = "";
+  loadUserList();
+  loadServerList();
+  loadLog();
+}
+
+// --- LOGIN FORM SUBMIT ---
+loginForm.onsubmit = async (e) => {
   e.preventDefault();
-  const user = document.getElementById("adminUsername").value.trim();
-  const pass = document.getElementById("adminPassword").value.trim();
-  if (!user || !pass) return showAlert("Isi username & password!", "danger");
-  document.getElementById("loginBtn").disabled = true;
+  loginError.classList.add("d-none");
+  loginForm.querySelector("button").disabled = true;
+  const username = document.getElementById("adminUser").value.trim();
+  const password = document.getElementById("adminPass").value.trim();
   try {
-    const res = await fetch(`${API_BASE}/api-admin/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ user, pass })
+    const res = await fetch(API_BASE + "/api-admin/list-user", {
+      headers: {
+        Authorization: "Bearer " + btoa(username + ":" + password + ":pinggulnya")
+      }
     });
-    const data = await res.json();
-    if (data.ok && data.token) {
-      saveAdminToken(data.token);
-      showAlert("Login berhasil!", "success");
-      setTimeout(()=>location.reload(), 900);
-    } else {
-      showAlert(data.error || "Login gagal!", "danger");
-    }
+    if (res.status === 403) throw new Error("Username/password salah.");
+    if (!res.ok) throw new Error("Gagal login admin.");
+    // --- LOGIN: worker cuma cek token, manual cek user/pw di sini ---
+    // Dapat token: encode base64(username:password:pinggulnya)
+    saveAdminToken(btoa(username + ":" + password + ":pinggulnya"));
+    showPanel();
+    showNotif("Berhasil login sebagai admin!");
+    loginForm.reset();
   } catch (err) {
-    showAlert("Gagal koneksi!", "danger");
+    loginError.textContent = err.message;
+    loginError.classList.remove("d-none");
   }
-  document.getElementById("loginBtn").disabled = false;
-});
+  loginForm.querySelector("button").disabled = false;
+};
 
-// --- LOGOUT HANDLER
-document.getElementById("logoutBtn")?.addEventListener("click", () => {
+// --- LOGOUT ---
+logoutBtn.onclick = () => {
   clearAdminToken();
-  showAlert("Logged out!", "success");
-  setTimeout(()=>location.reload(), 800);
+  showLogin();
+  showNotif("Logout admin.", "info");
+};
+
+// --- NAV TABS HANDLER ---
+document.querySelectorAll("#adminTabs .nav-link").forEach(btn => {
+  btn.onclick = function () {
+    document.querySelectorAll("#adminTabs .nav-link").forEach(b => b.classList.remove("active"));
+    this.classList.add("active");
+    const tab = this.dataset.tab;
+    document.querySelectorAll(".admin-tab-panel").forEach(p => p.classList.add("d-none"));
+    document.getElementById("tab-" + tab).classList.remove("d-none");
+    if (tab === "user") loadUserList();
+    if (tab === "server") loadServerList();
+    if (tab === "log") loadLog();
+  }
 });
 
-// --- AUTHTOKEN CHECKER
-async function checkAdminAuth() {
-  const token = getAdminToken();
-  if (!token) return false;
-  // Optionally, bisa cek ke /api-admin/check atau cukup token statis (ADMIN_TOKEN)
-  return true;
-}
-
-// --- INIT PANEL (AFTER LOGIN)
-async function loadAdminPanel() {
-  document.getElementById("adminLoginSection").classList.add("d-none");
-  document.getElementById("adminPanelSection").classList.remove("d-none");
-  document.getElementById("logoutBtn").classList.remove("d-none");
-  // Load user list (default)
-  await loadUserTab();
-  // Tab switching
-  document.querySelectorAll("#adminTab .nav-link").forEach(btn => {
-    btn.onclick = function() {
-      document.querySelectorAll("#adminTab .nav-link").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      document.querySelectorAll(".admin-tab").forEach(tab => tab.classList.add("d-none"));
-      document.getElementById("tab-" + btn.dataset.tab).classList.remove("d-none");
-      if (btn.dataset.tab === "user") loadUserTab();
-      if (btn.dataset.tab === "server") loadServerTab();
-      if (btn.dataset.tab === "varian") loadVarianTab();
-      if (btn.dataset.tab === "log") loadLogTab();
-    }
-  });
-}
-
-// ---- ACC USER TAB ----
-async function loadUserTab() {
-  const el = document.getElementById("tab-user");
-  el.innerHTML = `<div class="text-center my-4 text-muted"><i class="bi bi-hourglass-split"></i> Loading user ...</div>`;
-  try {
-    const res = await fetch(`${API_BASE}/api-admin/list-user`, {
-      headers: { Authorization: "Bearer " + getAdminToken() }
-    });
-    const data = await res.json();
-    if (data.ok && data.users) {
-      let html = `<h4>User Terdaftar</h4><table class="table table-striped mt-3"><thead>
-        <tr><th>Username</th><th>Email</th><th>Status</th><th>Saldo</th><th>Action</th></tr></thead><tbody>`;
-      data.users.forEach(u => {
-        html += `<tr>
-          <td>${u.username}</td>
-          <td>${u.email}</td>
-          <td>${u.status === "active" ? `<span class="badge bg-success">active</span>` : `<span class="badge bg-warning">pending</span>`}</td>
-          <td>Rp ${u.saldo?.toLocaleString()||0}</td>
-          <td>${u.status!=="active"?`<button class="btn btn-sm btn-primary accBtn" data-username="${u.username}">ACC</button>`:"-"}</td>
-        </tr>`;
-      });
-      html += `</tbody></table>`;
-      el.innerHTML = html;
-      document.querySelectorAll(".accBtn").forEach(btn => {
-        btn.onclick = async function() {
-          const username = btn.dataset.username;
-          btn.disabled = true;
-          await fetch(`${API_BASE}/api-admin/approve-user`, {
-            method: "POST",
-            headers: {
-              Authorization: "Bearer " + getAdminToken(),
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ username })
-          });
-          showAlert("Akun di-approve!", "success");
-          setTimeout(loadUserTab, 700);
-        }
-      });
-    } else {
-      el.innerHTML = `<div class="alert alert-danger">Gagal load user!</div>`;
-    }
-  } catch {
-    el.innerHTML = `<div class="alert alert-danger">Error koneksi!</div>`;
+// --- API CALLER ---
+async function callApi(path, opts = {}) {
+  const headers = opts.headers || {};
+  headers.Authorization = "Bearer " + getAdminToken();
+  if (opts.json) {
+    opts.body = JSON.stringify(opts.json);
+    headers["Content-Type"] = "application/json";
+    delete opts.json;
   }
-}
-
-// ---- MANAGE SERVER TAB ----
-async function loadServerTab() {
-  const el = document.getElementById("tab-server");
-  el.innerHTML = `<div class="text-center my-4 text-muted"><i class="bi bi-hourglass-split"></i> Loading server ...</div>`;
-  try {
-    const res = await fetch(`${API_BASE}/api-admin/list-server`, {
-      headers: { Authorization: "Bearer " + getAdminToken() }
-    });
-    const data = await res.json();
-    if (data.ok && data.servers) {
-      let html = `<h4>Server List</h4>
-        <table class="table mt-2"><thead><tr><th>Server</th><th>Base URL</th><th>Status</th><th>Action</th></tr></thead><tbody>`;
-      data.servers.forEach(s => {
-        html += `<tr>
-          <td>${s.server}</td>
-          <td>${s.base_url}</td>
-          <td>${s.status==="active"?'<span class="badge bg-success">active</span>':'<span class="badge bg-secondary">nonaktif</span>'}</td>
-          <td><button class="btn btn-danger btn-sm delServerBtn" data-server="${s.server}"><i class="bi bi-trash"></i></button></td>
-        </tr>`;
-      });
-      html += `</tbody></table>
-        <h5 class="mt-4 mb-2">Tambah Server Baru</h5>
-        <form id="addServerForm" class="row g-2 align-items-end">
-          <div class="col-md-3"><input class="form-control" name="server" placeholder="ID Server" required></div>
-          <div class="col-md-4"><input class="form-control" name="base_url" placeholder="Base URL" required></div>
-          <div class="col-md-3"><input class="form-control" name="authkey" placeholder="Authkey" required></div>
-          <div class="col-md-2"><button type="submit" class="btn btn-primary w-100">Tambah</button></div>
-        </form>`;
-      el.innerHTML = html;
-      document.getElementById("addServerForm")?.addEventListener("submit", async e=>{
-        e.preventDefault();
-        const fd = new FormData(e.target);
-        const data = Object.fromEntries(fd.entries());
-        data.status = "active";
-        await fetch(`${API_BASE}/api-admin/add-server`, {
-          method: "POST",
-          headers: { Authorization: "Bearer " + getAdminToken(), "Content-Type": "application/json" },
-          body: JSON.stringify(data)
-        });
-        showAlert("Server ditambah", "success");
-        setTimeout(loadServerTab, 700);
-      });
-      document.querySelectorAll(".delServerBtn").forEach(btn=>{
-        btn.onclick = async function(){
-          if(confirm("Yakin hapus server ini?")) {
-            await fetch(`${API_BASE}/api-admin/delete-server`, {
-              method: "POST",
-              headers: { Authorization: "Bearer " + getAdminToken(), "Content-Type": "application/json" },
-              body: JSON.stringify({ server: btn.dataset.server })
-            });
-            showAlert("Server dihapus!", "success");
-            setTimeout(loadServerTab, 700);
-          }
-        }
-      });
-    } else {
-      el.innerHTML = `<div class="alert alert-danger">Gagal load server!</div>`;
-    }
-  } catch {
-    el.innerHTML = `<div class="alert alert-danger">Error koneksi!</div>`;
+  opts.headers = headers;
+  const res = await fetch(API_BASE + path, opts);
+  if (!res.ok) {
+    let msg = "Error API";
+    try { const j = await res.json(); msg = j.error || msg; } catch {}
+    throw new Error(msg);
   }
+  return res.json();
 }
 
-// ---- VARIAN TAB ----
-async function loadVarianTab() {
-  const el = document.getElementById("tab-varian");
-  el.innerHTML = `<div class="text-center my-4 text-muted"><i class="bi bi-hourglass-split"></i> Loading ...</div>`;
-  // Pilih server
+// ====================
+// 1. USER MANAGEMENT
+// ====================
+async function loadUserList() {
+  const tbody = document.querySelector("#adminUserTable tbody");
+  tbody.innerHTML = "<tr><td colspan='5' class='text-center text-muted'>Loading...</td></tr>";
   try {
-    const res = await fetch(`${API_BASE}/api-admin/list-server`, {
-      headers: { Authorization: "Bearer " + getAdminToken() }
-    });
-    const data = await res.json();
-    if (data.ok && data.servers) {
-      let html = `<h5>Pilih Server:</h5><select id="varianServerSelect" class="form-select mb-3" style="max-width:330px;">`;
-      data.servers.forEach(s=>{
-        html += `<option value="${s.server}">${s.server}</option>`;
-      });
-      html += `</select>
-        <div id="varianListWrap"></div>
-        <button class="btn btn-success my-2" id="addVarianBtn"><i class="bi bi-plus-lg"></i> Tambah Varian</button>
-        <div id="addEditVarianFormWrap"></div>`;
-      el.innerHTML = html;
-      // --- on change
-      document.getElementById("varianServerSelect").onchange = ()=>loadVarianList();
-      document.getElementById("addVarianBtn").onclick = ()=>showAddEditVarianForm();
-      loadVarianList();
-    } else {
-      el.innerHTML = `<div class="alert alert-danger">Gagal load server!</div>`;
+    const { users } = await callApi("/api-admin/list-user");
+    if (!users.length) {
+      tbody.innerHTML = "<tr><td colspan='5' class='text-center text-muted'>Tidak ada user.</td></tr>";
+      return;
     }
-  } catch {
-    el.innerHTML = `<div class="alert alert-danger">Error koneksi!</div>`;
-  }
-}
-
-async function loadVarianList() {
-  const server = document.getElementById("varianServerSelect").value;
-  const res = await fetch(`${API_BASE}/api-admin/list-server`, {
-    headers: { Authorization: "Bearer " + getAdminToken() }
-  });
-  const data = await res.json();
-  let s = data.servers.find(x=>x.server===server);
-  let listHtml = `<h6>Varian pada server: <b>${server}</b></h6>`;
-  if (!s || !Array.isArray(s.varians) || !s.varians.length) {
-    listHtml += `<div class="alert alert-warning">Belum ada varian</div>`;
-  } else {
-    listHtml += `<table class="table table-bordered"><thead><tr>
-      <th>Nama</th><th>Exp</th><th>Quota</th><th>IP</th><th>Harga</th><th>Keterangan</th><th>Action</th></tr></thead><tbody>`;
-    s.varians.forEach(v=>{
-      listHtml += `<tr>
-        <td>${v.name}</td>
-        <td>${v.exp} hari</td>
-        <td>${v.quota}GB</td>
-        <td>${v.iplimit}</td>
-        <td>Rp ${v.price?.toLocaleString()||0}</td>
-        <td>${v.desc||''}</td>
+    tbody.innerHTML = "";
+    users.forEach(u => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${u.username}</td>
+        <td>${u.email}</td>
+        <td>${u.status === "active" ? "<span class='badge bg-success'>active</span>" : "<span class='badge bg-warning text-dark'>pending</span>"}</td>
+        <td>Rp ${u.saldo?.toLocaleString() || 0}</td>
         <td>
-          <button class="btn btn-sm btn-warning me-1" onclick="showAddEditVarianForm('${v.name}')"><i class="bi bi-pencil"></i></button>
-          <button class="btn btn-sm btn-danger" onclick="deleteVarian('${v.name}')"><i class="bi bi-trash"></i></button>
+          ${u.status !== "active"
+            ? `<button class="btn btn-success btn-sm" data-approve="${u.username}"><i class="bi bi-check-circle"></i> Approve</button>`
+            : "<span class='text-muted'>-</span>"
+          }
         </td>
-      </tr>`;
+      `;
+      tbody.appendChild(tr);
     });
-    listHtml += `</tbody></table>`;
-  }
-  document.getElementById("varianListWrap").innerHTML = listHtml;
-}
-
-window.showAddEditVarianForm = function(varianName="") {
-  const server = document.getElementById("varianServerSelect").value;
-  fetch(`${API_BASE}/api-admin/list-server`, {
-    headers: { Authorization: "Bearer " + getAdminToken() }
-  })
-  .then(res=>res.json())
-  .then(data=>{
-    let s = data.servers.find(x=>x.server===server);
-    let v = (s.varians||[]).find(x=>x.name===varianName) || {};
-    let html = `<form id="addEditVarianForm" class="row g-2 align-items-end border rounded p-3 mb-3">
-      <div class="col-md-2"><input class="form-control" name="name" value="${v.name||''}" placeholder="Nama" required></div>
-      <div class="col-md-2"><input class="form-control" name="exp" type="number" value="${v.exp||30}" placeholder="Exp (hari)" required></div>
-      <div class="col-md-2"><input class="form-control" name="quota" type="number" value="${v.quota||10}" placeholder="Quota (GB)" required></div>
-      <div class="col-md-1"><input class="form-control" name="iplimit" type="number" value="${v.iplimit||1}" placeholder="IP" required></div>
-      <div class="col-md-2"><input class="form-control" name="price" type="number" value="${v.price||0}" placeholder="Harga" required></div>
-      <div class="col-md-3"><input class="form-control" name="desc" value="${v.desc||''}" placeholder="Keterangan"></div>
-      <div class="col-12 mt-2">
-        <button class="btn btn-primary">${varianName?"Update":"Tambah"}</button>
-        <button type="button" class="btn btn-link" onclick="this.closest('form').remove()">Batal</button>
-      </div>
-    </form>`;
-    document.getElementById("addEditVarianFormWrap").innerHTML = html;
-    document.getElementById("addEditVarianForm").onsubmit = async function(e) {
-      e.preventDefault();
-      const fd = new FormData(this);
-      const varian = Object.fromEntries(fd.entries());
-      varian.exp = Number(varian.exp);
-      varian.quota = Number(varian.quota);
-      varian.iplimit = Number(varian.iplimit);
-      varian.price = Number(varian.price);
-      await fetch(`${API_BASE}/api-admin/save-varian`, {
-        method: "POST",
-        headers: { Authorization: "Bearer " + getAdminToken(), "Content-Type": "application/json" },
-        body: JSON.stringify({ server, varian })
-      });
-      showAlert("Varian disimpan", "success");
-      setTimeout(loadVarianList, 600);
-      this.remove();
-    }
-  });
-}
-
-window.deleteVarian = function(varianName) {
-  const server = document.getElementById("varianServerSelect").value;
-  if(confirm("Yakin hapus varian ini?")) {
-    fetch(`${API_BASE}/api-admin/delete-varian`, {
-      method: "POST",
-      headers: { Authorization: "Bearer " + getAdminToken(), "Content-Type": "application/json" },
-      body: JSON.stringify({ server, name: varianName })
-    }).then(()=> {
-      showAlert("Varian dihapus!", "success");
-      setTimeout(loadVarianList, 700);
+    tbody.querySelectorAll("[data-approve]").forEach(btn => {
+      btn.onclick = async function () {
+        btn.disabled = true;
+        try {
+          await callApi("/api-admin/approve-user", {
+            method: "POST",
+            json: { username: btn.dataset.approve }
+          });
+          showNotif("User di-approve!");
+          loadUserList();
+        } catch (e) {
+          showNotif(e.message, "danger");
+        }
+        btn.disabled = false;
+      };
     });
+  } catch (e) {
+    tbody.innerHTML = `<tr><td colspan='5' class='text-center text-danger'>${e.message}</td></tr>`;
   }
 }
 
-// ---- LOG TAB ----
-async function loadLogTab() {
-  const el = document.getElementById("tab-log");
-  el.innerHTML = `<div class="text-center my-4 text-muted"><i class="bi bi-hourglass-split"></i> Loading log ...</div>`;
+// ====================
+// 2. SERVER MANAGEMENT
+// ====================
+async function loadServerList() {
+  const wrap = document.getElementById("adminServerList");
+  wrap.innerHTML = "<div class='text-center text-muted'>Loading...</div>";
   try {
-    const today = (new Date()).toISOString().slice(0,10);
-    const res = await fetch(`${API_BASE}/api-admin/log?hari=${today}`, {
-      headers: { Authorization: "Bearer " + getAdminToken() }
+    const { servers } = await callApi("/api-admin/list-server");
+    if (!servers.length) {
+      wrap.innerHTML = "<div class='text-center text-muted'>Belum ada server terdaftar.</div>";
+      return;
+    }
+    wrap.innerHTML = "";
+    servers.forEach(s => {
+      const card = document.createElement("div");
+      card.className = "admin-server-card shadow-sm p-3 mb-3";
+      card.innerHTML = `
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <div>
+            <span class="fw-bold fs-5">${s.server}</span>
+            <span class="badge ${s.status === "active" ? "bg-success" : "bg-secondary"} ms-2">${s.status}</span>
+          </div>
+          <div>
+            <button class="btn btn-primary btn-sm me-1" data-edit-server="${s.server}"><i class="bi bi-pencil"></i></button>
+            <button class="btn btn-danger btn-sm" data-delete-server="${s.server}"><i class="bi bi-trash"></i></button>
+          </div>
+        </div>
+        <div class="mb-1"><b>API:</b> <span class="text-muted">${s.base_url}</span></div>
+        <div class="mb-2"><b>Auth Key:</b> <span class="text-muted">${s.authkey}</span></div>
+        <div>
+          <b>Varian:</b>
+          <button class="btn btn-success btn-sm ms-2" data-add-varian="${s.server}"><i class="bi bi-plus-circle"></i> Tambah Varian</button>
+          <ul class="list-group mt-2">
+            ${s.varians && s.varians.length
+              ? s.varians.map(v =>
+                `<li class="list-group-item d-flex justify-content-between align-items-center">
+                  <div>
+                    <b>${v.name}</b> &bull; <span class="text-muted">${v.desc || ""}</span>
+                    <br><small>Exp: ${v.exp} hari, Quota: ${v.quota}GB, IP: ${v.iplimit}, Harga: Rp${v.price?.toLocaleString()}</small>
+                  </div>
+                  <span>
+                    <button class="btn btn-primary btn-sm me-1" data-edit-varian='${JSON.stringify({ ...v, server: s.server })}'><i class="bi bi-pencil"></i></button>
+                    <button class="btn btn-danger btn-sm" data-delete-varian='${JSON.stringify({ server: s.server, name: v.name })}'><i class="bi bi-trash"></i></button>
+                  </span>
+                </li>`).join("")
+              : "<li class='list-group-item text-muted'>Belum ada varian.</li>"
+            }
+          </ul>
+        </div>
+      `;
+      wrap.appendChild(card);
     });
-    const data = await res.json();
-    let html = `<h5>Pendapatan hari ini: <span class="text-success">Rp ${data.pendapatan?.toLocaleString()||0}</span></h5>`;
-    html += `<h6 class="mt-4">Log Transaksi</h6>
-      <table class="table"><thead><tr>
-      <th>Tanggal</th><th>User</th><th>Server</th><th>Varian</th><th>Harga</th><th>Tipe</th></tr></thead><tbody>`;
-    (data.logs||[]).sort((a,b)=>b.ts-a.ts).forEach(l=>{
-      const tgl = (new Date(l.ts)).toLocaleString("id-ID");
-      html += `<tr>
-        <td>${tgl}</td>
-        <td>${l.username}</td>
-        <td>${l.server||''}</td>
-        <td>${l.varian||''}</td>
-        <td>Rp ${l.harga?.toLocaleString()||0}</td>
-        <td>${l.tipe}</td>
-      </tr>`;
+
+    // Edit & delete server
+    wrap.querySelectorAll("[data-edit-server]").forEach(btn => {
+      btn.onclick = () => openServerModal("edit", servers.find(s => s.server === btn.dataset.editServer));
     });
-    html += `</tbody></table>`;
-    el.innerHTML = html;
-  } catch {
-    el.innerHTML = `<div class="alert alert-danger">Gagal load log!</div>`;
+    wrap.querySelectorAll("[data-delete-server]").forEach(btn => {
+      btn.onclick = async () => {
+        if (!confirm("Hapus server ini?")) return;
+        btn.disabled = true;
+        try {
+          await callApi("/api-admin/delete-server", {
+            method: "POST",
+            json: { server: btn.dataset.deleteServer }
+          });
+          showNotif("Server dihapus!");
+          loadServerList();
+        } catch (e) {
+          showNotif(e.message, "danger");
+        }
+        btn.disabled = false;
+      };
+    });
+    // Add varian
+    wrap.querySelectorAll("[data-add-varian]").forEach(btn => {
+      btn.onclick = () => openVarianModal("add", { server: btn.dataset.addVarian });
+    });
+    // Edit & delete varian
+    wrap.querySelectorAll("[data-edit-varian]").forEach(btn => {
+      btn.onclick = () => openVarianModal("edit", JSON.parse(btn.dataset.editVarian));
+    });
+    wrap.querySelectorAll("[data-delete-varian]").forEach(btn => {
+      btn.onclick = async () => {
+        const data = JSON.parse(btn.dataset.deleteVarian);
+        if (!confirm("Hapus varian '" + data.name + "'?")) return;
+        btn.disabled = true;
+        try {
+          await callApi("/api-admin/delete-varian", {
+            method: "POST",
+            json: { server: data.server, name: data.name }
+          });
+          showNotif("Varian dihapus!");
+          loadServerList();
+        } catch (e) {
+          showNotif(e.message, "danger");
+        }
+        btn.disabled = false;
+      };
+    });
+  } catch (e) {
+    wrap.innerHTML = `<div class='text-danger text-center'>${e.message}</div>`;
   }
 }
 
-// --- AUTO LOGIN (PERSIST SESSION)
-(async function(){
-  if (await checkAdminAuth()) {
-    loadAdminPanel();
-  } else {
-    document.getElementById("adminLoginSection").classList.remove("d-none");
-    document.getElementById("adminPanelSection").classList.add("d-none");
-    document.getElementById("logoutBtn").classList.add("d-none");
+// --- SERVER MODAL (Tambah/Edit) ---
+const serverModal = new bootstrap.Modal(document.getElementById("serverModal"));
+document.getElementById("addServerBtn").onclick = () => openServerModal("add");
+function openServerModal(mode, data = {}) {
+  document.getElementById("serverFormMode").value = mode;
+  document.getElementById("serverModalLabel").textContent = mode === "add" ? "Tambah Server" : "Edit Server";
+  document.getElementById("serverName").value = data.server || "";
+  document.getElementById("serverName").readOnly = mode !== "add";
+  document.getElementById("serverBaseUrl").value = data.base_url || "";
+  document.getElementById("serverAuthKey").value = data.authkey || "";
+  document.getElementById("serverStatus").value = data.status || "active";
+  serverModal.show();
+}
+document.getElementById("serverForm").onsubmit = async function (e) {
+  e.preventDefault();
+  const mode = document.getElementById("serverFormMode").value;
+  const server = document.getElementById("serverName").value.trim();
+  const base_url = document.getElementById("serverBaseUrl").value.trim();
+  const authkey = document.getElementById("serverAuthKey").value.trim();
+  const status = document.getElementById("serverStatus").value;
+  if (!server || !base_url || !authkey) return showNotif("Semua field wajib diisi", "danger");
+  try {
+    await callApi("/api-admin/" + (mode === "add" ? "add-server" : "add-server"), {
+      method: "POST",
+      json: { server, base_url, authkey, status }
+    });
+    showNotif((mode === "add" ? "Tambah" : "Update") + " server sukses!");
+    loadServerList();
+    serverModal.hide();
+  } catch (e) {
+    showNotif(e.message, "danger");
   }
-})();
+};
+
+// --- VARIAN MODAL (Tambah/Edit) ---
+const varianModal = new bootstrap.Modal(document.getElementById("varianModal"));
+function openVarianModal(mode, data = {}) {
+  document.getElementById("varianModalLabel").textContent = mode === "add" ? "Tambah Varian" : "Edit Varian";
+  document.getElementById("varianServerName").value = data.server || "";
+  document.getElementById("varianName").value = data.name || "";
+  document.getElementById("varianName").readOnly = mode !== "add";
+  document.getElementById("varianExp").value = data.exp || "";
+  document.getElementById("varianQuota").value = data.quota || "";
+  document.getElementById("varianIpLimit").value = data.iplimit || "";
+  document.getElementById("varianPrice").value = data.price || "";
+  document.getElementById("varianDesc").value = data.desc || "";
+  varianModal.show();
+}
+document.getElementById("varianForm").onsubmit = async function (e) {
+  e.preventDefault();
+  const server = document.getElementById("varianServerName").value;
+  const name = document.getElementById("varianName").value.trim();
+  const exp = +document.getElementById("varianExp").value;
+  const quota = +document.getElementById("varianQuota").value;
+  const iplimit = +document.getElementById("varianIpLimit").value;
+  const price = +document.getElementById("varianPrice").value;
+  const desc = document.getElementById("varianDesc").value;
+  if (!server || !name || !exp || !quota || !iplimit || !price) return showNotif("Semua field wajib diisi!", "danger");
+  try {
+    await callApi("/api-admin/save-varian", {
+      method: "POST",
+      json: { server, varian: { name, exp, quota, iplimit, price, desc } }
+    });
+    showNotif("Varian disimpan!");
+    loadServerList();
+    varianModal.hide();
+  } catch (e) {
+    showNotif(e.message, "danger");
+  }
+};
+
+// ====================
+// 3. LOG / PENDAPATAN
+// ====================
+async function loadLog() {
+  const logTable = document.getElementById("logTable").querySelector("tbody");
+  const dateInput = document.getElementById("logDate");
+  const pendapatanEl = document.getElementById("pendapatanHariIni");
+  logTable.innerHTML = "<tr><td colspan='6' class='text-center text-muted'>Loading...</td></tr>";
+  let hari = dateInput.value || (new Date().toISOString().slice(0, 10));
+  try {
+    const { logs, pendapatan } = await callApi("/api-admin/log?hari=" + hari);
+    pendapatanEl.textContent = "Rp " + (pendapatan || 0).toLocaleString();
+    if (!logs.length) {
+      logTable.innerHTML = "<tr><td colspan='6' class='text-center text-muted'>Belum ada log.</td></tr>";
+      return;
+    }
+    // sort terbaru
+    logs.sort((a, b) => b.ts - a.ts);
+    logTable.innerHTML = "";
+    logs.forEach(log => {
+      const dt = new Date(log.ts);
+      logTable.innerHTML += `
+        <tr>
+          <td>${dt.toLocaleString("id-ID")}</td>
+          <td>${log.username}</td>
+          <td>${log.server}</td>
+          <td>${log.varian}</td>
+          <td>Rp ${(log.harga||0).toLocaleString()}</td>
+          <td>${log.tipe}</td>
+        </tr>`;
+    });
+  } catch (e) {
+    logTable.innerHTML = `<tr><td colspan='6' class='text-center text-danger'>${e.message}</td></tr>`;
+  }
+}
+document.getElementById("logDate").onchange = loadLog;
