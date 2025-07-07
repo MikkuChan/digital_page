@@ -1,0 +1,160 @@
+body, html {
+  font-family: 'Inter', Arial, sans-serif;
+  background: #f7fafc;
+}
+
+.admin-card {
+  background: #fff;
+  border-radius: 1.5em;
+  box-shadow: 0 8px 32px rgba(31, 41, 55, 0.12);
+  border: 1px solid #e3e8f7;
+  padding: 2.1em 2em 1.6em 2em;
+  margin-top: 7vh;
+}
+
+#adminLoginSection {
+  min-height: 75vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+#adminPanelSection {
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
+/* NAV PILLS */
+#adminTabs .nav-link {
+  border-radius: 2em;
+  padding: .7em 1.5em;
+  font-weight: 600;
+  color: #2563eb;
+  transition: background .15s, color .15s;
+}
+#adminTabs .nav-link.active {
+  background: linear-gradient(90deg,#38b2ac,#4299e1 90%);
+  color: #fff;
+  box-shadow: 0 4px 18px #4299e12c;
+}
+
+.admin-tab-panel {
+  background: #fff;
+  border-radius: 1.2em;
+  box-shadow: 0 4px 18px #1e293b12;
+  padding: 2.1em 1.6em 1.5em 1.6em;
+  margin-bottom: 32px;
+}
+
+/* Table Admin */
+.table {
+  background: #f8fafc;
+  border-radius: 1em;
+  overflow: hidden;
+}
+.table thead {
+  background: #f3f4f6;
+  font-weight: 700;
+  font-family: 'Space Grotesk', 'Inter', Arial, sans-serif;
+}
+.table td, .table th {
+  vertical-align: middle;
+  font-size: 1.04em;
+}
+.table-striped > tbody > tr:nth-of-type(odd) {
+  background: #f7fafc;
+}
+.table-hover > tbody > tr:hover {
+  background: #e3e8f7;
+}
+th, td {
+  padding: .77em .6em;
+}
+
+.badge {
+  border-radius: 1em;
+  padding: .22em .9em;
+  font-weight: 600;
+  letter-spacing: .01em;
+}
+
+/* Modal Form */
+.modal-content {
+  border-radius: 1.3em;
+  box-shadow: 0 8px 40px #3b82f622;
+  border: 1px solid #e3e8f7;
+}
+.modal-title {
+  font-family: 'Space Grotesk', 'Inter', Arial, sans-serif;
+  font-weight: 700;
+  color: #2563eb;
+}
+.form-label {
+  font-weight: 600;
+  color: #334155;
+}
+.form-control, .form-select {
+  border-radius: 0.8em;
+  border: 1px solid #cbd5e1;
+  font-size: 1em;
+  background: #f8fafc;
+  transition: border .19s;
+}
+.form-control:focus, .form-select:focus {
+  border-color: #4299e1;
+  box-shadow: 0 0 0 2px #4299e129;
+}
+
+.btn {
+  border-radius: 2em;
+  font-weight: 600;
+  font-family: 'Inter', Arial, sans-serif;
+  font-size: 1.07em;
+}
+
+.btn-primary, .btn-success {
+  box-shadow: 0 2px 10px #4299e128;
+}
+.btn-outline-danger {
+  border-radius: 2em;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .admin-card, .admin-tab-panel {
+    padding: 1.2em !important;
+  }
+}
+@media (max-width: 600px) {
+  .admin-card, .admin-tab-panel {
+    padding: .7em !important;
+    border-radius: 1em;
+  }
+  th, td {
+    font-size: .98em;
+    padding: .59em .3em;
+  }
+  .modal-content { border-radius: .8em; }
+}
+@media (max-width: 480px) {
+  .admin-card, .admin-tab-panel { padding: .35em !important; }
+}
+
+/* Misc */
+#adminUserTable td, #logTable td {
+  font-family: 'Inter', monospace;
+}
+#pendapatanHariIni {
+  font-size: 1.15em;
+}
+
+.alert {
+  border-radius: 1em;
+  font-size: 1em;
+  padding: .8em 1.1em;
+}
+
+::-webkit-input-placeholder { color: #a0aec0; opacity: 1; }
+::-moz-placeholder          { color: #a0aec0; opacity: 1; }
+:-ms-input-placeholder      { color: #a0aec0; opacity: 1; }
+::placeholder              { color: #a0aec0; opacity: 1; }

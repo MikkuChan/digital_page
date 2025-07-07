@@ -1,262 +1,331 @@
-// ------------ Konfigurasi -------------
-const API_USER = "https://acc.fadzdigital.dpdns.org";
-const API_VPN = "https://apivpn.fadzdigital.dpdns.org/api-vpn"; // endpoint API VPN kamu
-// --------------------------------------
+// ======= js/vpn.js =======
+// Ganti ke domain Worker kamu!
+const API_BASE = "https://api-v1.fadzdigital.dpdns.org";
+const TOKEN_KEY = "JandaMuda";
 
-// ---- UI Helper
-function show(el) { el.style.display = ""; }
-function hide(el) { el.style.display = "none"; }
-function alertMsg(msg, type = "danger") {
-  return `<div class="alert alert-${type} fw-bold py-2 px-3 mb-3">${msg}</div>`;
+// -------- Helper --------
+function show(sectionId) {
+  ["authSection", "userSection"].forEach(id => {
+    document.getElementById(id).style.display = id === sectionId ? "" : "none";
+  });
+}
+function showAlert(el, msg, type = "danger") {
+  el.innerHTML = `<div class="alert alert-${type}">${msg}</div>`;
+  setTimeout(() => { el.innerHTML = ""; }, 4200);
+}
+function setToken(token) { localStorage.setItem(TOKEN_KEY, token); }
+function getToken() { return localStorage.getItem(TOKEN_KEY); }
+function clearToken() { localStorage.removeItem(TOKEN_KEY); }
+function loadingBtn(btn, isLoading) {
+  btn.disabled = !!isLoading;
+  btn.innerHTML = isLoading ? `<span class="spinner-border spinner-border-sm"></span> Memproses...` : btn.dataset.text;
 }
 
-// --- Session
-function saveSession(token, username) {
-  localStorage.setItem("vpn_token", token);
-  localStorage.setItem("vpn_user", username);
-}
-function clearSession() {
-  localStorage.removeItem("vpn_token");
-  localStorage.removeItem("vpn_user");
-}
-function getToken() { return localStorage.getItem("vpn_token") || ""; }
-function getUser() { return localStorage.getItem("vpn_user") || ""; }
-
-// --- Auth logic
-async function checkLogin() {
-  const token = getToken();
-  if (!token) return false;
-  // Cek token ke Worker user
-  try {
-    const res = await fetch(`${API_USER}/me?token=${encodeURIComponent(token)}`);
-    const data = await res.json();
-    if (data && data.ok && data.user) {
-      document.getElementById("userWelcome").textContent = `${data.user.username} (${data.user.email})`;
-      return true;
-    }
-  } catch {}
-  return false;
-}
-
-// --- Auth UI Switch
+// --------- Switch Login/Register ---------
+const switchToReg = document.getElementById("switchToReg");
+const switchToLogin = document.getElementById("switchToLogin");
 const loginForm = document.getElementById("loginForm");
 const registerForm = document.getElementById("registerForm");
-const authWrap = document.getElementById("authWrap");
-const vpnMainWrap = document.getElementById("vpnMainWrap");
+const authTitle = document.getElementById("authTitle");
 const authAlert = document.getElementById("authAlert");
-const switchToRegister = document.getElementById("switchToRegister");
-const switchToLogin = document.getElementById("switchToLogin");
 
-switchToRegister.onclick = () => {
-  hide(loginForm); show(registerForm); hide(switchToRegister); show(switchToLogin);
-  document.getElementById("authTitle").textContent = "Daftar Akun";
-  authAlert.innerHTML = "";
-};
-switchToLogin.onclick = () => {
-  hide(registerForm); show(loginForm); hide(switchToLogin); show(switchToRegister);
-  document.getElementById("authTitle").textContent = "Masuk ke Akun";
-  authAlert.innerHTML = "";
-};
-
-// --- Register
-registerForm.onsubmit = async e => {
+switchToReg.addEventListener("click", e => {
   e.preventDefault();
+  loginForm.style.display = "none";
+  registerForm.style.display = "";
+  switchToReg.style.display = "none";
+  switchToLogin.style.display = "";
+  authTitle.textContent = "Registrasi User";
   authAlert.innerHTML = "";
-  const username = document.getElementById("regUsername").value.trim();
-  const password = document.getElementById("regPassword").value;
-  const email = document.getElementById("regEmail").value.trim();
-  if (!username || !password || !email) return authAlert.innerHTML = alertMsg("Isi semua data!", "danger");
-  try {
-    document.getElementById("regBtn").disabled = true;
-    const res = await fetch(`${API_USER}/register`, {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password, email })
-    });
-    const data = await res.json();
-    if (data.ok) {
-      authAlert.innerHTML = alertMsg("Registrasi sukses, tunggu approve admin!", "success");
-      setTimeout(() => { switchToLogin.onclick(); }, 1800);
-    } else {
-      authAlert.innerHTML = alertMsg(data.error || "Gagal daftar!", "danger");
-    }
-  } catch {
-    authAlert.innerHTML = alertMsg("Gagal koneksi!", "danger");
-  }
-  document.getElementById("regBtn").disabled = false;
-};
-
-// --- Login
-loginForm.onsubmit = async e => {
+});
+switchToLogin.addEventListener("click", e => {
   e.preventDefault();
+  loginForm.style.display = "";
+  registerForm.style.display = "none";
+  switchToReg.style.display = "";
+  switchToLogin.style.display = "none";
+  authTitle.textContent = "Login User";
+  authAlert.innerHTML = "";
+});
+
+// --------- LOGIN ---------
+loginForm.addEventListener("submit", async function(e){
+  e.preventDefault();
+  loadingBtn(loginForm.loginBtn, true);
   authAlert.innerHTML = "";
   const username = document.getElementById("loginUsername").value.trim();
   const password = document.getElementById("loginPassword").value;
-  if (!username || !password) return authAlert.innerHTML = alertMsg("Isi semua data!", "danger");
   try {
-    document.getElementById("loginBtn").disabled = true;
-    const res = await fetch(`${API_USER}/login`, {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password })
+    const res = await fetch(API_BASE + "/api/user/login", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({ username, password }),
     });
     const data = await res.json();
     if (data.ok && data.token) {
-      saveSession(data.token, username);
-      await afterLogin();
+      setToken(data.token);
+      await loadUser();
     } else {
-      authAlert.innerHTML = alertMsg(data.error || "Login gagal!", "danger");
+      showAlert(authAlert, data.error || "Login gagal");
     }
   } catch {
-    authAlert.innerHTML = alertMsg("Gagal koneksi!", "danger");
+    showAlert(authAlert, "Gagal koneksi ke server.");
   }
-  document.getElementById("loginBtn").disabled = false;
-};
+  loadingBtn(loginForm.loginBtn, false);
+});
 
-// --- Logout
-document.getElementById("logoutBtn").onclick = async function() {
-  const token = getToken();
-  if (token) {
-    await fetch(`${API_USER}/logout`, {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token })
+// --------- REGISTER ---------
+registerForm.addEventListener("submit", async function(e){
+  e.preventDefault();
+  loadingBtn(registerForm.registerBtn, true);
+  authAlert.innerHTML = "";
+  const username = document.getElementById("regUsername").value.trim();
+  const email = document.getElementById("regEmail").value.trim();
+  const password = document.getElementById("regPassword").value;
+  try {
+    const res = await fetch(API_BASE + "/api/user/register", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({ username, password, email }),
     });
+    const data = await res.json();
+    if (data.ok) {
+      showAlert(authAlert, "Registrasi sukses! Tunggu ACC admin.", "success");
+      setTimeout(() => { 
+        switchToLogin.click();
+      }, 1800);
+    } else {
+      showAlert(authAlert, data.error || "Registrasi gagal");
+    }
+  } catch {
+    showAlert(authAlert, "Gagal koneksi ke server.");
   }
-  clearSession();
-  window.location.reload();
-};
+  loadingBtn(registerForm.registerBtn, false);
+});
 
-// --- After login
-async function afterLogin() {
-  show(vpnMainWrap); hide(authWrap); show(document.getElementById("logoutBtn"));
-  document.getElementById("vpnResult").innerHTML = "";
-  document.getElementById("vpnResultWrap").style.display = "none";
-  // Set user
-  document.getElementById("userWelcome").textContent = getUser();
-  renderFields(serviceSelect.value);
+// --------- LOGOUT ---------
+document.getElementById("logoutBtn").addEventListener("click", async function() {
+  let token = getToken();
+  if (!token) return;
+  try {
+    await fetch(API_BASE + "/api/user/logout", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({ token }),
+    });
+  } catch {}
+  clearToken();
+  show("authSection");
+});
+
+// --------- LOAD USER DASHBOARD ---------
+async function loadUser() {
+  let token = getToken();
+  if (!token) { show("authSection"); return; }
+  try {
+    const res = await fetch(API_BASE + `/api/user/me?token=${encodeURIComponent(token)}`);
+    const data = await res.json();
+    if (data.ok && data.user) {
+      show("userSection");
+      renderUserDashboard(data.user);
+    } else {
+      clearToken();
+      show("authSection");
+      if (data.error) showAlert(authAlert, data.error);
+    }
+  } catch {
+    clearToken();
+    show("authSection");
+    showAlert(authAlert, "Gagal koneksi ke server.");
+  }
 }
 
-// ---- VPN form field dinamis
-const dynamicInputs = document.getElementById('dynamicInputs');
-const serviceSelect = document.getElementById('service');
-function renderFields(service) {
-  let html = '';
-  if (/^create/.test(service)) {
-    html += `
-      <input class="form-control mb-2" type="text" id="user" placeholder="Username" required />
-      ${service === "createssh" ? '<input class="form-control mb-2" type="text" id="pass" placeholder="Password (SSH)" required />' : ''}
-      <input class="form-control mb-2" type="number" min="1" max="365" id="exp" placeholder="Masa Aktif (hari)" required />
-      <input class="form-control mb-2" type="number" min="1" max="100" id="quota" placeholder="Kuota (GB)" required />
-      <input class="form-control mb-2" type="number" min="1" max="10" id="iplimit" placeholder="IP Limit" required />
-    `;
-  } else if (/^renew/.test(service)) {
-    html += `
-      <input class="form-control mb-2" type="text" id="user" placeholder="Username" required />
-      <input class="form-control mb-2" type="number" min="1" max="365" id="${service === "renewssh" ? 'days' : 'masaaktif'}" placeholder="Perpanjang (hari)" required />
-      ${service !== "renewssh" ? `<input class="form-control mb-2" type="number" min="1" max="100" id="quota" placeholder="Kuota (GB)" required />` : ''}
-      ${service !== "renewssh" ? `<input class="form-control mb-2" type="number" min="1" max="10" id="iplimit" placeholder="IP Limit" required />` : ''}
-    `;
-  } else if (/^delete/.test(service)) {
-    html += `<input class="form-control mb-2" type="text" id="user" placeholder="Username" required />`;
-  } else if (service === "backupserver") {
-    html += `
-      <input class="form-control mb-2" type="email" id="email" placeholder="Email backup (opsional)" />
-      <input type="hidden" id="action" value="backup" />
-    `;
-  } else if (service === "restoreserver") {
-    html += `
-      <input class="form-control mb-2" type="url" id="linkbackup" placeholder="Link file backup (.zip)" required />
-      <input type="hidden" id="action" value="restore" />
-    `;
-  }
-  dynamicInputs.innerHTML = html;
+// --------- Render Dashboard User ---------
+function renderUserDashboard(user) {
+  // Render profile
+  const userProfile = document.getElementById("userProfile");
+  userProfile.innerHTML = `
+    <div class="d-flex align-items-center mb-2">
+      <div class="flex-grow-1">
+        <div class="fw-bold" style="font-size:1.22em;">👤 ${user.username}</div>
+        <div class="text-muted">${user.email||""}</div>
+        <span class="badge bg-primary mt-1">Saldo: <span id="saldoUser">${user.saldo||0}</span></span>
+      </div>
+    </div>
+    <div class="small mt-2" style="color:#10b981;">
+      Status: <span class="fw-bold">${user.status === "active" ? "Aktif" : "Menunggu ACC Admin"}</span>
+    </div>
+  `;
+  // Render menu user, contoh: Topup & Beli VPN
+  document.getElementById("vpnUserTools").innerHTML = `
+    <div class="mb-3">
+      <button class="btn btn-success btn-sm me-2" id="btnTopupSaldo"><i class="bi bi-wallet2 me-1"></i>Topup Saldo</button>
+      <button class="btn btn-primary btn-sm" id="btnBeliVPN"><i class="bi bi-shield-lock me-1"></i>Beli VPN</button>
+    </div>
+    <div id="toolsContent"></div>
+    <div id="transaksiLog" class="mt-3"></div>
+  `;
+  document.getElementById("btnTopupSaldo").onclick = showTopupModal;
+  document.getElementById("btnBeliVPN").onclick = showBeliVPN;
+  // Load log pembelian user (optional, sesuai backend)
+  loadUserTransaksi(user.username);
 }
-serviceSelect && serviceSelect.addEventListener('change', e => renderFields(e.target.value));
 
-// ----------- Submit logic VPN -----------
-const vpnForm = document.getElementById('vpnForm');
-if (vpnForm) {
-  vpnForm.addEventListener('submit', async function(e){
-    e.preventDefault();
-    const service = serviceSelect.value;
-    let params = new URLSearchParams();
-    // Build param sesuai endpoint
-    if (/^create/.test(service)) {
-      params.set('user', document.getElementById('user').value.trim());
-      if (service === "createssh") params.set('pass', document.getElementById('pass').value.trim());
-      params.set('exp', document.getElementById('exp').value.trim());
-      params.set('quota', document.getElementById('quota').value.trim());
-      params.set('iplimit', document.getElementById('iplimit').value.trim());
+// ---- Topup Modal ----
+function showTopupModal() {
+  const tools = document.getElementById("toolsContent");
+  tools.innerHTML = `
+    <div class="card p-3 mb-3 shadow-sm">
+      <h5 class="fw-bold mb-3">Topup Saldo</h5>
+      <input type="number" id="inputNominal" class="form-control mb-2" placeholder="Nominal Topup (Rp)">
+      <button class="btn btn-success w-100" id="submitTopup">Topup Sekarang</button>
+      <div id="topupAlert" class="mt-2"></div>
+    </div>
+  `;
+  document.getElementById("submitTopup").onclick = async function(){
+    let nominal = Number(document.getElementById("inputNominal").value);
+    if (isNaN(nominal) || nominal < 1000) {
+      showAlert(document.getElementById("topupAlert"), "Minimal topup Rp 1.000");
+      return;
     }
-    else if (/^renew/.test(service)) {
-      params.set('user', document.getElementById('user').value.trim());
-      if (service === "renewssh") params.set('days', document.getElementById('days').value.trim());
-      else {
-        params.set('masaaktif', document.getElementById('masaaktif').value.trim());
-        params.set('quota', document.getElementById('quota').value.trim());
-        params.set('iplimit', document.getElementById('iplimit').value.trim());
-      }
-    }
-    else if (/^delete/.test(service)) {
-      params.set('user', document.getElementById('user').value.trim());
-    }
-    else if (service === "backupserver") {
-      params.set('action', 'backup');
-      const email = document.getElementById('email').value.trim();
-      if (email) params.set('email', email);
-    }
-    else if (service === "restoreserver") {
-      params.set('action', 'restore');
-      params.set('linkbackup', document.getElementById('linkbackup').value.trim());
-    }
-    // Endpoint ke Worker VPN kamu:
-    const apiUrl = `${API_VPN}/${service}?${params.toString()}`;
-    // UX loading
-    document.getElementById("vpnBtn").disabled = true;
-    document.getElementById("btnText").textContent = "Memproses...";
-    document.getElementById("loadingSpinner").classList.remove('d-none');
-    document.getElementById("vpnResult").innerHTML = "";
-    document.getElementById("vpnResultWrap").style.display = "none";
+    let token = getToken();
     try {
-      const res = await fetch(apiUrl);
-      let data;
-      try { data = await res.json(); } catch { data = { status: "error", message: "Bukan respon JSON valid!" }; }
-      let html = "";
-      if (data.status === "success") {
-        html += `<div class="alert alert-success fw-bold"><i class="bi bi-check-circle me-2"></i>${data.message||"Berhasil!"}</div>`;
-        html += `<pre>${JSON.stringify(data.data||data, null, 2)}</pre>`;
+      const res = await fetch(API_BASE + "/api/user/topup", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ token, nominal }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        showAlert(document.getElementById("topupAlert"), "Topup sukses! Saldo: Rp " + data.saldo, "success");
+        document.getElementById("saldoUser").textContent = data.saldo;
+        // update saldo user juga di local state
+        await loadUser();
       } else {
-        html += `<div class="alert alert-danger fw-bold"><i class="bi bi-x-circle me-2"></i>${data.message||"Terjadi error."}</div>`;
-        if (data.example) html += `<div class="alert alert-info small mt-2">Contoh: ${data.example}</div>`;
-        if (data.data) html += `<pre>${JSON.stringify(data.data, null, 2)}</pre>`;
+        showAlert(document.getElementById("topupAlert"), data.error || "Topup gagal");
       }
-      document.getElementById("vpnResult").innerHTML = html;
-      document.getElementById("vpnResultWrap").style.display = "block";
-    } catch (err) {
-      document.getElementById("vpnResult").innerHTML = `<div class="alert alert-danger fw-bold">❌ Gagal connect ke API Worker.</div>`;
-      document.getElementById("vpnResultWrap").style.display = "block";
-    }
-    document.getElementById("vpnBtn").disabled = false;
-    document.getElementById("btnText").textContent = "Proses";
-    document.getElementById("loadingSpinner").classList.add('d-none');
-  });
-  // Copy hasil
-  document.getElementById('copyVpnHasil').onclick = function() {
-    let txt = document.getElementById('vpnResult').innerText || "";
-    if (txt.trim()) {
-      navigator.clipboard.writeText(txt);
-      let btn = this, old = btn.innerHTML;
-      btn.innerHTML = "<i class='bi bi-clipboard-check'></i>Disalin!";
-      setTimeout(() => btn.innerHTML = old, 1400);
+    } catch {
+      showAlert(document.getElementById("topupAlert"), "Gagal koneksi ke server.");
     }
   };
 }
 
-// ------ Autologin logic saat load page ------
-window.addEventListener("DOMContentLoaded", async function() {
-  if (await checkLogin()) {
-    hide(authWrap); show(vpnMainWrap); show(document.getElementById("logoutBtn"));
-    renderFields(serviceSelect.value);
-  } else {
-    show(authWrap); hide(vpnMainWrap);
-    hide(document.getElementById("logoutBtn"));
+// ---- Beli VPN ----
+async function showBeliVPN() {
+  const tools = document.getElementById("toolsContent");
+  tools.innerHTML = `<div>Loading server...</div>`;
+  let token = getToken();
+  try {
+    const res = await fetch(API_BASE + "/api/user/server-list");
+    const data = await res.json();
+    if (!data.ok) return tools.innerHTML = `<div class="text-danger">${data.error||"Gagal load server."}</div>`;
+    let list = data.servers || [];
+    if (list.length === 0) return tools.innerHTML = `<div class="text-warning">Tidak ada server tersedia.</div>`;
+    let html = `
+      <div class="card p-3 mb-3 shadow-sm">
+        <h5 class="fw-bold mb-3">Beli VPN</h5>
+        <label for="serverSelect" class="form-label">Pilih Server</label>
+        <select id="serverSelect" class="form-select mb-2">
+          ${list.map(s => `<option value="${s.server}">${s.server}</option>`).join("")}
+        </select>
+        <label for="varianSelect" class="form-label">Pilih Varian</label>
+        <select id="varianSelect" class="form-select mb-2"></select>
+        <button class="btn btn-primary w-100" id="submitBeliVpn">Beli Sekarang</button>
+        <div id="beliVpnAlert" class="mt-2"></div>
+        <div id="beliVpnResult" class="mt-3"></div>
+      </div>
+    `;
+    tools.innerHTML = html;
+    // Isi varian awal
+    function updateVarian() {
+      let server = document.getElementById("serverSelect").value;
+      let srv = list.find(s => s.server === server);
+      let v = srv?.varians || [];
+      document.getElementById("varianSelect").innerHTML = v.map(x =>
+        `<option value="${x.name}">${x.name} - Exp: ${x.exp} hari, Quota: ${x.quota}GB, IP: ${x.iplimit}, Harga: Rp${x.price}</option>`
+      ).join("");
+    }
+    updateVarian();
+    document.getElementById("serverSelect").addEventListener("change", updateVarian);
+
+    document.getElementById("submitBeliVpn").onclick = async function(){
+      let server = document.getElementById("serverSelect").value;
+      let varian = document.getElementById("varianSelect").value;
+      let token = getToken();
+      if (!server || !varian) return showAlert(document.getElementById("beliVpnAlert"), "Pilih server/varian");
+      let beliBtn = this;
+      loadingBtn(beliBtn, true);
+      let userBefore = null;
+      // Simpan saldo sebelum beli, supaya bisa refund jika error
+      try {
+        const userData = await fetch(API_BASE + `/api/user/me?token=${encodeURIComponent(token)}`);
+        const ud = await userData.json();
+        userBefore = ud.user;
+      } catch {}
+
+      try {
+        const res = await fetch(API_BASE + "/api/user/beli-vpn", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({ token, server, varianName: varian }),
+        });
+        const data = await res.json();
+        if (data.ok && data.data) {
+          showAlert(document.getElementById("beliVpnAlert"), "Beli VPN sukses!", "success");
+          document.getElementById("beliVpnResult").innerHTML =
+            `<pre class="small text-wrap" style="font-size:.99em;">${JSON.stringify(data.data, null, 2)}</pre>`;
+          // Update saldo tampilan
+          await loadUser();
+        } else {
+          // Refund saldo jika error (otomatis, kalau backend support)
+          if (userBefore) {
+            // Fetch saldo sekarang
+            const afterUser = await fetch(API_BASE + `/api/user/me?token=${encodeURIComponent(token)}`).then(r=>r.json()).then(x=>x.user);
+            if (afterUser && afterUser.saldo < userBefore.saldo) {
+              // saldo berkurang, refund manual
+              await fetch(API_BASE + "/api/user/topup", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({ token, nominal: userBefore.saldo - afterUser.saldo }),
+              });
+            }
+          }
+          showAlert(document.getElementById("beliVpnAlert"), data.error || "Gagal beli VPN");
+          await loadUser();
+        }
+      } catch {
+        showAlert(document.getElementById("beliVpnAlert"), "Gagal koneksi ke server.");
+      }
+      loadingBtn(beliBtn, false);
+    };
+  } catch {
+    tools.innerHTML = `<div class="text-danger">Gagal koneksi ke server.</div>`;
   }
+}
+
+// ----- Log Transaksi user (Opsional: tampilkan 5 terakhir) -----
+async function loadUserTransaksi(username) {
+  // Jika backend belum support log per user, skip fungsi ini
+  // Cuma UI: edit backend kalau mau
+  /*
+  try {
+    const res = await fetch(API_BASE + `/api/user/log?user=${encodeURIComponent(username)}`);
+    const data = await res.json();
+    if (data.ok && data.logs) {
+      let html = `<h6 class="fw-bold mb-1">Riwayat Transaksi</h6><ul class="list-group small">`;
+      let logs = data.logs.slice(-5).reverse();
+      logs.forEach(l => {
+        html += `<li class="list-group-item d-flex justify-content-between">${l.tipe} <span class="text-muted">${new Date(l.ts).toLocaleString()}</span></li>`;
+      });
+      html += `</ul>`;
+      document.getElementById("transaksiLog").innerHTML = html;
+    }
+  } catch {}
+  */
+}
+
+// --------- AUTOLOAD SAAT MASUK PAGE ---------
+window.addEventListener("DOMContentLoaded", () => {
+  if (getToken()) loadUser();
+  else show("authSection");
 });

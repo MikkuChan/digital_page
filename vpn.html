@@ -6,24 +6,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Kelola akun VPN (VMess, VLESS, SSH, Trojan) dengan mudah dan aman di fadzdigital!">
   <link rel="icon" href="https://raw.githubusercontent.com/fadzdigital/image/main/favicon.ico">
-
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-  <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Bootstrap Icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-  <!-- Custom Global CSS -->
   <link href="css/style.css" rel="stylesheet">
-  <!-- Custom Page CSS -->
-  <link href="css/clash-converter.css" rel="stylesheet">
   <link href="css/vpn.css" rel="stylesheet">
 </head>
 <body>
-  
   <!-- Navbar: konsisten semua halaman -->
   <nav class="navbar navbar-expand-lg fixed-top">
     <div class="container">
@@ -52,99 +44,89 @@
   </nav>
 
   <main style="margin-top:90px;min-height:100vh;">
-    <section class="container py-5" id="vpnMainWrap" style="display:none;">
+    <!-- Hero -->
+    <section class="vpn-hero text-center font-display py-5 mb-0" style="background: linear-gradient(180deg, #f9fafb 60%, #e0f2fe 100%);">
+      <div class="container">
+        <span class="badge-tools mb-4 px-4 py-2 fs-6 d-inline-flex align-items-center">
+          <i class="bi bi-shield-lock me-2"></i>Manajemen VPN User
+        </span>
+        <h1 class="display-5 fw-bold mb-3" style="letter-spacing:-1px; color: #333;">
+          <span class="text-gradient" style="background: linear-gradient(90deg, #4285f4, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Dashboard VPN</span> fadzdigital
+        </h1>
+        <p class="lead mx-auto mb-4" style="max-width:660px; font-size:1.1rem; color: #666;">
+          Kelola akun, pembelian, & layanan VPN. <b>Login atau registrasi untuk akses!</b>
+        </p>
+      </div>
+    </section>
+
+    <!-- AUTH CARD (Login/Register) -->
+    <section class="container py-5" id="authSection" style="display:none;">
       <div class="row justify-content-center">
-        <div class="col-lg-8 col-md-11">
-          <div class="vpn-card shadow-lg p-4 mb-4 position-relative">
-            <button class="btn btn-outline-danger btn-sm" id="logoutBtn" type="button" style="display:none;"><i class="bi bi-box-arrow-right"></i> Logout</button>
-            <div class="mb-3"><b>Login sebagai:</b> <span id="userWelcome"></span></div>
-            <form id="vpnForm" autocomplete="off">
-              <div class="row g-3 align-items-center mb-3">
-                <div class="col-md-4">
-                  <label class="form-label fw-bold" for="service">Layanan VPN</label>
-                  <select class="form-select" id="service" required>
-                    <option value="createvmess">Buat VMess</option>
-                    <option value="createvless">Buat VLESS</option>
-                    <option value="createssh">Buat SSH</option>
-                    <option value="createtrojan">Buat Trojan</option>
-                    <option value="renewvmess">Renew VMess</option>
-                    <option value="renewvless">Renew VLESS</option>
-                    <option value="renewssh">Renew SSH</option>
-                    <option value="renewtrojan">Renew Trojan</option>
-                    <option value="cekuserssh">Cek User SSH</option>
-                    <option value="cekuservmess">Cek User VMess</option>
-                    <option value="cekuservless">Cek User VLESS</option>
-                    <option value="cekusertrojan">Cek User Trojan</option>
-                    <option value="deletessh">Hapus SSH</option>
-                    <option value="deletevmess">Hapus VMess</option>
-                    <option value="deletevless">Hapus VLESS</option>
-                    <option value="deletetrojan">Hapus Trojan</option>
-                    <option value="backupserver">Backup Server</option>
-                    <option value="restoreserver">Restore Server</option>
-                  </select>
-                </div>
-                <div class="col-md-8" id="dynamicInputs"></div>
+        <div class="col-md-6">
+          <div class="auth-card p-4 shadow-lg">
+            <div id="authAlert"></div>
+            <h3 id="authTitle" class="text-center fw-bold mb-4">Login User</h3>
+            <form id="loginForm" autocomplete="off">
+              <div class="mb-3">
+                <label for="loginUsername" class="form-label">Username</label>
+                <input type="text" class="form-control" id="loginUsername" placeholder="Username" required>
               </div>
-              <div class="d-grid">
-                <button type="submit" class="btn-vpn-gradient px-4 py-3 fw-bold" id="vpnBtn">
-                  <span id="btnText">Proses</span>
-                  <span id="loadingSpinner" class="spinner-border spinner-border-sm d-none"></span>
-                </button>
+              <div class="mb-3">
+                <label for="loginPassword" class="form-label">Password</label>
+                <input type="password" class="form-control" id="loginPassword" placeholder="Password" required>
               </div>
+              <button type="submit" class="btn btn-vpn-gradient w-100 py-2 fw-bold" id="loginBtn">Login</button>
             </form>
-            <div class="mt-4" id="vpnResultWrap" style="display:none;">
-              <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
-                <button class="btn btn-outline-success btn-sm" id="copyVpnHasil" type="button">
-                  <i class="bi bi-clipboard me-1"></i>Copy Hasil
-                </button>
+            <form id="registerForm" style="display:none;" autocomplete="off">
+              <div class="mb-3">
+                <label for="regUsername" class="form-label">Username</label>
+                <input type="text" class="form-control" id="regUsername" placeholder="Username (4-24 huruf/angka)" required>
               </div>
-              <div id="vpnResult"></div>
+              <div class="mb-3">
+                <label for="regEmail" class="form-label">Email</label>
+                <input type="email" class="form-control" id="regEmail" placeholder="Email valid" required>
+              </div>
+              <div class="mb-3">
+                <label for="regPassword" class="form-label">Password</label>
+                <input type="password" class="form-control" id="regPassword" placeholder="Password min. 6 karakter" required>
+              </div>
+              <button type="submit" class="btn btn-vpn-gradient w-100 py-2 fw-bold" id="registerBtn">Daftar</button>
+            </form>
+            <div class="form-switch-auth mt-3">
+              <span id="switchToReg">Belum punya akun? <a href="#">Daftar disini</a></span>
+              <span id="switchToLogin" style="display:none;">Sudah punya akun? <a href="#">Login</a></span>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- AUTH FORM -->
-    <section id="authWrap">
-      <div class="auth-card">
-        <h2 class="mb-3" id="authTitle">Masuk ke Akun</h2>
-        <div id="authAlert"></div>
-        <form id="loginForm" style="display:block;">
-          <div class="mb-3">
-            <input class="form-control" placeholder="Username" type="text" id="loginUsername" required>
+    <!-- USER DASHBOARD -->
+    <section class="container py-5" id="userSection" style="display:none;">
+      <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-11">
+          <div class="vpn-card shadow-lg p-4 mb-4 position-relative">
+            <button class="btn btn-outline-danger btn-sm" id="logoutBtn" type="button" title="Logout"><i class="bi bi-box-arrow-right me-1"></i>Logout</button>
+            <div class="mb-3" id="userProfile">
+              <!-- User Info diisi oleh JS -->
+            </div>
+            <hr>
+            <div id="vpnUserTools">
+              <!-- Tools VPN, beli/topup dsb, diisi JS -->
+            </div>
           </div>
-          <div class="mb-3">
-            <input class="form-control" placeholder="Password" type="password" id="loginPassword" required>
-          </div>
-          <button class="btn btn-primary w-100 fw-bold" id="loginBtn" type="submit">Login</button>
-        </form>
-        <form id="registerForm" style="display:none;">
-          <div class="mb-3">
-            <input class="form-control" placeholder="Username" type="text" id="regUsername" required>
-          </div>
-          <div class="mb-3">
-            <input class="form-control" placeholder="Password (min 6)" type="password" id="regPassword" required minlength="6">
-          </div>
-          <div class="mb-3">
-            <input class="form-control" placeholder="Email aktif" type="email" id="regEmail" required>
-          </div>
-          <button class="btn btn-success w-100 fw-bold" id="regBtn" type="submit">Daftar</button>
-        </form>
-        <div class="form-switch-auth mt-3">
-          <span id="switchToRegister">Belum punya akun? <a>Daftar!</a></span>
-          <span id="switchToLogin" style="display:none;">Sudah punya akun? <a>Login!</a></span>
         </div>
       </div>
     </section>
   </main>
+
   <footer class="py-4" style="background: var(--gray-900); color:var(--gray-100)">
     <div class="container text-center">
       <div class="mb-2">
         <span class="fw-bold font-display text-gradient" style="font-size:1.3rem;">fadzdigital</span>
       </div>
       <div class="mb-2 small">
-        &copy; 2025 fadzdigital. All rights reserved.<br />
+        &copy; 2025 fadzdigital. All rights reserved.<br>
         Made with 💙 in Indonesia
       </div>
       <div>
