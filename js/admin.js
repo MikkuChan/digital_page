@@ -1,6 +1,6 @@
 // js/admin.js
 const API_BASE = "https://api-v1.fadzdigital.dpdns.org";
-const ADMIN_TOKEN_KEY = "fadzdigital_admin_token";
+const ADMIN_TOKEN_KEY = "pinggulnya";
 
 // --- UTILS ---
 function showNotif(msg, type = "success") {
