@@ -2,219 +2,72 @@
 <html lang="id" class="light-mode">
 <head>
   <meta charset="UTF-8">
-  <title>Admin Dashboard – fadzdigital</title>
+  <title>Admin Panel – fadzdigital</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Dashboard admin Fadzdigital. Kelola user, server VPN, varian, pendapatan dan log transaksi dengan mudah.">
   <link rel="icon" href="https://raw.githubusercontent.com/fadzdigital/image/main/favicon.ico">
-  <!-- Google Fonts & Bootstrap -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link href="css/admin.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-  <link href="css/style.css" rel="stylesheet">
-  <link href="css/admin.css" rel="stylesheet">
 </head>
 <body>
-  <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg fixed-top">
+  <nav class="navbar navbar-expand-lg fixed-top admin-navbar">
     <div class="container">
       <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
-        <img src="https://raw.githubusercontent.com/fadzdigital/image/main/fadzdigital.png" alt="fadzdigital Logo" style="height:38px;width:auto;object-fit:contain;" />
-        <span class="text-gradient" style="font-size:2rem;font-weight:700;">fadzdigital</span>
+        <img src="https://raw.githubusercontent.com/fadzdigital/image/main/fadzdigital.png" alt="fadzdigital Logo" style="height:36px;object-fit:contain;">
+        <span class="text-gradient" style="font-size:1.5rem;font-weight:700;">fadzdigital <span class="d-none d-md-inline">Admin</span></span>
       </a>
       <button class="navbar-toggler border-0 p-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
         <span class="navbar-toggler-icon"></span>
       </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav mx-auto">
-          <li class="nav-item"><a class="nav-link" href="index.html">Beranda</a></li>
-          <li class="nav-item"><a class="nav-link" href="produk.html">Produk</a></li>
-          <li class="nav-item"><a class="nav-link" href="tools.html">Tools</a></li>
-          <li class="nav-item"><a class="nav-link active" href="admin.html">Admin</a></li>
-        </ul>
-        <div class="d-flex align-items-center gap-3">
-          <button class="theme-toggle" id="themeToggle" aria-label="Toggle tema"></button>
-        </div>
-      </div>
+      <div class="collapse navbar-collapse" id="navbarNav"></div>
+      <button class="btn btn-sm btn-danger ms-auto d-none" id="logoutBtn"><i class="bi bi-box-arrow-right"></i> Logout</button>
     </div>
   </nav>
-  <main style="margin-top:90px;min-height:100vh;">
-    <!-- Admin Login (hidden saat sudah login) -->
-    <section id="adminLoginSection" class="container" style="max-width:380px;">
-      <div class="admin-card p-4 mt-5 mb-3 shadow text-center">
-        <h2 class="mb-3 fw-bold"><i class="bi bi-lock"></i> Admin Login</h2>
+  <main style="margin-top:80px;">
+    <section class="container">
+      <div id="adminAlert"></div>
+
+      <!-- Login Form -->
+      <div id="adminLoginSection" class="admin-card mt-5" style="max-width:380px;margin:auto;">
+        <h2 class="mb-3">Login Admin</h2>
         <form id="adminLoginForm" autocomplete="off">
           <div class="mb-3">
-            <input type="text" class="form-control" id="adminUser" placeholder="Username" autocomplete="username" required />
+            <label for="adminUsername" class="form-label">Username</label>
+            <input type="text" class="form-control" id="adminUsername" autocomplete="username" required>
           </div>
           <div class="mb-3">
-            <input type="password" class="form-control" id="adminPass" placeholder="Password" autocomplete="current-password" required />
+            <label for="adminPassword" class="form-label">Password</label>
+            <input type="password" class="form-control" id="adminPassword" autocomplete="current-password" required>
           </div>
-          <button class="btn btn-primary w-100 fw-bold" type="submit">Login Admin</button>
+          <button type="submit" class="btn btn-primary w-100 fw-bold" id="loginBtn"><i class="bi bi-shield-lock"></i> Login</button>
         </form>
-        <div id="adminLoginError" class="alert alert-danger mt-3 py-2 d-none"></div>
       </div>
-    </section>
-    <!-- Admin Panel -->
-    <section id="adminPanelSection" class="container" style="display:none;">
-      <div class="row g-4">
-        <div class="col-12 mb-3">
-          <div class="d-flex justify-content-between align-items-center">
-            <h2 class="fw-bold"><i class="bi bi-speedometer2 me-2"></i>Dashboard Admin</h2>
-            <button class="btn btn-outline-danger" id="adminLogoutBtn"><i class="bi bi-box-arrow-right"></i> Logout</button>
+
+      <!-- Main Admin Panel (hidden before login) -->
+      <div id="adminPanelSection" class="d-none admin-panel-content">
+        <div class="row mb-4">
+          <div class="col">
+            <h3 class="mt-3 mb-2"><i class="bi bi-speedometer2 me-1"></i> Dashboard Admin</h3>
           </div>
         </div>
-        <!-- Tabs -->
-        <div class="col-12 mb-2">
-          <ul class="nav nav-pills mb-3" id="adminTabs">
-            <li class="nav-item"><a class="nav-link active" data-tab="user" href="#">User</a></li>
-            <li class="nav-item"><a class="nav-link" data-tab="server" href="#">Server</a></li>
-            <li class="nav-item"><a class="nav-link" data-tab="log" href="#">Transaksi & Pendapatan</a></li>
-          </ul>
-        </div>
-        <!-- Tab Content -->
-        <div class="col-12">
-          <div id="tab-user" class="admin-tab-panel">
-            <h5 class="mb-3"><i class="bi bi-people"></i> Kelola User</h5>
-            <div class="table-responsive">
-              <table class="table table-striped table-hover align-middle" id="adminUserTable">
-                <thead class="table-light">
-                  <tr>
-                    <th>Username</th><th>Email</th><th>Status</th><th>Saldo</th><th>Action</th>
-                  </tr>
-                </thead>
-                <tbody></tbody>
-              </table>
-            </div>
-          </div>
-          <div id="tab-server" class="admin-tab-panel d-none">
-            <h5 class="mb-3"><i class="bi bi-server"></i> Kelola Server & Varian</h5>
-            <div class="mb-3">
-              <button class="btn btn-success" id="addServerBtn"><i class="bi bi-plus-circle"></i> Tambah Server</button>
-            </div>
-            <div id="adminServerList"></div>
-          </div>
-          <div id="tab-log" class="admin-tab-panel d-none">
-            <h5 class="mb-3"><i class="bi bi-clock-history"></i> Log Transaksi & Pendapatan</h5>
-            <div class="mb-2">
-              <input type="date" class="form-control d-inline-block w-auto" id="logDate" />
-              <span class="ms-3 fw-bold">Pendapatan Hari Ini: <span id="pendapatanHariIni" class="text-success">Rp 0</span></span>
-            </div>
-            <div class="table-responsive">
-              <table class="table table-striped align-middle" id="logTable">
-                <thead class="table-light">
-                  <tr>
-                    <th>Waktu</th><th>User</th><th>Server</th><th>Varian</th><th>Harga</th><th>Jenis</th>
-                  </tr>
-                </thead>
-                <tbody></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- Modal tambah/edit server -->
-      <div class="modal fade" id="serverModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content">
-            <form id="serverForm">
-              <div class="modal-header">
-                <h5 class="modal-title" id="serverModalLabel">Tambah/Edit Server</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body">
-                <input type="hidden" id="serverFormMode" value="add" />
-                <div class="mb-3">
-                  <label class="form-label">Nama Server</label>
-                  <input type="text" class="form-control" id="serverName" required />
-                </div>
-                <div class="mb-3">
-                  <label class="form-label">Base URL API Server</label>
-                  <input type="url" class="form-control" id="serverBaseUrl" placeholder="http://..." required />
-                </div>
-                <div class="mb-3">
-                  <label class="form-label">Auth Key API</label>
-                  <input type="text" class="form-control" id="serverAuthKey" required />
-                </div>
-                <div class="mb-3">
-                  <label class="form-label">Status</label>
-                  <select class="form-select" id="serverStatus">
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                  </select>
-                </div>
-              </div>
-              <div class="modal-footer">
-                <button class="btn btn-primary" type="submit">Simpan</button>
-                <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Batal</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-      <!-- Modal tambah/edit varian -->
-      <div class="modal fade" id="varianModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content">
-            <form id="varianForm">
-              <div class="modal-header">
-                <h5 class="modal-title" id="varianModalLabel">Tambah/Edit Varian</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body">
-                <input type="hidden" id="varianServerName" />
-                <div class="mb-3">
-                  <label class="form-label">Nama Varian</label>
-                  <input type="text" class="form-control" id="varianName" required />
-                </div>
-                <div class="mb-3">
-                  <label class="form-label">Expired (hari)</label>
-                  <input type="number" class="form-control" id="varianExp" min="1" max="365" required />
-                </div>
-                <div class="mb-3">
-                  <label class="form-label">Kuota (GB)</label>
-                  <input type="number" class="form-control" id="varianQuota" min="1" max="10000" required />
-                </div>
-                <div class="mb-3">
-                  <label class="form-label">IP Limit</label>
-                  <input type="number" class="form-control" id="varianIpLimit" min="1" max="99" required />
-                </div>
-                <div class="mb-3">
-                  <label class="form-label">Harga (Rp)</label>
-                  <input type="number" class="form-control" id="varianPrice" min="0" max="1000000" required />
-                </div>
-                <div class="mb-3">
-                  <label class="form-label">Deskripsi Varian</label>
-                  <textarea class="form-control" id="varianDesc" rows="2"></textarea>
-                </div>
-              </div>
-              <div class="modal-footer">
-                <button class="btn btn-primary" type="submit">Simpan</button>
-                <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Batal</button>
-              </div>
-            </form>
-          </div>
-        </div>
+        <ul class="nav nav-tabs mb-3" id="adminTab">
+          <li class="nav-item"><button class="nav-link active" data-tab="user">ACC User</button></li>
+          <li class="nav-item"><button class="nav-link" data-tab="server">Manage Server</button></li>
+          <li class="nav-item"><button class="nav-link" data-tab="varian">Varian VPN</button></li>
+          <li class="nav-item"><button class="nav-link" data-tab="log">Log & Pendapatan</button></li>
+        </ul>
+        <!-- Tab: User -->
+        <div class="admin-tab" id="tab-user"></div>
+        <!-- Tab: Server -->
+        <div class="admin-tab d-none" id="tab-server"></div>
+        <!-- Tab: Varian -->
+        <div class="admin-tab d-none" id="tab-varian"></div>
+        <!-- Tab: Log -->
+        <div class="admin-tab d-none" id="tab-log"></div>
       </div>
     </section>
   </main>
-  <footer class="py-4" style="background: var(--gray-900); color:var(--gray-100)">
-    <div class="container text-center">
-      <div class="mb-2">
-        <span class="fw-bold font-display text-gradient" style="font-size:1.3rem;">fadzdigital</span>
-      </div>
-      <div class="mb-2 small">
-        &copy; 2025 fadzdigital. All rights reserved.<br>
-        Made with 💙 in Indonesia
-      </div>
-      <div>
-        <a href="index.html" class="text-primary small text-decoration-none mx-2">Beranda</a>
-        <a href="produk.html" class="text-primary small text-decoration-none mx-2">Produk</a>
-        <a href="tools.html" class="text-primary small text-decoration-none mx-2">Tools</a>
-        <a href="index.html#contact" class="text-primary small text-decoration-none mx-2">Kontak</a>
-      </div>
-    </div>
-  </footer>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="js/admin.js"></script>
 </body>
 </html>
