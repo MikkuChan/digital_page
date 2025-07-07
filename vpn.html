@@ -52,24 +52,12 @@
   </nav>
 
   <main style="margin-top:90px;min-height:100vh;">
-    <section class="chatgpt-hero text-center font-display py-5 mb-0" style="background: linear-gradient(180deg, #f9fafb 60%, #e0f2fe 100%);">
-      <div class="container">
-        <span class="badge-tools mb-4 px-4 py-2 fs-6 d-inline-flex align-items-center">
-          <i class="bi bi-chat-dots me-2"></i>Vpn Manage Web
-        </span>
-        <h1 class="display-5 fw-bold mb-3" style="letter-spacing:-1px; color: #333;">
-          Chat <span class="text-gradient" style="background: linear-gradient(90deg, #4285f4, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Vpn Manage</span> Indonesia
-        </h1>
-        <p class="lead mx-auto mb-4" style="max-width:700px; font-size:1.1rem; color: #666;">
-          Buat, perpanjang, cek, backup, restore, dan hapus akun VPN (VMess, VLESS, SSH, Trojan) secara gratis & cepat di fadzdigital!
-        </p>
-      </div>
-    </section>
-
-    <section class="container py-5">
+    <section class="container py-5" id="vpnMainWrap" style="display:none;">
       <div class="row justify-content-center">
         <div class="col-lg-8 col-md-11">
-          <div class="vpn-card shadow-lg p-4 mb-4">
+          <div class="vpn-card shadow-lg p-4 mb-4 position-relative">
+            <button class="btn btn-outline-danger btn-sm" id="logoutBtn" type="button" style="display:none;"><i class="bi bi-box-arrow-right"></i> Logout</button>
+            <div class="mb-3"><b>Login sebagai:</b> <span id="userWelcome"></span></div>
             <form id="vpnForm" autocomplete="off">
               <div class="row g-3 align-items-center mb-3">
                 <div class="col-md-4">
@@ -95,9 +83,7 @@
                     <option value="restoreserver">Restore Server</option>
                   </select>
                 </div>
-                <div class="col-md-8" id="dynamicInputs">
-                  <!-- Field dinamis akan muncul di sini -->
-                </div>
+                <div class="col-md-8" id="dynamicInputs"></div>
               </div>
               <div class="d-grid">
                 <button type="submit" class="btn-vpn-gradient px-4 py-3 fw-bold" id="vpnBtn">
@@ -115,6 +101,39 @@
               <div id="vpnResult"></div>
             </div>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- AUTH FORM -->
+    <section id="authWrap">
+      <div class="auth-card">
+        <h2 class="mb-3" id="authTitle">Masuk ke Akun</h2>
+        <div id="authAlert"></div>
+        <form id="loginForm" style="display:block;">
+          <div class="mb-3">
+            <input class="form-control" placeholder="Username" type="text" id="loginUsername" required>
+          </div>
+          <div class="mb-3">
+            <input class="form-control" placeholder="Password" type="password" id="loginPassword" required>
+          </div>
+          <button class="btn btn-primary w-100 fw-bold" id="loginBtn" type="submit">Login</button>
+        </form>
+        <form id="registerForm" style="display:none;">
+          <div class="mb-3">
+            <input class="form-control" placeholder="Username" type="text" id="regUsername" required>
+          </div>
+          <div class="mb-3">
+            <input class="form-control" placeholder="Password (min 6)" type="password" id="regPassword" required minlength="6">
+          </div>
+          <div class="mb-3">
+            <input class="form-control" placeholder="Email aktif" type="email" id="regEmail" required>
+          </div>
+          <button class="btn btn-success w-100 fw-bold" id="regBtn" type="submit">Daftar</button>
+        </form>
+        <div class="form-switch-auth mt-3">
+          <span id="switchToRegister">Belum punya akun? <a>Daftar!</a></span>
+          <span id="switchToLogin" style="display:none;">Sudah punya akun? <a>Login!</a></span>
         </div>
       </div>
     </section>
