@@ -1,6 +1,6 @@
 // js/admin.js
 const API_BASE = "https://api-v1.fadzdigital.dpdns.org";
-const ADMIN_TOKEN_KEY = "pinggulnya";
+const ADMIN_TOKEN_KEY = "fadzdigital_admin_token";
 
 // --- UTILS ---
 function showNotif(msg, type = "success") {
@@ -56,16 +56,16 @@ loginForm.onsubmit = async (e) => {
   const username = document.getElementById("adminUser").value.trim();
   const password = document.getElementById("adminPass").value.trim();
   try {
-    const res = await fetch(API_BASE + "/api-admin/list-user", {
-      headers: {
-        Authorization: "Bearer " + btoa(username + ":" + password + ":pinggulnya")
-      }
+    // Call /api-admin/login
+    const res = await fetch(API_BASE + "/api-admin/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ user: username, pass: password })
     });
-    if (res.status === 403) throw new Error("Username/password salah.");
-    if (!res.ok) throw new Error("Gagal login admin.");
-    // --- LOGIN: worker cuma cek token, manual cek user/pw di sini ---
-    // Dapat token: encode base64(username:password:pinggulnya)
-    saveAdminToken(btoa(username + ":" + password + ":pinggulnya"));
+    const data = await res.json();
+    if (!res.ok || !data.ok) throw new Error(data.error || "Username/password salah!");
+    // Save the token
+    saveAdminToken(data.token);
     showPanel();
     showNotif("Berhasil login sebagai admin!");
     loginForm.reset();
