@@ -1,0 +1,56 @@
+body, html {
+  font-family: 'Inter', Arial, sans-serif;
+  background: #f8fafc;
+}
+.vpn-hero {
+  background: linear-gradient(180deg, #f9fafb 60%, #e0f2fe 100%);
+}
+.vpn-hero-icon {
+  font-size: 1.3em;
+  color: #4299e1;
+}
+.badge-tools {
+  background: #e0e7ef;
+  color: #4263eb;
+  border-radius: 1em;
+  font-weight: 500;
+  font-family: 'Inter', monospace;
+}
+.vpn-card {
+  background: #fff;
+  border-radius: 1.5rem;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.09), 0 1.5px 5px rgba(0,0,0,0.07);
+  border: 1px solid #e3e8f7;
+  font-size: 1.07em;
+}
+.btn-vpn-gradient {
+  background: linear-gradient(90deg,#4299e1 0,#38b2ac 100%);
+  color: #fff;
+  border: none;
+  border-radius: 1.3em;
+  font-size: 1.13em;
+  font-weight: 700;
+  letter-spacing: .02em;
+  box-shadow: 0 2px 8px #e2e8f6;
+  transition: box-shadow .19s;
+}
+.btn-vpn-gradient:hover, .btn-vpn-gradient:focus {
+  background: linear-gradient(90deg,#38b2ac 0,#4299e1 100%);
+  color: #fff;
+  box-shadow: 0 6px 18px #4299e11a;
+}
+#vpnResult pre {
+  background: #f5f7fa;
+  color: #27336b;
+  border-radius: 1em;
+  padding: 1em;
+  font-size: 1em;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+#vpnResult, #vpnResultWrap {
+  font-family: 'Inter', monospace;
+}
+@media (max-width: 600px) {
+  .vpn-card, .vpn-hero { padding: 1.1em !important; }
+}
