@@ -4,23 +4,58 @@
   box-shadow: 0 8px 40px rgba(0,0,0,0.09), 0 1.5px 5px rgba(0,0,0,0.07);
   border: 1px solid #e3e8f7;
 }
+
 .kuota-input-card {
   border: 1px solid #dbeafe;
   background: #f3f6fa;
 }
+
 #hasil, #hasilwrap {
   font-family: 'Inter', monospace;
 }
+
 #hasil ul {
   margin: 0 0 0 16px;
   padding-left: 0.5em;
 }
+
 #hasil li {
   font-size: 1rem;
 }
+
 #copyHasil {
   min-width: 110px;
 }
+
+.kuota-progress-container {
+  height: 20px;
+  background-color: #e9ecef;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.kuota-progress-bar {
+  height: 100%;
+  text-align: right;
+  padding-right: 10px;
+  color: #fff;
+  font-weight: bold;
+}
+
+.progress-high {
+  background-color: #28a745;
+}
+
+.progress-medium {
+  background-color: #ffc107;
+}
+
+.progress-low {
+  background-color: #dc3545;
+}
+
 @media (max-width: 600px) {
-  .cek-kuota-card, .kuota-input-card { padding: 1.2em !important; }
+  .cek-kuota-card, .kuota-input-card {
+    padding: 1.2em !important;
+  }
 }
