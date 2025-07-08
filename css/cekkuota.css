@@ -1,26 +1,437 @@
+/* Main Containers & Cards */
 .cek-kuota-card {
   background: #fff;
   border-radius: 1.5rem;
   box-shadow: 0 8px 40px rgba(0,0,0,0.09), 0 1.5px 5px rgba(0,0,0,0.07);
   border: 1px solid #e3e8f7;
+  transition: all 0.3s ease;
 }
+
 .kuota-input-card {
   border: 1px solid #dbeafe;
   background: #f3f6fa;
+  transition: all 0.3s ease;
 }
+
+.kuota-input-card:focus-within {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+}
+
 #hasil, #hasilwrap {
-  font-family: 'Inter', monospace;
+  font-family: 'Inter', sans-serif;
 }
+
+.kuota-result-container {
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.kuota-info-card {
+  background: #f8fafc;
+  border-radius: 1rem;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+/* Headers & Text Elements */
+.kuota-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.kuota-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.75rem;
+  border-radius: 2rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-right: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.kuota-badge-primary {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.kuota-badge-success {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.kuota-badge-warning {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.kuota-badge-danger {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+/* Package Container */
+.kuota-package {
+  background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+  border-radius: 1rem;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+  border: 1px solid #bae6fd;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.kuota-package:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.kuota-package-name {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #0369a1;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px dashed #bae6fd;
+}
+
+.kuota-package-expiry {
+  font-size: 0.9rem;
+  color: #0e7490;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* Detail Items */
+.kuota-detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.kuota-detail-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.kuota-detail-label {
+  font-weight: 500;
+  color: #334155;
+}
+
+.kuota-detail-value {
+  font-weight: 700;
+  color: #0369a1;
+}
+
+.kuota-benefit-type {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.kuota-benefit-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 1rem;
+  color: white;
+  background: linear-gradient(135deg, #3b82f6, #0ea5e9);
+}
+
+.kuota-benefit-name {
+  font-weight: 500;
+  color: #334155;
+}
+
+.kuota-benefit-value {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+}
+
+.kuota-benefit-quota {
+  font-weight: 700;
+  color: #0369a1;
+  font-size: 1.1rem;
+}
+
+.kuota-benefit-total {
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+/* Progress Bars */
+.kuota-progress-container {
+  margin-top: 0.5rem;
+  width: 100%;
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.kuota-progress-bar {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 1s ease;
+}
+
+.progress-high {
+  background: linear-gradient(90deg, #22c55e, #10b981);
+}
+
+.progress-medium {
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
+}
+
+.progress-low {
+  background: linear-gradient(90deg, #ef4444, #f87171);
+}
+
+/* Animations & Effects */
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.loading-spinner {
+  display: inline-block;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 3px solid rgba(59, 130, 246, 0.3);
+  border-radius: 50%;
+  border-top-color: #3b82f6;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .cek-kuota-card, 
+  .kuota-input-card { 
+    padding: 1.2em !important; 
+  }
+  
+  .kuota-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .kuota-detail-item {
+    flex-wrap: wrap;
+  }
+  
+  .kuota-package-expiry {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .kuota-benefit-type {
+    margin-bottom: 0.5rem;
+  }
+  
+  .kuota-benefit-value {
+    width: 100%;
+    align-items: flex-start;
+    margin-top: 0.5rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .kuota-detail-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .kuota-detail-value {
+    margin-top: 0.25rem;
+    align-self: flex-start;
+  }
+  
+  .kuota-badge {
+    margin-bottom: 0.5rem;
+  }
+}
+
+/* Button Styles */
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.action-btn:hover {
+  transform: translateY(-2px);
+}
+
+.action-btn-copy {
+  color: #15803d;
+  background-color: #dcfce7;
+  border: 1px solid #86efac;
+}
+
+.action-btn-copy:hover {
+  background-color: #bbf7d0;
+}
+
+.action-btn-refresh {
+  color: #1d4ed8;
+  background-color: #dbeafe;
+  border: 1px solid #93c5fd;
+}
+
+.action-btn-refresh:hover {
+  background-color: #bfdbfe;
+}
+
+/* Toast Notification */
+.toast-notification {
+  position: fixed;
+  top: 80px;
+  right: 24px;
+  padding: 0.75rem 1.5rem;
+  background: #16a34a;
+  color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  font-weight: 600;
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.toast-notification.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Extra UI Enhancements */
+.input-icon {
+  transition: all 0.3s ease;
+}
+
+.form-control:focus + .input-icon {
+  transform: scale(1.1);
+}
+
+/* Add pulse animation for empty state */
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+  color: #64748b;
+  animation: pulse 2s infinite;
+}
+
+.empty-state i {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+/* Form focused state */
+.form-focused .cek-kuota-card {
+  box-shadow: 0 12px 50px rgba(59, 130, 246, 0.15);
+}
+
+/* Input field enhancement */
+#msisdn {
+  font-size: 1.1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  transition: all 0.3s ease;
+}
+
+#msisdn:focus {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+  border-color: #3b82f6;
+}
+
+/* Custom styles for the submit button */
+#cekBtn {
+  transition: all 0.3s ease;
+  border-radius: 1rem;
+  font-size: 1rem;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+}
+
+#cekBtn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.3);
+}
+
+#cekBtn:active {
+  transform: translateY(-1px);
+}
+
+/* Copy result button enhancement */
+#copyHasil {
+  min-width: 110px;
+  border-radius: 0.75rem;
+  transition: all 0.3s ease;
+}
+
+#copyHasil:hover {
+  transform: translateY(-2px);
+}
+
+/* Enhance the basic list styles */
 #hasil ul {
   margin: 0 0 0 16px;
   padding-left: 0.5em;
+  list-style-type: none;
 }
+
 #hasil li {
   font-size: 1rem;
+  margin-bottom: 1rem;
+  position: relative;
 }
-#copyHasil {
-  min-width: 110px;
+
+#hasil li:before {
+  content: "";
+  position: absolute;
+  left: -16px;
+  top: 8px;
+  width: 8px;
+  height: 8px;
+  background-color: #3b82f6;
+  border-radius: 50%;
 }
-@media (max-width: 600px) {
-  .cek-kuota-card, .kuota-input-card { padding: 1.2em !important; }
-}
+
