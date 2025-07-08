@@ -265,18 +265,7 @@
   }
 }
 
-/* ===== DARK MODE ===== */
-[data-theme="dark"] .produk-feature-card {
-  background: rgba(31,41,55,0.98);
-  color: var(--gray-100);
-  border: 1.5px solid var(--gray-700);
-}
-[data-theme="dark"] .produk-section-title {
-  color: var(--gray-100);
-}
-[data-theme="dark"] .produk-hero-section {
-  background: linear-gradient(120deg,#111827 0,#1f2937 80%);
-}
+
 /* ===== HERO SECTION - FIXED ===== */
 .produk-hero-section {
   min-height: auto;
@@ -573,17 +562,4 @@
     min-height: 38px;
     font-size: .95rem;
   }
-}
-
-/* ===== DARK MODE ===== */
-[data-theme="dark"] .produk-feature-card {
-  background: linear-gradient(120deg,#232a35 0,#1a2330 100%) !important;
-  color: var(--gray-100);
-  border: 1.5px solid var(--gray-700);
-}
-[data-theme="dark"] .produk-section-title {
-  color: var(--gray-100);
-}
-[data-theme="dark"] .produk-hero-section {
-  background: linear-gradient(120deg,#111827 0,#1f2937 80%);
 }

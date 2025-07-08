@@ -224,21 +224,6 @@
     font-size: .95rem;
   }
 }
-/* --- Dark Mode Support --- */
-[data-theme="dark"] .badge-tutorial {background: linear-gradient(90deg,var(--primary-900),var(--success-500));}
-[data-theme="dark"] .tutorial-toc-bar,
-[data-theme="dark"] .tutorial-step-card,
-[data-theme="dark"] .tutorial-accordion .accordion-button,
-[data-theme="dark"] .accordion-body {
-  background: #181f31;
-  color: var(--gray-100);
-}
-[data-theme="dark"] .step-title {color: var(--gray-100);}
-[data-theme="dark"] .tutorial-step-card:hover, 
-[data-theme="dark"] .tutorial-step-card.active {
-  border:1.2px solid var(--primary-500);
-  background: #1e293b;
-}
 
 /* --- Wrap List Download Agar Tidak Overflow di Mobile --- */
 .tutorial-step-card .download-list {
