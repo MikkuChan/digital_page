@@ -6,13 +6,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Katalog produk digital fadzdigital: VPN, VPS DigitalOcean, Bot Telegram, Kuota XL. Support fast response, harga jujur, garansi aman.">
   <link rel="icon" href="https://raw.githubusercontent.com/fadzdigital/image/main/favicon.ico">
-  <!-- FONT GOOGLE SAMA PERSIS HOMEPAGE -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
   <link href="css/style.css" rel="stylesheet">
+  <link href="css/clash-converter.css" rel="stylesheet">
   <link href="css/product.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <style>
@@ -25,6 +25,10 @@
   </style>
 </head>
 <body>
+  <!-- Loading Screen -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+  </div>
   <!-- Navbar copy homepage -->
   <nav class="navbar navbar-expand-lg fixed-top">
     <div class="container">
@@ -52,189 +56,439 @@
       </div>
     </div>
   </nav>
-
   <main style="margin-top:90px;min-height:100vh;">
-    <!-- HERO PRODUK TANPA SVG -->
-    <section class="produk-hero-section text-center font-display">
-      <div class="container position-relative" style="z-index:1;">
-        <span class="badge-premium mb-3 px-3 py-2" style="font-size:1rem;"><i class="bi bi-stars me-2"></i>Katalog Produk Terbaik</span>
-        <h1 class="display-5 fw-bold mb-3" style="line-height:1.12;">Produk <span class="text-gradient">Digital</span> fadzdigital</h1>
-        <p class="lead" style="max-width:660px;margin:auto;font-family:var(--font-primary);font-size:1.17rem;">
-          Semua solusi digital <b>premium</b> dalam satu halaman.<br>
-          Nikmati harga transparan, layanan personal, support 24/7, dan garansi.
+    <section class="clash-converter-hero text-center font-display py-5 mb-0" style="background: linear-gradient(180deg, #f9fafb 60%, #e0f2fe 100%);">
+      <div class="container">
+        <span class="badge-tools mb-4 px-4 py-2 fs-6 d-inline-flex align-items-center">
+          <i class="bi bi-shop-window me-2"></i>
+          Pilihan Produk Unggulan
+        </span>
+        <h1 class="display-5 fw-bold mb-3" style="letter-spacing:-1px; color: #333;">
+          Temukan <span class="text-gradient" style="background: linear-gradient(90deg, #4285f4, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Produk Terbaik</span> di fadzdigital
+        </h1>
+        <p class="lead mx-auto mb-4" style="max-width:650px; font-size:1.1rem; color: #666;">
+          Rasakan pengalaman belanja <span style="font-weight:500;">harga transparan</span> dengan pelayanan personal. Tersedia layanan VPN, Kuota, AutoScript VPN, Sewa Bot, hingga VPS DigitalOcean!
         </p>
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+          <span class="badge bg-light text-primary px-3 py-2 d-inline-flex align-items-center" style="font-size: 1rem; border-radius: 1.5rem; box-shadow: 0 1px 5px #e0e7ef;">
+            <i class="bi bi-box-seam me-1"></i>
+            Produk Variatif
+          </span>
+          <span class="badge bg-light text-success px-3 py-2 d-inline-flex align-items-center" style="font-size: 1rem; border-radius: 1.5rem; box-shadow: 0 1px 5px #e0e7ef;">
+            <i class="bi bi-shield-check me-1"></i>
+            Transaksi Aman
+          </span>
+          <span class="badge bg-light text-warning px-3 py-2 d-inline-flex align-items-center" style="font-size: 1rem; border-radius: 1.5rem; box-shadow: 0 1px 5px #e0e7ef;">
+            <i class="bi bi-lightning-charge me-1"></i>
+            Respons Cepat
+          </span>
+        </div>
       </div>
     </section>
-
     <!-- GRID PRODUK UTAMA -->
     <section class="produk-grid-section section-padding" style="background:var(--gray-50);">
       <div class="container">
-        <!-- ===== VPN ===== -->
-        <div class="row g-4 justify-content-center align-items-start mb-4">
+        <!-- ===== VPN SINGAPORE - DIGITAL OCEAN ===== -->
+        <div class="row g-4 justify-content-center align-items-stretch mb-4">
           <div class="col-12">
             <div class="produk-section-title font-display mb-2 d-flex align-items-center gap-2" data-aos="fade-right">
               <span class="produk-ikon-lg bg-gradient-primary"><i class="bi bi-shield-lock"></i></span>
-              VPN Premium
-              <span class="produk-badge badge bg-gradient-primary ms-2">Best Seller</span>
+              VPN Singapore - DIGITAL OCEAN
+              <span class="produk-badge badge bg-gradient-primary ms-2"><i class="bi bi-award me-1"></i>Best Seller</span>
             </div>
-            <p class="text-muted mb-4" style="max-width:480px;">Aman, cepat, tanpa ribet. Untuk internetan lancar & privasi maksimal di semua device.</p>
+            <p class="text-muted mb-4" style="max-width:480px;">
+              Aman, cepat, tanpa ribet. Untuk internetan lancar & privasi maksimal di semua device.
+            </p>
           </div>
+          <!-- SG DO Reguler -->
           <div class="col-md-6 col-lg-4" data-aos="fade-up">
             <div class="produk-feature-card">
               <div class="produk-feature-ikon bg-primary"><i class="bi bi-shield-lock"></i></div>
-              <div>
-                <div class="produk-badge badge bg-primary">VPN Basic</div>
-                <div class="produk-harga font-display mb-1">Rp 25K <span>/bulan</span></div>
-                <ul class="produk-list list-unstyled small mb-3">
-                  <li>5 Device • 20+ Server</li>
-                  <li>Unlimited Bandwidth</li>
-                  <li>No Log Policy</li>
-                  <li>Garansi 30 hari</li>
+              <div class="produk-content-wrapper">
+                <div class="produk-badge badge bg-primary">SG DO Reguler</div>
+                <div class="produk-harga font-display mb-1">Rp 10K <span>/bulan</span></div>
+                <ul class="produk-list list-unstyled small">
+                  <li><i class="bi-check-circle text-success me-1"></i>Untuk Pengguna Pribadi/Hp/IOS</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Max 2 Device login</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Kuota 300GB</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Masa Aktif 30 Hari</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Vmess/Vless/Trojan/SSH</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Support VC & Call</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Support Game</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Garansi Akun Aktif</li>
+                  <li><i class="bi bi-x-circle text-danger me-1"></i>Non STB/Hotspot/Wifi-sharing</li>
                 </ul>
-                <a href="https://wa.me/6285727035336?text=Order+VPN+Basic" class="btn btn-primary w-100 rounded-pill fw-bold">Pesan Sekarang</a>
+              </div>
+              <div class="produk-button-wrapper">
+                <a href="https://wa.me/6285727035336?text=Order+VPN+SG+DO+Reguler" class="btn btn-primary w-100 rounded-pill fw-bold d-flex align-items-center justify-content-center">
+                  <i class="bi bi-cart-plus me-2"></i>Pesan Sekarang
+                </a>
               </div>
             </div>
           </div>
+          <!-- SG DO STB/Hotspot -->
           <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
             <div class="produk-feature-card">
               <div class="produk-feature-ikon bg-success"><i class="bi bi-shield-check"></i></div>
-              <div>
-                <div class="produk-badge badge bg-success">VPN Premium</div>
-                <div class="produk-harga font-display mb-1">Rp 50K <span>/bulan</span></div>
-                <ul class="produk-list list-unstyled small mb-3">
-                  <li>10 Device • 50+ Server</li>
-                  <li>Multi Platform</li>
-                  <li>Priority Support</li>
-                  <li>Garansi 30 hari</li>
+              <div class="produk-content-wrapper">
+                <div class="produk-badge badge bg-success">SG DO STB/Hotspot</div>
+                <div class="produk-harga font-display mb-1">Rp 15K <span>/bulan</span></div>
+                <ul class="produk-list list-unstyled small">
+                  <li><i class="bi-check-circle text-success me-1"></i>Untuk Pengguna Openwrt/Wifi-Sharing</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Max 1 Device login</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Kuota 600GB</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Masa Aktif 30 Hari</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Vmess/Vless/Trojan/SSH</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Support VC & Call</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Support Game</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Garansi Akun Aktif</li>
+                  <li><i class="bi bi-x-circle text-danger me-1"></i>Non RT/RWnet</li>
                 </ul>
-                <a href="https://wa.me/6285727035336?text=Order+VPN+Premium" class="btn btn-success w-100 rounded-pill fw-bold">Pesan Sekarang</a>
+              </div>
+              <div class="produk-button-wrapper">
+                <a href="https://wa.me/6285727035336?text=Order+VPN+Premium+SG+DO+Stb/Hostpot" class="btn btn-success w-100 rounded-pill fw-bold d-flex align-items-center justify-content-center">
+                  <i class="bi bi-cart-plus me-2"></i>Pesan Sekarang
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- ===== VPN INDONESIA ID IKD ===== -->
+        <div class="row g-4 justify-content-center align-items-stretch mb-4">
+          <div class="col-12">
+            <div class="produk-section-title font-display mb-2 d-flex align-items-center gap-2" data-aos="fade-right">
+              <span class="produk-ikon-lg bg-gradient-primary"><i class="bi bi-shield-lock"></i></span>
+              VPN Indonesia - IKD
+            </div>
+          </div>
+          <!-- ID IKD Reguler -->
+          <div class="col-md-6 col-lg-4" data-aos="fade-up">
+            <div class="produk-feature-card">
+              <div class="produk-feature-ikon bg-primary"><i class="bi bi-shield-lock"></i></div>
+              <div class="produk-content-wrapper">
+                <div class="produk-badge badge bg-primary">ID IKD Reguler</div>
+                <div class="produk-harga font-display mb-1">Rp 15K <span>/bulan</span></div>
+                <ul class="produk-list list-unstyled small">
+                  <li><i class="bi-check-circle text-success me-1"></i>Untuk Pengguna Pribadi/Hp/IOS</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Max 2 Device login</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Kuota 300GB</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Masa Aktif 30 Hari</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Vmess/Vless/Trojan/SSH</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Support VC & Call</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Support Game</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Garansi Akun Aktif</li>
+                  <li><i class="bi bi-x-circle text-danger me-1"></i>Non STB/Hotspot/Wifi-sharing</li>
+                </ul>
+              </div>
+              <div class="produk-button-wrapper">
+                <a href="https://wa.me/6285727035336?text=Order+VPN+ID+IKD+Reguler" class="btn btn-primary w-100 rounded-pill fw-bold d-flex align-items-center justify-content-center">
+                  <i class="bi bi-cart-plus me-2"></i>Pesan Sekarang
+                </a>
+              </div>
+            </div>
+          </div>
+          <!-- ID IKD STB/Hotspot -->
+          <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
+            <div class="produk-feature-card">
+              <div class="produk-feature-ikon bg-success"><i class="bi bi-shield-check"></i></div>
+              <div class="produk-content-wrapper">
+                <div class="produk-badge badge bg-success">ID IKD STB/Hotspot</div>
+                <div class="produk-harga font-display mb-1">Rp 15K <span>/bulan</span></div>
+                <ul class="produk-list list-unstyled small">
+                  <li><i class="bi-check-circle text-success me-1"></i>Untuk Pengguna Openwrt/Wifi-Sharing</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Max 1 Device login</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Kuota 600GB</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Masa Aktif 30 Hari</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Vmess/Vless/Trojan/SSH</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Support VC & Call</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Support Game</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Garansi Akun Aktif</li>
+                  <li><i class="bi bi-x-circle text-danger me-1"></i>Non RT/RWnet</li>
+                </ul>
+              </div>
+              <div class="produk-button-wrapper">
+                <a href="https://wa.me/6285727035336?text=Order+VPN+Premium+ID+IKD+Stb/Hostpot" class="btn btn-success w-100 rounded-pill fw-bold d-flex align-items-center justify-content-center">
+                  <i class="bi bi-cart-plus me-2"></i>Pesan Sekarang
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- ===== VPN INDONESIA ID WIJAYA ===== -->
+        <div class="row g-4 justify-content-center align-items-stretch mb-4">
+          <div class="col-12">
+            <div class="produk-section-title font-display mb-2 d-flex align-items-center gap-2" data-aos="fade-right">
+              <span class="produk-ikon-lg bg-gradient-primary"><i class="bi bi-shield-lock"></i></span>
+              VPN Indonesia - WIJAYA
+            </div>
+          </div>
+          <!-- ID WIJAYA Reguler -->
+          <div class="col-md-6 col-lg-4" data-aos="fade-up">
+            <div class="produk-feature-card">
+              <div class="produk-feature-ikon bg-primary"><i class="bi bi-shield-lock"></i></div>
+              <div class="produk-content-wrapper">
+                <div class="produk-badge badge bg-primary">ID WIJAYA Reguler</div>
+                <div class="produk-harga font-display mb-1">Rp 15K <span>/bulan</span></div>
+                <ul class="produk-list list-unstyled small">
+                  <li><i class="bi-check-circle text-success me-1"></i>Untuk Pengguna Pribadi/Hp/IOS</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Max 2 Device login</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Kuota 300GB</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Masa Aktif 30 Hari</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Vmess/Vless/Trojan/SSH</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Support VC & Call</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Support Game</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Garansi Akun Aktif</li>
+                  <li><i class="bi bi-x-circle text-danger me-1"></i>Non STB/Hotspot/Wifi-sharing</li>
+                </ul>
+              </div>
+              <div class="produk-button-wrapper">
+                <a href="https://wa.me/6285727035336?text=Order+VPN+ID+WIJAYA+Reguler" class="btn btn-primary w-100 rounded-pill fw-bold d-flex align-items-center justify-content-center">
+                  <i class="bi bi-cart-plus me-2"></i>Pesan Sekarang
+                </a>
+              </div>
+            </div>
+          </div>
+          <!-- ID WIJAYA STB/Hotspot -->
+          <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
+            <div class="produk-feature-card">
+              <div class="produk-feature-ikon bg-success"><i class="bi bi-shield-check"></i></div>
+              <div class="produk-content-wrapper">
+                <div class="produk-badge badge bg-success">ID WIJAYA STB/Hotspot</div>
+                <div class="produk-harga font-display mb-1">Rp 20K <span>/bulan</span></div>
+                <ul class="produk-list list-unstyled small">
+                  <li><i class="bi-check-circle text-success me-1"></i>Untuk Pengguna Openwrt/Wifi-Sharing</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Max 1 Device login</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Kuota 600GB</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Masa Aktif 30 Hari</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Vmess/Vless/Trojan/SSH</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Support VC & Call</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Support Game</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Garansi Akun Aktif</li>
+                  <li><i class="bi bi-x-circle text-danger me-1"></i>Non RT/RWnet</li>
+                </ul>
+              </div>
+              <div class="produk-button-wrapper">
+                <a href="https://wa.me/6285727035336?text=Order+VPN+Premium+ID+WIJAYA+Stb/Hostpot" class="btn btn-success w-100 rounded-pill fw-bold d-flex align-items-center justify-content-center">
+                  <i class="bi bi-cart-plus me-2"></i>Pesan Sekarang
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- ===== VPN INDONESIA ID BIZNET ===== -->
+        <div class="row g-4 justify-content-center align-items-stretch mb-4">
+          <div class="col-12">
+            <div class="produk-section-title font-display mb-2 d-flex align-items-center gap-2" data-aos="fade-right">
+              <span class="produk-ikon-lg bg-gradient-primary"><i class="bi bi-shield-lock"></i></span>
+              VPN Indonesia - BIZNET
+            </div>
+          </div>
+          <!-- ID BIZNET Reguler -->
+          <div class="col-md-6 col-lg-4" data-aos="fade-up">
+            <div class="produk-feature-card">
+              <div class="produk-feature-ikon bg-primary"><i class="bi bi-shield-lock"></i></div>
+              <div class="produk-content-wrapper">
+                <div class="produk-badge badge bg-primary">ID BIZNET Reguler</div>
+                <div class="produk-harga font-display mb-1">Rp 15K <span>/bulan</span></div>
+                <ul class="produk-list list-unstyled small">
+                  <li><i class="bi-check-circle text-success me-1"></i>Untuk Pengguna Pribadi/Hp/IOS</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Max 2 Device login</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Kuota 300GB</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Masa Aktif 30 Hari</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Vmess/Vless/Trojan/SSH</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Support VC & Call</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Support Game</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Garansi Akun Aktif</li>
+                  <li><i class="bi bi-x-circle text-danger me-1"></i>Non STB/Hotspot/Wifi-sharing</li>
+                </ul>
+              </div>
+              <div class="produk-button-wrapper">
+                <a href="https://wa.me/6285727035336?text=Order+VPN+ID+BIZNET+Reguler" class="btn btn-primary w-100 rounded-pill fw-bold d-flex align-items-center justify-content-center">
+                  <i class="bi bi-cart-plus me-2"></i>Pesan Sekarang
+                </a>
+              </div>
+            </div>
+          </div>
+          <!-- ID BIZNET STB/Hotspot -->
+          <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
+            <div class="produk-feature-card">
+              <div class="produk-feature-ikon bg-success"><i class="bi bi-shield-check"></i></div>
+              <div class="produk-content-wrapper">
+                <div class="produk-badge badge bg-success">ID BIZNET STB/Hotspot</div>
+                <div class="produk-harga font-display mb-1">Rp 20K <span>/bulan</span></div>
+                <ul class="produk-list list-unstyled small">
+                  <li><i class="bi-check-circle text-success me-1"></i>Untuk Pengguna Openwrt/Wifi-Sharing</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Max 1 Device login</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Kuota 600GB</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Masa Aktif 30 Hari</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Vmess/Vless/Trojan/SSH</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Support VC & Call</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Support Game</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Garansi Akun Aktif</li>
+                  <li><i class="bi bi-x-circle text-danger me-1"></i>Non RT/RWnet</li>
+                </ul>
+              </div>
+              <div class="produk-button-wrapper">
+                <a href="https://wa.me/6285727035336?text=Order+VPN+Premium+ID+BIZNET+Stb/Hostpot" class="btn btn-success w-100 rounded-pill fw-bold d-flex align-items-center justify-content-center">
+                  <i class="bi bi-cart-plus me-2"></i>Pesan Sekarang
+                </a>
               </div>
             </div>
           </div>
         </div>
         <!-- ===== VPS ===== -->
-        <div class="row g-4 justify-content-center align-items-start mb-4">
+        <div class="row g-4 justify-content-center align-items-stretch mb-4">
           <div class="col-12">
             <div class="produk-section-title font-display mb-2 d-flex align-items-center gap-2" data-aos="fade-right">
               <span class="produk-ikon-lg bg-gradient-info"><i class="bi bi-hdd-network"></i></span>
               VPS DigitalOcean
-              <span class="produk-badge badge bg-gradient-info ms-2">Original DO</span>
+              <span class="produk-badge badge bg-gradient-info ms-2"><i class="bi bi-patch-check me-1"></i>Original DO</span>
             </div>
-            <p class="text-muted mb-4" style="max-width:480px;">VPS resmi DigitalOcean ready deploy. Pilihan server Singapura (low latency).</p>
+            <p class="text-muted mb-4" style="max-width:480px;">
+              VPS resmi DigitalOcean ready deploy. Pilihan server Singapura (low latency).
+            </p>
           </div>
           <div class="col-md-6 col-lg-4" data-aos="fade-up">
             <div class="produk-feature-card">
               <div class="produk-feature-ikon bg-info"><i class="bi bi-hdd-network"></i></div>
-              <div>
+              <div class="produk-content-wrapper">
                 <div class="produk-badge badge bg-info text-dark">1GB RAM</div>
                 <div class="produk-harga font-display mb-1">Rp 70K <span>/bulan</span></div>
-                <ul class="produk-list list-unstyled small mb-3">
-                  <li>1 vCPU • 25GB SSD</li>
-                  <li>Root full</li>
-                  <li>Server Singapore</li>
+                <ul class="produk-list list-unstyled small">
+                  <li><i class="bi-check-circle text-success me-1"></i>1 vCPU • 25GB SSD</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Root full</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Server Singapore</li>
                 </ul>
-                <a href="https://wa.me/6285727035336?text=Order+VPS+1GB" class="btn btn-info w-100 rounded-pill fw-bold">Pesan Sekarang</a>
+              </div>
+              <div class="produk-button-wrapper">
+                <a href="https://wa.me/6285727035336?text=Order+VPS+1GB" class="btn btn-info w-100 rounded-pill fw-bold d-flex align-items-center justify-content-center">
+                  <i class="bi bi-cart-plus me-2"></i>Pesan Sekarang
+                </a>
               </div>
             </div>
           </div>
           <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
             <div class="produk-feature-card">
               <div class="produk-feature-ikon bg-primary"><i class="bi bi-hdd-fill"></i></div>
-              <div>
+              <div class="produk-content-wrapper">
                 <div class="produk-badge badge bg-primary">2GB RAM</div>
                 <div class="produk-harga font-display mb-1">Rp 130K <span>/bulan</span></div>
-                <ul class="produk-list list-unstyled small mb-3">
-                  <li>1 vCPU • 50GB SSD</li>
-                  <li>Root full</li>
-                  <li>Server Singapore</li>
+                <ul class="produk-list list-unstyled small">
+                  <li><i class="bi-check-circle text-success me-1"></i>1 vCPU • 50GB SSD</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Root full</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Server Singapore</li>
                 </ul>
-                <a href="https://wa.me/6285727035336?text=Order+VPS+2GB" class="btn btn-primary w-100 rounded-pill fw-bold">Pesan Sekarang</a>
+              </div>
+              <div class="produk-button-wrapper">
+                <a href="https://wa.me/6285727035336?text=Order+VPS+2GB" class="btn btn-primary w-100 rounded-pill fw-bold d-flex align-items-center justify-content-center">
+                  <i class="bi bi-cart-plus me-2"></i>Pesan Sekarang
+                </a>
               </div>
             </div>
           </div>
         </div>
         <!-- ===== BOT & AUTOSCRIPT ===== -->
-        <div class="row g-4 justify-content-center align-items-start mb-4">
+        <div class="row g-4 justify-content-center align-items-stretch mb-4">
           <div class="col-12">
             <div class="produk-section-title font-display mb-2 d-flex align-items-center gap-2" data-aos="fade-right">
               <span class="produk-ikon-lg bg-gradient-warning"><i class="bi bi-robot"></i></span>
               Bot & Autoscript VPN
-              <span class="produk-badge badge bg-gradient-warning ms-2">Customizable</span>
+              <span class="produk-badge badge bg-gradient-warning ms-2"><i class="bi bi-gear me-1"></i>Customizable</span>
             </div>
-            <p class="text-muted mb-4" style="max-width:480px;">Bisa custom fiturnya, auto order, payment Telegram, atau full script install VPN (V2Ray/SSH).</p>
+            <p class="text-muted mb-4" style="max-width:480px;">
+              Bisa custom fiturnya, auto order, payment Telegram, atau full script install VPN (V2Ray/SSH).
+            </p>
           </div>
           <div class="col-md-6 col-lg-4" data-aos="fade-up">
             <div class="produk-feature-card">
               <div class="produk-feature-ikon bg-warning"><i class="bi bi-terminal"></i></div>
-              <div>
+              <div class="produk-content-wrapper">
                 <div class="produk-badge badge bg-warning text-dark">Script VPN</div>
                 <div class="produk-harga font-display mb-1">Rp 100K <span>sekali bayar</span></div>
-                <ul class="produk-list list-unstyled small mb-3">
-                  <li>Support Ubuntu/Debian</li>
-                  <li>Menu panel lengkap</li>
-                  <li>Free update 1 bulan</li>
-                  <li>Panduan video</li>
+                <ul class="produk-list list-unstyled small">
+                  <li><i class="bi-check-circle text-success me-1"></i>Support Ubuntu/Debian</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Menu panel lengkap</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Free update 1 bulan</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Panduan video</li>
                 </ul>
-                <a href="https://wa.me/6285727035336?text=Order+Script+VPN" class="btn btn-warning w-100 rounded-pill fw-bold">Pesan Sekarang</a>
+              </div>
+              <div class="produk-button-wrapper">
+                <a href="https://wa.me/6285727035336?text=Order+Script+VPN" class="btn btn-warning w-100 rounded-pill fw-bold d-flex align-items-center justify-content-center">
+                  <i class="bi bi-cart-plus me-2"></i>Pesan Sekarang
+                </a>
               </div>
             </div>
           </div>
           <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
             <div class="produk-feature-card">
               <div class="produk-feature-ikon bg-primary"><i class="bi bi-robot"></i></div>
-              <div>
+              <div class="produk-content-wrapper">
                 <div class="produk-badge badge bg-primary">Bot Telegram</div>
                 <div class="produk-harga font-display mb-1">Mulai Rp 150K</div>
-                <ul class="produk-list list-unstyled small mb-3">
-                  <li>Otomasi order & pembayaran</li>
-                  <li>Multi admin, fitur custom</li>
-                  <li>Free update 1 bulan</li>
-                  <li>Integrasi Telegram & API</li>
+                <ul class="produk-list list-unstyled small">
+                  <li><i class="bi-check-circle text-success me-1"></i>Otomasi order & pembayaran</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Multi admin, fitur custom</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Free update 1 bulan</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Integrasi Telegram & API</li>
                 </ul>
-                <a href="https://wa.me/6285727035336?text=Order+Bot+Telegram" class="btn btn-primary w-100 rounded-pill fw-bold">Pesan Sekarang</a>
+              </div>
+              <div class="produk-button-wrapper">
+                <a href="https://wa.me/6285727035336?text=Order+Bot+Telegram" class="btn btn-primary w-100 rounded-pill fw-bold d-flex align-items-center justify-content-center">
+                  <i class="bi bi-cart-plus me-2"></i>Pesan Sekarang
+                </a>
               </div>
             </div>
           </div>
         </div>
         <!-- ===== KUOTA XL ===== -->
-        <div class="row g-4 justify-content-center align-items-start mb-2">
+        <div class="row g-4 justify-content-center align-items-stretch mb-2">
           <div class="col-12">
             <div class="produk-section-title font-display mb-2 d-flex align-items-center gap-2" data-aos="fade-right">
               <span class="produk-ikon-lg bg-gradient-success"><i class="bi bi-sim"></i></span>
               Kuota XL
-              <span class="produk-badge badge bg-gradient-success ms-2">Fast Delivery</span>
+              <span class="produk-badge badge bg-gradient-success ms-2"><i class="bi bi-lightning-charge me-1"></i>Fast Delivery</span>
             </div>
-            <p class="text-muted mb-4" style="max-width:480px;">Kuota utama XL, ready kirim cepat. Cocok untuk pengguna aktif internetan sebulan penuh.</p>
+            <p class="text-muted mb-4" style="max-width:480px;">
+              Kuota utama XL, ready kirim cepat. Cocok untuk pengguna aktif internetan sebulan penuh.
+            </p>
           </div>
           <div class="col-md-6 col-lg-4" data-aos="fade-up">
             <div class="produk-feature-card">
               <div class="produk-feature-ikon bg-success"><i class="bi bi-sim"></i></div>
-              <div>
+              <div class="produk-content-wrapper">
                 <div class="produk-badge badge bg-success">30GB + Lokal</div>
                 <div class="produk-harga font-display mb-1">Rp 70K <span>instan</span></div>
-                <ul class="produk-list list-unstyled small mb-3">
-                  <li>Masa aktif 30 hari</li>
-                  <li>Resmi XL</li>
-                  <li>Untuk semua aplikasi</li>
-                  <li>Pengiriman instan</li>
+                <ul class="produk-list list-unstyled small">
+                  <li><i class="bi-check-circle text-success me-1"></i>Masa aktif 30 hari</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Resmi XL</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Untuk semua aplikasi</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Pengiriman instan</li>
                 </ul>
-                <a href="https://wa.me/6285727035336?text=Order+Kuota+XL+30GB" class="btn btn-success w-100 rounded-pill fw-bold">Pesan Sekarang</a>
+              </div>
+              <div class="produk-button-wrapper">
+                <a href="https://wa.me/6285727035336?text=Order+Kuota+XL+30GB" class="btn btn-success w-100 rounded-pill fw-bold d-flex align-items-center justify-content-center">
+                  <i class="bi bi-cart-plus me-2"></i>Pesan Sekarang
+                </a>
               </div>
             </div>
           </div>
           <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
             <div class="produk-feature-card">
               <div class="produk-feature-ikon bg-primary"><i class="bi bi-sim-fill"></i></div>
-              <div>
+              <div class="produk-content-wrapper">
                 <div class="produk-badge badge bg-primary">50GB Nasional</div>
                 <div class="produk-harga font-display mb-1">Rp 120K <span>instan</span></div>
-                <ul class="produk-list list-unstyled small mb-3">
-                  <li>Masa aktif 60 hari</li>
-                  <li>Resmi XL</li>
-                  <li>Support all device</li>
-                  <li>Kuota utama nasional</li>
+                <ul class="produk-list list-unstyled small">
+                  <li><i class="bi-check-circle text-success me-1"></i>Masa aktif 60 hari</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Resmi XL</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Support all device</li>
+                  <li><i class="bi-check-circle text-success me-1"></i>Kuota utama nasional</li>
                 </ul>
-                <a href="https://wa.me/6285727035336?text=Order+Kuota+XL+50GB" class="btn btn-primary w-100 rounded-pill fw-bold">Pesan Sekarang</a>
+              </div>
+              <div class="produk-button-wrapper">
+                <a href="https://wa.me/6285727035336?text=Order+Kuota+XL+50GB" class="btn btn-primary w-100 rounded-pill fw-bold d-flex align-items-center justify-content-center">
+                  <i class="bi bi-cart-plus me-2"></i>Pesan Sekarang
+                </a>
               </div>
             </div>
           </div>
@@ -242,8 +496,6 @@
       </div>
     </section>
   </main>
-
-  <!-- Footer (copy homepage) -->
   <footer class="py-4" style="background: var(--gray-900); color:var(--gray-100)">
     <div class="container text-center">
       <div class="mb-2">
@@ -265,6 +517,7 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
   <script src="js/main.js"></script>
+  <script src="js/product.js"></script>
   <script>
     AOS.init({ once: true, duration: 900, offset: 80 });
   </script>
