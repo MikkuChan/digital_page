@@ -55,6 +55,14 @@ document.addEventListener('DOMContentLoaded', function () {
     url: "uuid.html",
     badge: "Gratis",
     gradient: "purple"
+  },
+    {
+    title: "Cek Kuota Xl/Axis",
+    desc: "Cek sisa kuota dan detail paket aktif secara gratis!",
+    icon: "bi bi-wifi",
+    url: "cekkuota.html",
+    badge: "Gratis",
+    gradient: "purple"
   }
 ];
 

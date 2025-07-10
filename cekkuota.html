@@ -14,6 +14,10 @@
   <link href="css/cekkuota.css" rel="stylesheet">
 </head>
 <body>
+  <!-- Loading Screen -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+  </div>
   <!-- Navbar -->
   <nav class="navbar navbar-expand-lg fixed-top">
     <div class="container">
@@ -121,5 +125,16 @@
   </footer>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="js/cekkuota.js"></script>
+  <script>
+    // Overlay loading saat halaman dibuka
+window.addEventListener('load', function () {
+  setTimeout(function () {
+    document.getElementById('loadingOverlay').style.opacity = '0';
+    setTimeout(function () {
+      document.getElementById('loadingOverlay').style.display = 'none';
+    }, 600); // Waktu transisi hilang overlay
+  }, 400); // Lama tampil overlay loading
+});
+  </script>
 </body>
 </html>

@@ -905,6 +905,16 @@
         document.getElementById('imgModalSrc').src = '';
       });
     });
+    
+    // Overlay loading saat halaman dibuka
+window.addEventListener('load', function () {
+  setTimeout(function () {
+    document.getElementById('loadingOverlay').style.opacity = '0';
+    setTimeout(function () {
+      document.getElementById('loadingOverlay').style.display = 'none';
+    }, 600); // Waktu transisi hilang overlay
+  }, 400); // Lama tampil overlay loading
+});
   </script>
 </body>
 </html>
