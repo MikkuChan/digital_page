@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="id" class="light-mode">
+<head>
+  <meta charset="UTF-8">
+  <title>Cek Tagihan PLN – fadzdigital</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Cek tagihan listrik PLN kamu dengan input ID Pelanggan atau Nomor Meter secara gratis, cepat dan mudah!">
+  <link rel="icon" href="https://raw.githubusercontent.com/fadzdigital/image/main/favicon.ico">
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="css/style.css" rel="stylesheet">
+  <style>
+    /* Custom CSS untuk Cek Tagihan PLN */
+    :root {
+      --pln-primary: #005bea;
+      --pln-secondary: #00c6fb;
+      --pln-accent: #ffb703;
+      --pln-success: #10b981;
+      --pln-warning: #f59e0b;
+      --pln-danger: #ef4444;
+    }
+    
+    .badge-tools {
+      background: linear-gradient(to right, rgba(0, 91, 234, 0.1), rgba(0, 198, 251, 0.1));
+      color: var(--pln-primary);
+      border-radius: 30px;
+      font-weight: 600;
+    }
+    
+    .cek-tagihan-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+      transition: all 0.3s ease;
+    }
+    
+    .tagihan-input-card {
+      transition: all 0.3s ease;
+    }
+    
+    .tagihan-input-card:hover {
+      box-shadow: 0 15px 30px -10px rgba(0, 91, 234, 0.1);
+      transform: translateY(-2px);
+    }
+    
+    .info-card {
+      background: linear-gradient(to right, rgba(0, 91, 234, 0.05), rgba(0, 198, 251, 0.05));
+      border-left: 4px solid var(--pln-primary);
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    
+    .result-section {
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+      margin-top: 25px;
+      overflow: hidden;
+    }
+    
+    .result-header {
+      background: linear-gradient(135deg, var(--pln-primary), var(--pln-secondary));
+      color: white;
+      padding: 16px;
+      position: relative;
+    }
+    
+    .result-header::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 150px;
+      height: 100%;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" opacity="0.1"><path d="M13 5.41V21a1 1 0 0 1-2 0V5.41l-5.3 5.3a1 1 0 1 1-1.4-1.42l7-7a1 1 0 0 1 1.4 0l7 7a1 1 0 1 1-1.4 1.42L13 5.4z"/></svg>');
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: 120px;
+      opacity: 0.1;
+    }
+    
+    .result-body {
+      padding: 20px;
+    }
+    
+    .customer-info {
+      margin-bottom: 25px;
+    }
+    
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+    }
+    
+    .info-item {
+      padding-bottom: 10px;
+    }
+    
+    .info-label {
+      font-size: 0.85rem;
+      color: #6b7280;
+      margin-bottom: 5px;
+    }
+    
+    .info-value {
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+    
+    .billing-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+    
+    .stat-card {
+      background: #f9fafb;
+      border-radius: 12px;
+      padding: 16px;
+      transition: all 0.3s ease;
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+    }
+    
+    .stat-label {
+      font-size: 0.85rem;
+      color: #6b7280;
+      margin-bottom: 8px;
+    }
+    
+    .stat-value {
+      font-weight: 700;
+      font-size: 1.3rem;
+      color: #1e293b;
+    }
+    
+    .stat-value.danger {
+      color: var(--pln-danger);
+    }
+    
+    .stat-value.success {
+      color: var(--pln-success);
+    }
+    
+    .total-section {
+      background: linear-gradient(to right, var(--pln-primary), var(--pln-secondary));
+      color: white;
+      padding: 20px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      margin-top: 20px;
+    }
+    
+    .total-label {
+      font-size: 1.1rem;
+      font-weight: 500;
+    }
+    
+    .total-value {
+      font-weight: 700;
+      font-size: 1.5rem;
+    }
+    
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+    
+    .feature-icon {
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--pln-primary), var(--pln-secondary));
+      color: white;
+      border-radius: 12px;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+    
+    .feature-content h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+    
+    .feature-content p {
+      color: #6b7280;
+      font-size: 0.95rem;
+      margin-bottom: 0;
+    }
+    
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.97);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.6s ease;
+    }
+    
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid rgba(0, 91, 234, 0.1);
+      border-radius: 50%;
+      border-top-color: var(--pln-primary);
+      animation: spin 1s ease-in-out infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .btn-copy {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--pln-success);
+      border: none;
+    }
+    
+    .btn-copy:hover {
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--pln-success);
+    }
+    
+    .btn-check-another {
+      border: 1px solid var(--pln-primary);
+      color: var(--pln-primary);
+      background: white;
+    }
+    
+    .btn-check-another:hover {
+      background: rgba(0, 91, 234, 0.05);
+      color: var(--pln-primary);
+    }
+    
+    .loading-indicator {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    
+    .loading-indicator .spinner-border {
+      width: 1.5rem;
+      height: 1.5rem;
+      color: var(--pln-primary);
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .info-grid, .billing-stats {
+        grid-template-columns: 1fr;
+      }
+      
+      .total-section {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Loading Screen -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg fixed-top">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
+        <img src="https://raw.githubusercontent.com/fadzdigital/image/main/fadzdigital.png" alt="fadzdigital Logo" style="height:38px; width:auto; object-fit:contain;" />
+        <span class="text-gradient" style="font-size:2rem; font-weight:700;">fadzdigital</span>
+      </a>
+      <button class="navbar-toggler border-0 p-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav mx-auto">
+          <li class="nav-item"><a class="nav-link" href="index.html">Beranda</a></li>
+          <li class="nav-item"><a class="nav-link" href="index.html#features">Fitur</a></li>
+          <li class="nav-item"><a class="nav-link" href="produk.html">Produk</a></li>
+          <li class="nav-item"><a class="nav-link" href="tutorial.html">Tutorial</a></li>
+          <li class="nav-item"><a class="nav-link active" href="tools.html">Tools</a></li>
+          <li class="nav-item"><a class="nav-link" href="index.html#contact">Kontak</a></li>
+        </ul>
+        <div class="d-flex align-items-center gap-3">
+          <button class="theme-toggle" id="themeToggle" aria-label="Toggle tema"></button>
+          <a href="https://wa.me/6285727035336" class="btn btn-success d-none d-lg-inline-flex">WhatsApp</a>
+          <a href="https://t.me/fadzdigital" class="btn btn-primary">Telegram</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main style="margin-top:90px;min-height:100vh;">
+    <section class="cek-tagihan-hero text-center font-display py-5 mb-0"
+      style="background: linear-gradient(180deg, #f9fafb 60%, #dbeafe 100%);">
+      <div class="container">
+        <span class="badge-tools mb-4 px-4 py-2 fs-6 d-inline-flex align-items-center">
+          <i class="bi bi-lightning-charge me-2"></i>Cek Tagihan PLN
+        </span>
+        <h1 class="display-5 fw-bold mb-3" style="letter-spacing:-1px; color: #333;">
+          Cek <span class="text-gradient" style="background: linear-gradient(90deg, #005bea, #00c6fb); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Tagihan Listrik</span> Dengan Mudah!
+        </h1>
+        <p class="lead mx-auto mb-4" style="max-width:600px; font-size:1.1rem; color: #666;">
+          Masukkan ID Pelanggan atau Nomor Meter PLN Anda. Cek tagihan listrik dan rincian pembayaran secara <b>gratis</b>, <b>cepat</b>, dan <b>aman</b>!
+        </p>
+      </div>
+    </section>
+
+    <section class="container py-5">
+      <div class="row justify-content-center">
+        <div class="col-lg-7 col-md-10">
+          <div class="cek-tagihan-card p-4 mb-4">
+            <div class="info-card mb-4">
+              <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-info-circle-fill text-primary"></i>
+                <div class="fw-semibold">Informasi Penting</div>
+              </div>
+              <div class="small mt-2">
+                Masukkan ID Pelanggan atau Nomor Meter PLN yang terdiri dari 11-12 digit angka. Pastikan nomor yang dimasukkan benar untuk mendapatkan informasi tagihan yang akurat.
+              </div>
+            </div>
+            
+            <form id="cekTagihanForm" autocomplete="off">
+              <div class="mb-4">
+                                <div class="tagihan-input-card shadow-sm rounded-4 px-3 py-4 mb-2 d-flex align-items-center gap-3" style="background: #f3f6fa;">
+                  <span class="input-icon d-flex align-items-center justify-content-center rounded-3" style="width:50px;height:50px; background:linear-gradient(135deg,#005bea,#00c6fb); color:#fff; font-size:2rem;">
+                    <i class="bi bi-plug"></i>
+                  </span>
+                  <div class="flex-grow-1">
+                    <label class="fw-bold font-display fs-5 mb-1" for="customerId" style="color:#263056">
+                      Masukkan ID Pelanggan / Nomor Meter
+                    </label>
+                    <input type="text" class="form-control mt-1 mb-1 shadow-sm" id="customerId" placeholder="Masukkan 11-12 digit angka" autocomplete="off" maxlength="12" />
+                    <div class="form-text small" style="color:#3182ce">
+                      Contoh: 5413810027489 atau 541381002748
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="d-grid">
+                <button type="submit" class="btn btn-primary px-4 py-3 fw-bold" id="cekBtn">
+                  <i class="bi bi-search me-2"></i>Cek Tagihan PLN
+                </button>
+              </div>
+            </form>
+            
+            <div id="loadingIndicator" class="loading-indicator mt-4 text-center">
+              <div class="d-flex justify-content-center align-items-center gap-2">
+                <div class="spinner-border" role="status"></div>
+                <div>Memproses permintaan...</div>
+              </div>
+            </div>
+            
+            <div id="errorContainer" class="mt-4 alert alert-danger" style="display:none;">
+              <div class="d-flex gap-2">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <div>
+                  <strong>Terjadi Kesalahan</strong>
+                  <div id="errorMessage"></div>
+                </div>
+              </div>
+            </div>
+            
+            <div id="resultContainer" class="mt-4" style="display:none;">
+              <div class="result-section">
+                <div class="result-header">
+                  <h3 class="m-0 fs-5">Informasi Tagihan Listrik</h3>
+                  <p class="m-0 small">ID Pelanggan: <span id="resultCustomerId"></span></p>
+                </div>
+                <div class="result-body">
+                  <div class="customer-info">
+                    <h4 class="fs-6 text-primary mb-3">Data Pelanggan</h4>
+                    <div class="info-grid">
+                      <div class="info-item">
+                        <div class="info-label">Nama</div>
+                        <div class="info-value" id="customerName">-</div>
+                      </div>
+                      <div class="info-item">
+                        <div class="info-label">ID Pelanggan</div>
+                        <div class="info-value" id="customerId_display">-</div>
+                      </div>
+                      <div class="info-item">
+                        <div class="info-label">Tarif/Daya</div>
+                        <div class="info-value" id="powerRate">-</div>
+                      </div>
+                      <div class="info-item">
+                        <div class="info-label">Alamat</div>
+                        <div class="info-value" id="customerAddress">-</div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="billing-info">
+                    <h4 class="fs-6 text-primary mb-3">Detail Tagihan</h4>
+                    <div class="billing-stats">
+                      <div class="stat-card">
+                        <div class="stat-label">Periode Tagihan</div>
+                        <div class="stat-value" id="billPeriod">-</div>
+                      </div>
+                      <div class="stat-card">
+                        <div class="stat-label">Status</div>
+                        <div class="stat-value" id="billStatus">-</div>
+                      </div>
+                      <div class="stat-card">
+                        <div class="stat-label">Jatuh Tempo</div>
+                        <div class="stat-value danger" id="dueDate">-</div>
+                      </div>
+                      <div class="stat-card">
+                        <div class="stat-label">Nomor Referensi</div>
+                        <div class="stat-value" id="referenceNo">-</div>
+                      </div>
+                    </div>
+                    
+                    <div class="total-section">
+                      <div class="total-label">Total Tagihan</div>
+                      <div class="total-value" id="billAmount">-</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="d-flex flex-column flex-md-row gap-3 mt-4">
+                <button class="btn btn-success flex-grow-1" id="payNowBtn">
+                  <i class="bi bi-credit-card me-2"></i> Bayar Sekarang
+                </button>
+                <button class="btn btn-outline-primary" id="printBtn">
+                  <i class="bi bi-printer me-2"></i> Cetak Bukti
+                </button>
+                <button class="btn btn-check-another" id="checkAnotherBtn">
+                  <i class="bi bi-search me-2"></i> Cek Tagihan Lain
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mb-5">
+            <h4 class="fw-bold mb-4">Keunggulan Layanan Cek Tagihan PLN</h4>
+            <div class="feature-item">
+              <div class="feature-icon">
+                <i class="bi bi-shield-check"></i>
+              </div>
+              <div class="feature-content">
+                <h3>Aman & Terpercaya</h3>
+                <p>Layanan ini terhubung langsung ke database PLN dengan koneksi terenkripsi, menjamin keamanan data pelanggan dan keakuratan informasi tagihan.</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon">
+                <i class="bi bi-lightning-charge"></i>
+              </div>
+              <div class="feature-content">
+                <h3>Cepat & Realtime</h3>
+                <p>Dapatkan informasi tagihan listrik dalam hitungan detik. Data selalu diperbarui secara realtime sesuai dengan database PLN pusat.</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon">
+                <i class="bi bi-clock-history"></i>
+              </div>
+              <div class="feature-content">
+                <h3>Cek Kapan Saja</h3>
+                <p>Layanan ini tersedia 24/7, memungkinkan Anda untuk mengecek tagihan listrik kapan saja dan di mana saja tanpa batasan waktu.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="py-4" style="background: var(--gray-900); color:var(--gray-100)">
+    <div class="container text-center">
+      <div class="mb-2">
+        <span class="fw-bold font-display text-gradient" style="font-size:1.3rem;">fadzdigital</span>
+      </div>
+      <div class="mb-2 small">
+        &copy; 2025 fadzdigital. All rights reserved.<br />
+        Made with 💙 in Indonesia
+      </div>
+      <div>
+        <a href="index.html" class="text-primary small text-decoration-none mx-2">Beranda</a>
+        <a href="produk.html" class="text-primary small text-decoration-none mx-2">Produk</a>
+        <a href="tutorial.html" class="text-primary small text-decoration-none mx-2">Tutorial</a>
+        <a href="tools.html" class="text-primary small text-decoration-none mx-2">Tools</a>
+        <a href="index.html#contact" class="text-primary small text-decoration-none mx-2">Kontak</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Elemen-elemen UI
+      const loadingOverlay = document.getElementById('loadingOverlay');
+      const cekTagihanForm = document.getElementById('cekTagihanForm');
+      const customerIdInput = document.getElementById('customerId');
+      const loadingIndicator = document.getElementById('loadingIndicator');
+      const errorContainer = document.getElementById('errorContainer');
+      const errorMessage = document.getElementById('errorMessage');
+      const resultContainer = document.getElementById('resultContainer');
+      const resultCustomerId = document.getElementById('resultCustomerId');
+      
+      // Tombol-tombol aksi
+      const payNowBtn = document.getElementById('payNowBtn');
+      const printBtn = document.getElementById('printBtn');
+      const checkAnotherBtn = document.getElementById('checkAnotherBtn');
+      
+      // Format angka ke Rupiah
+      function formatRupiah(angka) {
+        return new Intl.NumberFormat('id-ID', {
+          style: 'currency',
+          currency: 'IDR',
+          minimumFractionDigits: 0
+        }).format(angka);
+      }
+      
+      // Format tanggal ke format Indonesia
+      function formatDate(dateString) {
+        const options = { 
+          day: 'numeric', 
+          month: 'long', 
+          year: 'numeric' 
+        };
+        return new Date(dateString).toLocaleDateString('id-ID', options);
+      }
+      
+      // Validasi input
+      function validateInput(customerId) {
+        if (!customerId) {
+          return {
+            valid: false,
+            message: "Silakan masukkan ID Pelanggan atau Nomor Meter PLN."
+          };
+        }
+        
+        if (!/^\d+$/.test(customerId)) {
+          return {
+            valid: false,
+            message: "ID Pelanggan hanya boleh berisi angka."
+          };
+        }
+        
+        if (customerId.length < 10 || customerId.length > 12) {
+          return {
+            valid: false,
+            message: "ID Pelanggan harus terdiri dari 10-12 digit angka."
+          };
+        }
+        
+        return { valid: true };
+      }
+      
+      // Menampilkan pesan error
+      function showError(message) {
+        errorMessage.textContent = message;
+        errorContainer.style.display = 'block';
+        resultContainer.style.display = 'none';
+      }
+      
+      // Menyembunyikan pesan error
+      function hideError() {
+        errorContainer.style.display = 'none';
+      }
+      
+      // Menampilkan loading
+      function showLoading() {
+        loadingIndicator.style.display = 'flex';
+      }
+      
+      // Menyembunyikan loading
+      function hideLoading() {
+        loadingIndicator.style.display = 'none';
+      }
+      
+      // Mengambil data dari API
+      async function fetchBillingData(customerId) {
+        showLoading();
+        hideError();
+        
+        try {
+          // URL API worker
+          const apiUrl = `https://cekpln.fadzdigital.dpdns.org/api-pln/billing?customerId=${customerId}`;
+          
+          const response = await fetch(apiUrl);
+          if (!response.ok) {
+            if (response.status === 403) {
+              throw new Error("Akses ditolak. Silakan verifikasi kembali akses Anda ke layanan ini.");
+            }
+            throw new Error(`Error: ${response.status}`);
+          }
+          
+          const data = await response.json();
+          
+          hideLoading();
+          
+          if (data.status === "success") {
+            displayBillingData(data.data);
+            return true;
+          } else {
+            showError(data.message || "Terjadi kesalahan saat mengambil data tagihan.");
+            return false;
+          }
+        } catch (error) {
+          hideLoading();
+          showError(error.message || "Gagal terhubung ke server. Silakan coba lagi nanti.");
+          return false;
+        }
+      }
+      
+      // Menampilkan data tagihan
+      function displayBillingData(data) {
+        // Menampilkan ID Pelanggan
+        resultCustomerId.textContent = data.customer.id;
+        
+        // Mengisi data pelanggan
+        document.getElementById('customerName').textContent = data.customer.name;
+        document.getElementById('customerId_display').textContent = data.customer.id;
+        document.getElementById('powerRate').textContent = data.customer.powerRate;
+        document.getElementById('customerAddress').textContent = data.customer.address;
+        
+        // Mengisi data tagihan
+        document.getElementById('billPeriod').textContent = data.billing.period;
+        document.getElementById('billAmount').textContent = formatRupiah(data.billing.amount);
+        
+        // Status tagihan dengan warna
+        const billStatus = document.getElementById('billStatus');
+        billStatus.textContent = data.billing.status;
+        if (data.billing.status === "BELUM DIBAYAR") {
+          billStatus.style.color = "var(--pln-danger)";
+        } else if (data.billing.status === "LUNAS") {
+          billStatus.style.color = "var(--pln-success)";
+        }
+        
+        // Tanggal jatuh tempo
+        document.getElementById('dueDate').textContent = formatDate(data.billing.dueDate);
+        
+        // Nomor referensi
+        document.getElementById('referenceNo').textContent = data.billing.invoiceNumber || '-';
+        
+        // Menampilkan hasil
+        resultContainer.style.display = 'block';
+        resultContainer.scrollIntoView({ behavior: 'smooth' });
+      }
+      
+      // Submit form
+      cekTagihanForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const customerId = customerIdInput.value.trim();
+        const validation = validateInput(customerId);
+        
+        if (!validation.valid) {
+          showError(validation.message);
+          return;
+        }
+        
+        await fetchBillingData(customerId);
+      });
+      
+      // Validasi saat input
+      customerIdInput.addEventListener('input', function(e) {
+               // Hanya menerima angka
+        this.value = this.value.replace(/[^0-9]/g, '');
+        
+        // Sembunyikan error jika sebelumnya ada error
+        if (this.value.length > 0) {
+          hideError();
+        }
+      });
+      
+      // Tombol bayar sekarang
+      payNowBtn.addEventListener('click', function() {
+        alert('Fitur pembayaran akan segera hadir. Silakan gunakan m-banking atau e-wallet Anda untuk melakukan pembayaran tagihan PLN.');
+      });
+      
+      // Tombol cetak
+      printBtn.addEventListener('click', function() {
+        window.print();
+      });
+      
+      // Tombol cek tagihan lain
+      checkAnotherBtn.addEventListener('click', function() {
+        // Reset form dan tampilan
+        customerIdInput.value = '';
+        resultContainer.style.display = 'none';
+        hideError();
+        
+        // Fokus ke input
+        customerIdInput.focus();
+        
+        // Scroll ke form
+        cekTagihanForm.scrollIntoView({ behavior: 'smooth' });
+      });
+      
+      // Hilangkan overlay loading saat halaman selesai dimuat
+      window.addEventListener('load', function() {
+        setTimeout(function() {
+          loadingOverlay.style.opacity = '0';
+          setTimeout(function() {
+            loadingOverlay.style.display = 'none';
+          }, 600); // Waktu transisi hilang overlay
+        }, 400); // Lama tampil overlay loading
+      });
+      
+      // Theme toggler functionality
+      const themeToggle = document.getElementById('themeToggle');
+      
+      // Check for saved theme preference or use user's system preference
+      const currentTheme = localStorage.getItem('theme') || 
+        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      
+      // Apply theme class to html element
+      document.documentElement.className = currentTheme + '-mode';
+      
+      // Update button icon based on current theme
+      themeToggle.innerHTML = currentTheme === 'dark' 
+        ? '<i class="bi bi-sun-fill"></i>' 
+        : '<i class="bi bi-moon-fill"></i>';
+      
+      // Toggle theme when button is clicked
+      themeToggle.addEventListener('click', function() {
+        const newTheme = document.documentElement.className.includes('light') ? 'dark' : 'light';
+        
+        // Update class on html element
+        document.documentElement.className = newTheme + '-mode';
+        
+        // Update button icon
+        this.innerHTML = newTheme === 'dark' 
+          ? '<i class="bi bi-sun-fill"></i>' 
+          : '<i class="bi bi-moon-fill"></i>';
+        
+        // Save preference to localStorage
+        localStorage.setItem('theme', newTheme);
+      });
+    });
+  </script>
+</body>
+</html>
