@@ -1,51 +1,264 @@
-body {
-  font-family: 'Inter', sans-serif;
-}
-
-.loading-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(255, 255, 255, 0.8);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-  transition: opacity 0.6s ease;
-}
-
-.loading-spinner {
-  border: 8px solid rgba(0, 0, 0, 0.1);
-  border-top: 8px solid #4285f4;
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.cek-kuota-hero {
-  background: linear-gradient(180deg, #f9fafb 60%, #e0f2fe 100%);
-}
-
-.text-gradient {
-  background: linear-gradient(90deg, #4285f4, #34d399);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.cek-tagihan-section {
-  background: #f0f4f8;
-  padding: 40px 0;
-}
-
-.input-group {
-  max-width: 600px;
-  margin: 0 auto;
-}
+    /* Custom CSS untuk Cek Tagihan PLN */
+    :root {
+      --pln-primary: #005bea;
+      --pln-secondary: #00c6fb;
+      --pln-accent: #ffb703;
+      --pln-success: #10b981;
+      --pln-warning: #f59e0b;
+      --pln-danger: #ef4444;
+    }
+    
+    .badge-tools {
+      background: linear-gradient(to right, rgba(0, 91, 234, 0.1), rgba(0, 198, 251, 0.1));
+      color: var(--pln-primary);
+      border-radius: 30px;
+      font-weight: 600;
+    }
+    
+    .cek-tagihan-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+      transition: all 0.3s ease;
+    }
+    
+    .tagihan-input-card {
+      transition: all 0.3s ease;
+    }
+    
+    .tagihan-input-card:hover {
+      box-shadow: 0 15px 30px -10px rgba(0, 91, 234, 0.1);
+      transform: translateY(-2px);
+    }
+    
+    .info-card {
+      background: linear-gradient(to right, rgba(0, 91, 234, 0.05), rgba(0, 198, 251, 0.05));
+      border-left: 4px solid var(--pln-primary);
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    
+    .result-section {
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+      margin-top: 25px;
+      overflow: hidden;
+    }
+    
+    .result-header {
+      background: linear-gradient(135deg, var(--pln-primary), var(--pln-secondary));
+      color: white;
+      padding: 16px;
+      position: relative;
+    }
+    
+    .result-header::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 150px;
+      height: 100%;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" opacity="0.1"><path d="M13 5.41V21a1 1 0 0 1-2 0V5.41l-5.3 5.3a1 1 0 1 1-1.4-1.42l7-7a1 1 0 0 1 1.4 0l7 7a1 1 0 1 1-1.4 1.42L13 5.4z"/></svg>');
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: 120px;
+      opacity: 0.1;
+    }
+    
+    .result-body {
+      padding: 20px;
+    }
+    
+    .customer-info {
+      margin-bottom: 25px;
+    }
+    
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+    }
+    
+    .info-item {
+      padding-bottom: 10px;
+    }
+    
+    .info-label {
+      font-size: 0.85rem;
+      color: #6b7280;
+      margin-bottom: 5px;
+    }
+    
+    .info-value {
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+    
+    .billing-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+    
+    .stat-card {
+      background: #f9fafb;
+      border-radius: 12px;
+      padding: 16px;
+      transition: all 0.3s ease;
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+    }
+    
+    .stat-label {
+      font-size: 0.85rem;
+      color: #6b7280;
+      margin-bottom: 8px;
+    }
+    
+    .stat-value {
+      font-weight: 700;
+      font-size: 1.3rem;
+      color: #1e293b;
+    }
+    
+    .stat-value.danger {
+      color: var(--pln-danger);
+    }
+    
+    .stat-value.success {
+      color: var(--pln-success);
+    }
+    
+    .total-section {
+      background: linear-gradient(to right, var(--pln-primary), var(--pln-secondary));
+      color: white;
+      padding: 20px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      margin-top: 20px;
+    }
+    
+    .total-label {
+      font-size: 1.1rem;
+      font-weight: 500;
+    }
+    
+    .total-value {
+      font-weight: 700;
+      font-size: 1.5rem;
+    }
+    
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+    
+    .feature-icon {
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--pln-primary), var(--pln-secondary));
+      color: white;
+      border-radius: 12px;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+    
+    .feature-content h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+    
+    .feature-content p {
+      color: #6b7280;
+      font-size: 0.95rem;
+      margin-bottom: 0;
+    }
+    
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.97);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.6s ease;
+    }
+    
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid rgba(0, 91, 234, 0.1);
+      border-radius: 50%;
+      border-top-color: var(--pln-primary);
+      animation: spin 1s ease-in-out infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .btn-copy {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--pln-success);
+      border: none;
+    }
+    
+    .btn-copy:hover {
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--pln-success);
+    }
+    
+    .btn-check-another {
+      border: 1px solid var(--pln-primary);
+      color: var(--pln-primary);
+      background: white;
+    }
+    
+    .btn-check-another:hover {
+      background: rgba(0, 91, 234, 0.05);
+      color: var(--pln-primary);
+    }
+    
+    .loading-indicator {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    
+    .loading-indicator .spinner-border {
+      width: 1.5rem;
+      height: 1.5rem;
+      color: var(--pln-primary);
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .info-grid, .billing-stats {
+        grid-template-columns: 1fr;
+      }
+      
+      .total-section {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
