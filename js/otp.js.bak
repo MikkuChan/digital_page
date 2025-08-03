@@ -454,22 +454,8 @@ document.addEventListener('DOMContentLoaded', function () {
     elements.quotaResults.innerHTML = resultsHTML;
   }
 
-  // Event Handlers
-  elements.phoneInput.addEventListener('input', function() {
-    // Format input (remove non-digits and limit length)
-    let value = this.value.replace(/\D/g, '');
-    if (value.length > 13) value = value.substring(0, 13);
-    this.value = value;
-  });
-
-  elements.otpCodeInput.addEventListener('input', function() {
-    // Only allow digits and limit to 6 characters
-    let value = this.value.replace(/\D/g, '');
-    if (value.length > 6) value = value.substring(0, 6);
-    this.value = value;
-  });
-
-  elements.requestOtpBtn.addEventListener('click', async function() {
+  // 🔄 MAIN FUNCTION - ALUR BARU: CEK SESI LOGIN DULU
+  async function handlePhoneNumberSubmit() {
     const phoneValue = elements.phoneInput.value.trim();
     
     if (!phoneValue) {
@@ -487,59 +473,77 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     currentState.phoneNumber = validation.formatted;
+    setButtonLoading(elements.requestOtpBtn, true);
     
-    setButtonLoading(this, true);
+    // 🔥 STEP 1: CEK SESI LOGIN DULU (PRIORITAS UTAMA)
+    console.log('🔍 Step 1: Checking for active session...');
+    showAlert('Mengecek sesi login...', 'info', 3000);
     
-    // First, check if there's an active session
-    console.log('Checking for active session...');
     const sessionCheck = await checkActiveSession(currentState.phoneNumber);
     
     if (sessionCheck.success) {
-      // Active session found! Skip OTP and go directly to quota
-      console.log('Active session found! Skipping OTP...');
+      // 🎉 SESI AKTIF DITEMUKAN - LANGSUNG CEK KUOTA
+      console.log('✅ Active session found! Using existing token...');
       currentState.accessToken = sessionCheck.accessToken;
       currentState.hasActiveSession = true;
       
       showAlert('Sesi login aktif ditemukan! Mengambil data kuota...', 'success');
       
-      // Get quota data directly
+      // Langsung ambil data kuota tanpa OTP
       const quotaResult = await getQuotaDetails(currentState.accessToken);
       
-      setButtonLoading(this, false);
+      setButtonLoading(elements.requestOtpBtn, false);
       
       if (quotaResult.success) {
         elements.phoneDisplayResult.textContent = formatPhoneNumber(currentState.phoneNumber);
         displayQuotaResults(quotaResult.data);
         showStep(3);
-        showAlert('Data kuota berhasil dimuat!', 'success');
+        showAlert('Data kuota berhasil dimuat! (menggunakan sesi aktif)', 'success');
       } else {
-        showAlert('Gagal mengambil data kuota: ' + quotaResult.message, 'danger');
-        // Fall back to OTP if quota fetch fails
-        proceedWithOTP();
+        showAlert('Sesi aktif ditemukan, tapi gagal mengambil data kuota: ' + quotaResult.message, 'warning');
       }
+      
     } else {
-      // No active session, proceed with OTP
-      console.log('No active session found, proceeding with OTP...');
+      // 🔥 TIDAK ADA SESI AKTIF - LANJUT KE PROSES OTP
+      console.log('❌ No active session found, proceeding with OTP...');
       currentState.hasActiveSession = false;
-      proceedWithOTP();
-    }
-    
-    async function proceedWithOTP() {
-      const result = await requestOTP(currentState.phoneNumber);
+      
+      showAlert('Tidak ada sesi aktif, mengirim kode OTP...', 'info');
+      
+      // Request OTP
+      const otpResult = await requestOTP(currentState.phoneNumber);
       
       setButtonLoading(elements.requestOtpBtn, false);
       
-      if (result.success) {
-        currentState.authId = result.authId;
+      if (otpResult.success) {
+        currentState.authId = otpResult.authId;
         elements.phoneDisplay.textContent = formatPhoneNumber(currentState.phoneNumber);
-        showAlert(result.message, 'success');
+        showAlert(otpResult.message, 'success');
         showStep(2);
         startCountdown();
       } else {
-        showAlert(result.message, 'danger');
+        showAlert('Gagal mengirim OTP: ' + otpResult.message, 'danger');
       }
     }
+  }
+
+  // Event Handlers
+  elements.phoneInput.addEventListener('input', function() {
+    // Format input (remove non-digits and limit length)
+    let value = this.value.replace(/\D/g, '');
+    if (value.length > 13) value = value.substring(0, 13);
+    this.value = value;
   });
+
+  elements.otpCodeInput.addEventListener('input', function() {
+    // Only allow digits and limit to 6 characters
+    let value = this.value.replace(/\D/g, '');
+    if (value.length > 6) value = value.substring(0, 6);
+    this.value = value;
+  });
+
+  // 🔥 BUTTON CLICK - PANGGIL FUNGSI UTAMA
+  elements.requestOtpBtn.addEventListener('click', handlePhoneNumberSubmit);
 
   elements.verifyOtpBtn.addEventListener('click', async function() {
     const otpCode = elements.otpCodeInput.value.trim();
@@ -552,13 +556,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
     setButtonLoading(this, true);
     
+    // Verify OTP and login
     const result = await verifyOTP(currentState.phoneNumber, currentState.authId, otpCode);
     
     if (result.success) {
       showAlert('OTP berhasil diverifikasi! Mengambil data kuota...', 'success');
       currentState.accessToken = result.accessToken;
       
-      // Get real quota data
+      // Get quota data setelah login berhasil
       const quotaResult = await getQuotaDetails(currentState.accessToken);
       
       setButtonLoading(this, false);
@@ -574,7 +579,7 @@ document.addEventListener('DOMContentLoaded', function () {
           clearInterval(currentState.countdownTimer);
         }
       } else {
-        showAlert('OTP berhasil, tapi gagal mengambil data kuota: ' + quotaResult.message, 'warning');
+        showAlert('Login berhasil, tapi gagal mengambil data kuota: ' + quotaResult.message, 'warning');
         // Still show success step but with error message
         elements.phoneDisplayResult.textContent = formatPhoneNumber(currentState.phoneNumber);
         elements.quotaResults.innerHTML = `
@@ -642,7 +647,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // Enter key handlers
   elements.phoneInput.addEventListener('keypress', function(e) {
     if (e.key === 'Enter') {
-      elements.requestOtpBtn.click();
+      handlePhoneNumberSubmit();
     }
   });
 
@@ -655,11 +660,5 @@ document.addEventListener('DOMContentLoaded', function () {
   // Initialize
   showStep(1);
   
-  // Show configuration warning if using default values
-  if (CONFIG.API_BASE_URL.includes('your-vps-ip')) {
-    console.warn('⚠️ Jangan lupa ganti CONFIG.API_BASE_URL di js/otp.js dengan URL FadzApi Gateway yang sebenarnya!');
-    showAlert('⚠️ Configuration belum diupdate. Cek console untuk details.', 'warning', 10000);
-  }
-  
-  console.log('🔒 FadzApi Gateway: Kredensial disimpan aman di server, tidak di frontend!');
+  console.log('🔒 FadzApi Gateway: Alur baru - Cek sesi login dulu, baru OTP jika diperlukan!');
 });

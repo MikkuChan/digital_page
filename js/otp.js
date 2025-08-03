@@ -165,7 +165,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }, 1000);
   }
 
-  // API Functions
+  // ✅ FIXED FUNCTION - CEK SESI LOGIN
   async function checkActiveSession(phoneNumber) {
     try {
       const queryParams = new URLSearchParams({
@@ -178,20 +178,25 @@ document.addEventListener('DOMContentLoaded', function () {
 
       const data = await response.json();
       
-      if (data.status) {
+      console.log('📡 Cek sesi login response:', data);
+      
+      // ✅ FIXED: Cek response dengan benar
+      if (data.status === true && data.statusCode === 200 && data.data && data.data.access_token) {
+        console.log('✅ Sesi aktif ditemukan! Token:', data.data.access_token);
         return {
           success: true,
           accessToken: data.data.access_token,
           message: data.message
         };
       } else {
+        console.log('❌ Tidak ada sesi aktif atau response tidak valid');
         return {
           success: false,
           message: data.message || 'Tidak ada sesi login aktif'
         };
       }
     } catch (error) {
-      console.error('Error checking session:', error);
+      console.error('❌ Error checking session:', error);
       return {
         success: false,
         message: 'Terjadi kesalahan saat cek sesi login'
