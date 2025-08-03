@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
   const CONFIG = {
-    API_BASE_URL: 'https://otp.fadzdigital.dpdns.org'
+    API_BASE_URL: 'http://bahan.vpnluxury.web.id:5570'
   };
 
   // DOM Elements
