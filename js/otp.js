@@ -40,42 +40,51 @@ document.addEventListener('DOMContentLoaded', function () {
     hasActiveSession: false
   };
 
-  // Utility Functions
-  function formatPhoneNumber(phone) {
-    // Remove any non-digit characters
-    phone = phone.replace(/\D/g, '');
-    
-    // Remove leading 0 if present
-    if (phone.startsWith('0')) {
-      phone = phone.substring(1);
-    }
-    
-    // Add +62 prefix for display
-    return `+62${phone}`;
-  }
-
+  // ✅ FIXED VALIDATION FUNCTION
   function validatePhoneNumber(phone) {
     // Remove any non-digit characters
     phone = phone.replace(/\D/g, '');
     
-    // Remove leading 0 if present
-    if (phone.startsWith('0')) {
-      phone = phone.substring(1);
+    // Convert to 08xxxx format (yang dibutuhkan API Hesda)
+    if (phone.startsWith('62')) {
+      // 628xxxx → 08xxxx
+      phone = '0' + phone.substring(2);
+    } else if (!phone.startsWith('0')) {
+      // 8xxxx → 08xxxx
+      phone = '0' + phone;
     }
     
-    // Check if it's XL/Axis number (starts with 817, 818, 819, 859, 877, 878)
-    const xlAxisPrefixes = ['817', '818', '819', '859', '877', '878'];
+    // Validation dengan format 08xxxx
+    const xlAxisPrefixes = ['0817', '0818', '0819', '0859', '0877', '0878'];
     const isXLAxis = xlAxisPrefixes.some(prefix => phone.startsWith(prefix));
     
-    // Check length (should be 10-12 digits after country code)
-    const isValidLength = phone.length >= 10 && phone.length <= 12;
+    // Check length (11-13 digits dengan leading 0)
+    const isValidLength = phone.length >= 11 && phone.length <= 13;
     
     return {
       isValid: isXLAxis && isValidLength,
       formatted: phone,
-      message: !isXLAxis ? 'Nomor harus XL/Axis (dimulai 817, 818, 819, 859, 877, 878)' : 
+      message: !isXLAxis ? 'Nomor harus XL/Axis (dimulai 0817, 0818, 0819, 0859, 0877, 0878)' : 
                !isValidLength ? 'Panjang nomor tidak valid' : ''
     };
+  }
+
+  // ✅ FIXED DISPLAY FUNCTION  
+  function formatPhoneNumber(phone) {
+    // Remove any non-digit characters
+    phone = phone.replace(/\D/g, '');
+    
+    // Convert untuk display (+62 format)
+    if (phone.startsWith('0')) {
+      // 08xxxx → +628xxxx (untuk display)
+      return `+62${phone.substring(1)}`;
+    } else if (!phone.startsWith('62')) {
+      // 8xxxx → +628xxxx
+      return `+62${phone}`;
+    } else {
+      // 628xxxx → +628xxxx
+      return `+${phone}`;
+    }
   }
 
   function showAlert(message, type = 'info', duration = 5000) {
