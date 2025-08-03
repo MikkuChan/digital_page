@@ -673,52 +673,59 @@
     </div>
   </section>
 
-  <!-- Testimonials Section -->
-  <section id="testimonials" class="section-padding">
-    <div class="container">
-      <div class="text-center mb-5" data-aos="fade-up">
-        <h2 class="display-5 font-display fw-bold mb-4">
-          Apa Kata <span class="text-gradient">Pengguna Kami?</span>
-        </h2>
-        <p class="text-lead mx-auto" style="max-width:600px;">
-          Lihat pengalaman nyata pelanggan setia kami dari berbagai bisnis dan komunitas digital.
-        </p>
+<!-- Testimonials Section -->
+<section id="testimonials" class="section-padding">
+  <div class="container">
+    <div class="text-center mb-5" data-aos="fade-up">
+      <h2 class="display-5 font-display fw-bold mb-4">
+        Apa Kata <span class="text-gradient">Pengguna Kami?</span>
+      </h2>
+      <p class="text-lead mx-auto" style="max-width:600px;">
+        Lihat pengalaman nyata pelanggan setia kami dari berbagai bisnis dan komunitas digital.
+      </p>
+    </div>
+    <div class="row g-4 justify-content-center">
+      <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
+        <div class="testimonial-card h-100">
+          <div class="mb-3">
+            <img src="https://raw.githubusercontent.com/fadzdigital/imagine/refs/heads/main/httpcustom_10.png" alt="Testimonial Andi Saputra" class="testimonial-img" width="200" height="200" onclick="openPopup('https://raw.githubusercontent.com/fadzdigital/imagine/refs/heads/main/httpcustom_10.png')">
+          </div>
+          
+          <div class="fw-bold">Andi Saputra</div>
+          <div class="text-muted small">Digital Agency, Jakarta</div>
+        </div>
       </div>
-      <div class="row g-4 justify-content-center">
-        <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
-          <div class="testimonial-card h-100">
-            <div class="mb-3">
-              <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User" class="rounded-circle" width="60" height="60">
-            </div>
-            <p class="mb-4">"Pelayanan dan responnya cepat, VPN stabil banget buat kebutuhan bisnis digital. Setting mudah, support-nya luar biasa ramah."</p>
-            <div class="fw-bold">Andi Saputra</div>
-            <div class="text-muted small">Digital Agency, Jakarta</div>
+      <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="200">
+        <div class="testimonial-card h-100">
+          <div class="mb-3">
+            <img src="https://raw.githubusercontent.com/fadzdigital/imagine/refs/heads/main/httpcustom_10.png" alt="Testimonial Putri Melati" class="testimonial-img" width="200" height="200" onclick="openPopup('https://raw.githubusercontent.com/fadzdigital/imagine/refs/heads/main/httpcustom_10.png')">
           </div>
+          
+          <div class="fw-bold">Putri Melati</div>
+          <div class="text-muted small">Admin Komunitas, Bandung</div>
         </div>
-        <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="200">
-          <div class="testimonial-card h-100">
-            <div class="mb-3">
-              <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User" class="rounded-circle" width="60" height="60">
-            </div>
-            <p class="mb-4">"Bot Telegram-nya sangat membantu otomasi channel & komunitas, hemat waktu banget. Recomended buat admin grup!"</p>
-            <div class="fw-bold">Putri Melati</div>
-            <div class="text-muted small">Admin Komunitas, Bandung</div>
+      </div>
+      <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="300">
+        <div class="testimonial-card h-100">
+          <div class="mb-3">
+            <img src="https://raw.githubusercontent.com/fadzdigital/imagine/refs/heads/main/httpcustom_10.png" alt="Testimonial Hendra Wijaya" class="testimonial-img" width="200" height="200" onclick="openPopup('https://raw.githubusercontent.com/fadzdigital/imagine/refs/heads/main/httpcustom_10.png')">
           </div>
-        </div>
-        <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="300">
-          <div class="testimonial-card h-100">
-            <div class="mb-3">
-              <img src="https://randomuser.me/api/portraits/men/65.jpg" alt="User" class="rounded-circle" width="60" height="60">
-            </div>
-            <p class="mb-4">"Saya langganan sudah lebih dari setahun. Uptime 99%, ada masalah langsung dibantu, bener-bener solusi premium."</p>
-            <div class="fw-bold">Hendra Wijaya</div>
-            <div class="text-muted small">Reseller IT, Surabaya</div>
-          </div>
+          
+          <div class="fw-bold">Hendra Wijaya</div>
+          <div class="text-muted small">Reseller IT, Surabaya</div>
         </div>
       </div>
     </div>
-  </section>
+  </div>
 
+  <!-- Popup Modal -->
+  <div id="imagePopup" class="popup">
+    <div class="popup-content">
+      <span class="close-btn" onclick="closePopup()">×</span>
+      <img id="popupImage" src="" alt="Testimonial Image">
+    </div>
+  </div>
+</section>
   <!-- Contact Section -->
   <section id="contact" class="section-padding" style="background: var(--gray-100);">
     <div class="container">

@@ -124,3 +124,22 @@ document.addEventListener('mousemove', (e) => {
     particle.style.transform = `translate(${x}px, ${y}px)`;
   });
 });
+
+function openPopup(imageSrc) {
+  const popup = document.getElementById('imagePopup');
+  const popupImage = document.getElementById('popupImage');
+  popupImage.src = imageSrc;
+  popup.style.display = 'flex';
+}
+
+function closePopup() {
+  const popup = document.getElementById('imagePopup');
+  popup.style.display = 'none';
+}
+
+// Tutup popup jika klik di luar gambar
+document.getElementById('imagePopup').addEventListener('click', function(e) {
+  if (e.target === this) {
+    closePopup();
+  }
+});
