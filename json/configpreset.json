@@ -1,34 +1,182 @@
 [
   {
-    "provider": "XL",
+    "provider": "Xl",
     "presets": [
       {
-        "label": "XL VIDIO",
+        "label": "VIDIO NOWC",
         "value": "Xl_vidio_nowc",
-        "server": { "type": "ubah", "value": "quiz.int.vidio.com" },
-        "servername": { "type": "tetap", "value": "" },
-        "host": { "type": "tetap", "value": "" }
-      },
-      {
-        "label": "testing",
-        "value": "Work",
-        "server": { "type": "tetap", "value": "" },
-        "servername": { "type": "tetap", "value": "" },
-        "host": { "type": "tetap", "value": "" }
+        "server": {
+          "type": "ubah",
+          "value": "quiz.int.vidio.com"
+        },
+        "servername": {
+          "type": "tetap",
+          "value": ""
+        },
+        "host": {
+          "type": "tetap",
+          "value": ""
+        }
       },
       {
         "label": "XCVIP NOWC",
         "value": "xcvip_nowc",
-        "server": { "type": "ubah", "value": "104.17.3.81" },
-        "servername": { "type": "tetap", "value": "" },
-        "host": { "type": "tetap", "value": "" }
+        "server": {
+          "type": "ubah",
+          "value": "104.17.3.81"
+        },
+        "servername": {
+          "type": "tetap",
+          "value": ""
+        },
+        "host": {
+          "type": "tetap",
+          "value": ""
+        }
       },
       {
         "label": "XCVIP WC",
         "value": "xcvip_wc",
-        "server": { "type": "ubah", "value": "support.zoom.us" },
-        "servername": { "type": "menambah", "value": "support.zoom.us" },
-        "host": { "type": "menambah", "value": "support.zoom.us" }
+        "server": {
+          "type": "ubah",
+          "value": "support.zoom.us"
+        },
+        "servername": {
+          "type": "menambah",
+          "value": "support.zoom.us"
+        },
+        "host": {
+          "type": "menambah",
+          "value": "support.zoom.us"
+        }
+      },
+      {
+        "label": "VIDIO WC",
+        "value": "vidiowc_mode",
+        "server": {
+          "type": "ubah",
+          "value": "quiz.int.vidio.com"
+        },
+        "servername": {
+          "type": "menambah",
+          "value": "quiz.int.vidio.com"
+        },
+        "host": {
+          "type": "menambah",
+          "value": "quiz.int.vidio.com"
+        }
+      },
+      {
+        "label": "XCVIP SSL",
+        "value": "xcvip_ssl1",
+        "server": {
+          "type": "tetap",
+          "value": ""
+        },
+        "servername": {
+          "type": "ubah",
+          "value": "live.iflix.com"
+        },
+        "host": {
+          "type": "tetap",
+          "value": ""
+        }
+      },
+      {
+        "label": "XUTS",
+        "value": "xuts",
+        "server": {
+          "type": "ubah",
+          "value": "ava.game.naver.com"
+        },
+        "servername": {
+          "type": "menambah",
+          "value": "ava.game.naver.com"
+        },
+        "host": {
+          "type": "menambah",
+          "value": "ava.game.naver.com"
+        }
+      },
+      {
+        "label": "IFLIX (SSL)",
+        "value": "iflix_ssl",
+        "server": {
+          "type": "tetap",
+          "value": ""
+        },
+        "servername": {
+          "type": "ubah",
+          "value": "live.iflix.com"
+        },
+        "host": {
+          "type": "tetap",
+          "value": ""
+        }
+      },
+      {
+        "label": "Xuts | IG",
+        "value": "xuts_ig",
+        "server": {
+          "type": "tetap",
+          "value": ""
+        },
+        "servername": {
+          "type": "ubah",
+          "value": "graph.instagram.com"
+        },
+        "host": {
+          "type": "tetap",
+          "value": ""
+        }
+      },
+      {
+        "label": "Xuts | FB",
+        "value": "xuts_fb_ssl",
+        "server": {
+          "type": "tetap",
+          "value": ""
+        },
+        "servername": {
+          "type": "ubah",
+          "value": "edge-ig-mqtt-p4-shv-sin6.facebook.com"
+        },
+        "host": {
+          "type": "tetap",
+          "value": ""
+        }
+      },
+      {
+        "label": "Viu Wc",
+        "value": "viu_wc",
+        "server": {
+          "type": "ubah",
+          "value": "zaintest.vuclip.com"
+        },
+        "servername": {
+          "type": "menambah",
+          "value": "zaintest.vuclip.com"
+        },
+        "host": {
+          "type": "menambah",
+          "value": "zaintest.vuclip.com"
+        }
+      },
+      {
+        "label": "Netflix Wc",
+        "value": "Netflix_wc",
+        "server": {
+          "type": "ubah",
+          "value": "cache.netflix.com"
+        },
+        "servername": {
+          "type": "menambah",
+          "value": "cache.netflix.com"
+        },
+        "host": {
+          "type": "menambah",
+          "value": "cache.netflix.com"
+        }
       }
     ]
   },

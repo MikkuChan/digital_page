@@ -1,0 +1,39 @@
+[
+  {
+    "provider": "XL",
+    "presets": [
+      {
+        "label": "XL VIDIO",
+        "value": "Xl_vidio_nowc",
+        "server": { "type": "ubah", "value": "quiz.int.vidio.com" },
+        "servername": { "type": "tetap", "value": "" },
+        "host": { "type": "tetap", "value": "" }
+      },
+      {
+        "label": "testing",
+        "value": "Work",
+        "server": { "type": "tetap", "value": "" },
+        "servername": { "type": "tetap", "value": "" },
+        "host": { "type": "tetap", "value": "" }
+      },
+      {
+        "label": "XCVIP NOWC",
+        "value": "xcvip_nowc",
+        "server": { "type": "ubah", "value": "104.17.3.81" },
+        "servername": { "type": "tetap", "value": "" },
+        "host": { "type": "tetap", "value": "" }
+      },
+      {
+        "label": "XCVIP WC",
+        "value": "xcvip_wc",
+        "server": { "type": "ubah", "value": "support.zoom.us" },
+        "servername": { "type": "menambah", "value": "support.zoom.us" },
+        "host": { "type": "menambah", "value": "support.zoom.us" }
+      }
+    ]
+  },
+  {
+    "provider": "Axis",
+    "presets": []
+  }
+]
