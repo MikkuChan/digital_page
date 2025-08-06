@@ -25,11 +25,11 @@ document.addEventListener('DOMContentLoaded', function () {
     gradient: "orange"
   },
   {
-    title: "IP Locator",
-    desc: "Cari lokasi, kota, negara, ASN, provider, dan detail lengkap dari sebuah IP publik.",
-    icon: "bi bi-geo-alt-fill",
+    title: "Login Otp & Cek kuota",
+    desc: "Login otp Mandiri & Cek Kuota XL.",
+    icon: "bi bi-wifi",
     url: "iplocator.html",
-    badge: "Gratis",
+    badge: "Unlimited",
     gradient: "sky"
   },
   {
@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', function () {
     desc: "Cek sisa kuota dan detail paket aktif secara gratis!",
     icon: "bi bi-wifi",
     url: "cekkuota.html",
-    badge: "Gratis",
+    badge: "Limit Harian",
     gradient: "purple"
   }
 ];

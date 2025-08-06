@@ -681,35 +681,38 @@
         Apa Kata <span class="text-gradient">Pengguna Kami?</span>
       </h2>
       <p class="text-lead mx-auto" style="max-width:600px;">
-  Berikut beberapa testimoni dari pelanggan kami. Bergabunglah dan jadilah bagian dari testimoni berikutnya!
-</p>
+        Lihat pengalaman nyata pelanggan setia kami dari berbagai bisnis dan komunitas digital.
+      </p>
     </div>
     <div class="row g-4 justify-content-center">
       <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
         <div class="testimonial-card h-100">
           <div class="mb-3">
-            <img src="assets/testi/testi_01.png" alt="Testimonial #01" class="testimonial-img" width="200" height="200" onclick="openPopup('assets/testi/testi_01.png')">
+            <img src="https://raw.githubusercontent.com/fadzdigital/imagine/refs/heads/main/httpcustom_10.png" alt="Testimonial Andi Saputra" class="testimonial-img" width="200" height="200" onclick="openPopup('https://raw.githubusercontent.com/fadzdigital/imagine/refs/heads/main/httpcustom_10.png')">
           </div>
-          <div class="fw-bold">Someone #01</div>
-          <div class="text-muted small">vpn premium, indonesia</div>
+          
+          <div class="fw-bold">Andi Saputra</div>
+          <div class="text-muted small">Digital Agency, Jakarta</div>
         </div>
       </div>
       <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="200">
         <div class="testimonial-card h-100">
           <div class="mb-3">
-            <img src="assets/testi/testi_02.png" alt="Testimonial #02" class="testimonial-img" width="200" height="200" onclick="openPopup('assets/testi/testi_02.png')">
+            <img src="https://raw.githubusercontent.com/fadzdigital/imagine/refs/heads/main/httpcustom_10.png" alt="Testimonial Putri Melati" class="testimonial-img" width="200" height="200" onclick="openPopup('https://raw.githubusercontent.com/fadzdigital/imagine/refs/heads/main/httpcustom_10.png')">
           </div>
-          <div class="fw-bold">Someone #02</div>
-          <div class="text-muted small">vpn premium, indonesia</div>
+          
+          <div class="fw-bold">Putri Melati</div>
+          <div class="text-muted small">Admin Komunitas, Bandung</div>
         </div>
       </div>
       <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="300">
         <div class="testimonial-card h-100">
           <div class="mb-3">
-            <img src="assets/testi/testi_03.png" alt="Testimonial #03" class="testimonial-img" width="200" height="200" onclick="openPopup('assets/testi/testi_03.png')">
+            <img src="https://raw.githubusercontent.com/fadzdigital/imagine/refs/heads/main/httpcustom_10.png" alt="Testimonial Hendra Wijaya" class="testimonial-img" width="200" height="200" onclick="openPopup('https://raw.githubusercontent.com/fadzdigital/imagine/refs/heads/main/httpcustom_10.png')">
           </div>
-          <div class="fw-bold">Someone #03</div>
-          <div class="text-muted small">vpn premium, singapore</div>
+          
+          <div class="fw-bold">Hendra Wijaya</div>
+          <div class="text-muted small">Reseller IT, Surabaya</div>
         </div>
       </div>
     </div>
