@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function () {
     hasActiveSession: false
   };
 
-  // Fungsi validasi nomor HP
+  // ✅ FIXED VALIDATION FUNCTION
   function validatePhoneNumber(phone) {
     // Remove any non-digit characters
     phone = phone.replace(/\D/g, '');
@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', function () {
     };
   }
 
-  // Fungsi format nomor HP untuk display
+  // ✅ FIXED DISPLAY FUNCTION  
   function formatPhoneNumber(phone) {
     // Remove any non-digit characters
     phone = phone.replace(/\D/g, '');
@@ -165,7 +165,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }, 1000);
   }
 
-  // UPDATED: Fungsi cek sesi login - Sesuaikan dengan format response baru (array data + latest_access_token)
+  // ✅ FIXED FUNCTION - CEK SESI LOGIN
   async function checkActiveSession(phoneNumber) {
     try {
       const queryParams = new URLSearchParams({
@@ -178,25 +178,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
       const data = await response.json();
       
-      console.log('📡 Response cek sesi login:', data);
+      console.log('📡 Cek sesi login response:', data);
       
-      // Penyesuaian: Cek jika ada latest_access_token (dari backend update)
-      // Jika ada, gunakan sebagai access token yang ada (sesi aktif)
-      if (data.status === true && data.latest_access_token) {
-        console.log('✅ Sesi aktif ditemukan! Menggunakan access token terbaru:', data.latest_access_token);
+      // ✅ FIXED: Cek response dengan benar
+      if (data.status === true && data.statusCode === 200 && data.data && data.data.access_token) {
+        console.log('✅ Sesi aktif ditemukan! Token:', data.data.access_token);
         return {
           success: true,
-          accessToken: data.latest_access_token,
-          message: data.message || 'Sesi login aktif ditemukan'
-        };
-      } else if (data.status === true && Array.isArray(data.data) && data.data.length > 0) {
-        // Fallback jika backend belum diupdate: Ambil access_token dari item pertama (terbaru)
-        const latestAccessToken = data.data[0].access_token;
-        console.log('✅ Sesi aktif ditemukan (fallback)! Menggunakan access token terbaru:', latestAccessToken);
-        return {
-          success: true,
-          accessToken: latestAccessToken,
-          message: data.message || 'Sesi login aktif ditemukan'
+          accessToken: data.data.access_token,
+          message: data.message
         };
       } else {
         console.log('❌ Tidak ada sesi aktif atau response tidak valid');
@@ -206,7 +196,7 @@ document.addEventListener('DOMContentLoaded', function () {
         };
       }
     } catch (error) {
-      console.error('❌ Error saat cek sesi login:', error);
+      console.error('❌ Error checking session:', error);
       return {
         success: false,
         message: 'Terjadi kesalahan saat cek sesi login'
@@ -239,7 +229,7 @@ document.addEventListener('DOMContentLoaded', function () {
         };
       }
     } catch (error) {
-      console.error('Error saat mengambil detail kuota:', error);
+      console.error('Error getting quota details:', error);
       return {
         success: false,
         message: 'Terjadi kesalahan saat mengambil data kuota'
@@ -273,7 +263,7 @@ document.addEventListener('DOMContentLoaded', function () {
         };
       }
     } catch (error) {
-      console.error('Error saat request OTP:', error);
+      console.error('Error requesting OTP:', error);
       return {
         success: false,
         message: 'Terjadi kesalahan koneksi. Pastikan server gateway berjalan.'
@@ -309,7 +299,7 @@ document.addEventListener('DOMContentLoaded', function () {
         };
       }
     } catch (error) {
-      console.error('Error saat verifikasi OTP:', error);
+      console.error('Error verifying OTP:', error);
       return {
         success: false,
         message: 'Terjadi kesalahan koneksi. Pastikan server gateway berjalan.'
@@ -435,7 +425,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     <div class="benefit-progress">
                       <div class="progress" style="height: 4px;">
                         <div class="progress-bar bg-success" 
-                             style="width: ${(parseFloat(benefit.remaining_quota.replace(/[^\d.]/g, '')) / parseFloat(benefit.quota.replace(/[^\d.]/g, '')) * 100) || 0}%">
+                             style="width: ${(parseFloat(benefit.remaining_quota) / parseFloat(benefit.quota) * 100) || 0}%">
                         </div>
                       </div>
                     </div>
@@ -469,7 +459,7 @@ document.addEventListener('DOMContentLoaded', function () {
     elements.quotaResults.innerHTML = resultsHTML;
   }
 
-  // Fungsi utama untuk submit nomor HP - Cek sesi login dulu, gunakan access token jika ada
+  // 🔄 MAIN FUNCTION - ALUR BARU: CEK SESI LOGIN DULU
   async function handlePhoneNumberSubmit() {
     const phoneValue = elements.phoneInput.value.trim();
     
@@ -490,20 +480,21 @@ document.addEventListener('DOMContentLoaded', function () {
     currentState.phoneNumber = validation.formatted;
     setButtonLoading(elements.requestOtpBtn, true);
     
-    // STEP 1: Cek sesi login dulu
-    console.log('🔍 Mengecek sesi login aktif...');
+    // 🔥 STEP 1: CEK SESI LOGIN DULU (PRIORITAS UTAMA)
+    console.log('🔍 Step 1: Checking for active session...');
     showAlert('Mengecek sesi login...', 'info', 3000);
     
     const sessionCheck = await checkActiveSession(currentState.phoneNumber);
     
     if (sessionCheck.success) {
-      // Sesi aktif ditemukan - Gunakan access token yang ada dan ambil data kuota
-      console.log('✅ Sesi aktif ditemukan! Menggunakan access token yang ada...');
+      // 🎉 SESI AKTIF DITEMUKAN - LANGSUNG CEK KUOTA
+      console.log('✅ Active session found! Using existing token...');
       currentState.accessToken = sessionCheck.accessToken;
       currentState.hasActiveSession = true;
       
       showAlert('Sesi login aktif ditemukan! Mengambil data kuota...', 'success');
       
+      // Langsung ambil data kuota tanpa OTP
       const quotaResult = await getQuotaDetails(currentState.accessToken);
       
       setButtonLoading(elements.requestOtpBtn, false);
@@ -512,18 +503,19 @@ document.addEventListener('DOMContentLoaded', function () {
         elements.phoneDisplayResult.textContent = formatPhoneNumber(currentState.phoneNumber);
         displayQuotaResults(quotaResult.data);
         showStep(3);
-        showAlert('Data kuota berhasil dimuat menggunakan sesi aktif!', 'success');
+        showAlert('Data kuota berhasil dimuat! (menggunakan sesi aktif)', 'success');
       } else {
         showAlert('Sesi aktif ditemukan, tapi gagal mengambil data kuota: ' + quotaResult.message, 'warning');
       }
       
     } else {
-      // Tidak ada sesi aktif - Lanjut ke proses OTP
-      console.log('❌ Tidak ada sesi aktif, lanjut ke proses OTP...');
+      // 🔥 TIDAK ADA SESI AKTIF - LANJUT KE PROSES OTP
+      console.log('❌ No active session found, proceeding with OTP...');
       currentState.hasActiveSession = false;
       
       showAlert('Tidak ada sesi aktif, mengirim kode OTP...', 'info');
       
+      // Request OTP
       const otpResult = await requestOTP(currentState.phoneNumber);
       
       setButtonLoading(elements.requestOtpBtn, false);
@@ -555,6 +547,7 @@ document.addEventListener('DOMContentLoaded', function () {
     this.value = value;
   });
 
+  // 🔥 BUTTON CLICK - PANGGIL FUNGSI UTAMA
   elements.requestOtpBtn.addEventListener('click', handlePhoneNumberSubmit);
 
   elements.verifyOtpBtn.addEventListener('click', async function() {
@@ -568,12 +561,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
     setButtonLoading(this, true);
     
+    // Verify OTP and login
     const result = await verifyOTP(currentState.phoneNumber, currentState.authId, otpCode);
     
     if (result.success) {
       showAlert('OTP berhasil diverifikasi! Mengambil data kuota...', 'success');
       currentState.accessToken = result.accessToken;
       
+      // Get quota data setelah login berhasil
       const quotaResult = await getQuotaDetails(currentState.accessToken);
       
       setButtonLoading(this, false);
@@ -670,5 +665,5 @@ document.addEventListener('DOMContentLoaded', function () {
   // Initialize
   showStep(1);
   
-  console.log('🔒 FadzApi Gateway: Alur baru - Cek sesi login dulu, gunakan access token jika ada!');
+  console.log('🔒 FadzApi Gateway: Alur baru - Cek sesi login dulu, baru OTP jika diperlukan!');
 });
