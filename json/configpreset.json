@@ -177,6 +177,20 @@
           "type": "menambah",
           "value": "cache.netflix.com"
         }
+      },
+      {
+        "label": "EDUKASI WC",
+        "value": "edukasi_wc",
+        "server": { "type": "ubah", "value": "support.zoom.us" },
+        "servername": { "type": "menambah", "value": "support.zoom.us" },
+        "host": { "type": "menambah", "value": "support.zoom.us" }
+      },
+      {
+        "label": "EDUKASI NOWC",
+        "value": "edukasi_nowc",
+        "server": { "type": "ubah", "value": "104.17.3.81" },
+        "servername": { "type": "tetap", "value": "" },
+        "host": { "type": "tetap", "value": "" }
       }
     ]
   },
