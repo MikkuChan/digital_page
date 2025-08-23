@@ -115,7 +115,7 @@ document.getElementById('cekForm').addEventListener('submit', async function(e) 
   hasil.innerHTML = "<span class='text-info'><i class='bi bi-hourglass-split'></i> Mengecek kuota XL/Axis...</span>";
   hasilwrap.style.display = "block";
   try {
-    const res = await fetch('https://cekkuota.fadzdigital.dpdns.org/cekkuota', {
+    const res = await fetch('https://www.fadzdigital.store/cekkuota', {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
