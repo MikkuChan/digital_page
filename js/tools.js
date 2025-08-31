@@ -25,8 +25,8 @@ document.addEventListener('DOMContentLoaded', function () {
     gradient: "orange"
   },
   {
-    title: "Login Otp & Cek kuota",
-    desc: "Login otp Mandiri & Cek Kuota XL.",
+    title: "Cek iP Address",
+    desc: "Cek iP Adrres anda dengan mudah & cepat.",
     icon: "bi bi-wifi",
     url: "iplocator.html",
     badge: "Unlimited",
