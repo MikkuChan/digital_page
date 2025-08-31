@@ -1,5 +1,5 @@
 // --- Konfigurasi Endpoint
-const API_CHATGPT = "https://api.ryzumi.vip/api/ai/chatgpt";
+const API_CHATGPT = "https://api.fadzdigital.store/chatgpt";
 
 // --- Unique ID Generator
 function randomSessionId() {
