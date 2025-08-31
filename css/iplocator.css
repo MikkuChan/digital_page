@@ -1,78 +1,58 @@
-.ip-locator-card {
-  background: #fff;
-  border-radius: 1.25rem;
-  box-shadow: 0 6px 32px 0 rgba(52,100,167,0.09);
-  border: 1px solid #e6ecf2;
-}
-#ipCardInfo {
-  background: #f8fafc;
-  border-radius: 18px;
-  padding: 1.25em 1.5em;
-  font-family: 'Inter', 'JetBrains Mono', 'Menlo', monospace;
-  color: #222;
-  font-size: 1.12em;
-  margin-bottom: 0.6em;
-  border: 1px solid #e2e8f0;
-}
+
+#ipCardInfo { word-break: normal; overflow-wrap: normal; }
+
+/* Baris info: pakai flex biar stabil (bukan grid) */
 #ipCardInfo .row-info {
   display: flex;
   align-items: center;
   gap: 0.8em;
-  margin-bottom: 0.45em;
-  font-size: 1.06em;
+  padding: 0.35em 0.55em;
+  border-radius: 10px;
+  transition: background-color .18s ease, transform .18s ease;
 }
-#ipCardInfo .row-info .icon {
-  width: 1.55em;
-  text-align: center;
-  color: #3693ff;
-}
-#ipCardInfo .flag {
-  font-size: 2em;
-  vertical-align: middle;
-  margin-right: 0.12em;
-}
+
+/* Ikon tetap fix */
+#ipCardInfo .row-info .icon { width: 26px; flex: 0 0 26px; text-align: center; }
+
+/* Label (key) diberi lebar minimum supaya rapi */
 #ipCardInfo .key {
-  min-width: 105px;
-  font-weight: 600;
-  color: #393;
+  min-width: 110px;       /* silakan sesuaikan 100–140 */
+  font-weight: 700;
+  color: #0d9488;
 }
+
+/* Nilai (val) default: TIDAK wrap per-karakter, dan tidak patah tiap huruf */
 #ipCardInfo .val {
-  color: #151515;
-  font-weight: 500;
+  flex: 1 1 auto;
+  white-space: nowrap;     /* biar 1 baris di desktop */
+  overflow: hidden;
+  text-overflow: ellipsis; /* kalau kepanjangan, kasih ellipsis ... */
+  font-weight: 600;
+  color: #1f2937;
 }
+
+/* Country code badge */
+.cc-badge {
+  display: inline-block;
+  margin-left: .5em;
+  padding: .1em .5em;
+  font-size: .85em;
+  font-weight: 700;
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  background: #f8fafc;
+  color: #334155;
+}
+
+/* Baris hover tetap halus */
+#ipCardInfo .row-info:hover { background: var(--bg-soft, #f1f5f9); transform: translateY(-1px); }
+
+/* Responsif: di mobile boleh wrap supaya tidak kepotong */
 @media (max-width: 575px) {
-  #ipCardInfo {
-    padding: 1em 0.65em;
-    font-size: 0.98em;
+  #ipCardInfo .val {
+    white-space: normal;   /* boleh multilines di layar kecil */
+    overflow: visible;
+    text-overflow: unset;
+    word-break: break-word; /* patah sesuai kata/panjang token */
   }
-}
-.ipinput-card {
-  border: 1.5px solid #e4eaf2;
-  transition: box-shadow 0.18s, border-color 0.18s;
-}
-.ipinput-card:focus-within, .ipinput-input:focus {
-  border-color: #60a5fa !important;
-  box-shadow: 0 0 0 2px #bae6fd;
-}
-.ipinput-input {
-  font-size: 1.15em;
-  font-family: 'JetBrains Mono', 'Menlo', monospace;
-  border-radius: 0.6em;
-  border: 1.5px solid #d6e0ee;
-  padding-left: 0.9em;
-}
-.input-icon {
-  min-width: 50px;
-  min-height: 50px;
-  box-shadow: 0 2px 8px 0 #bae6fd3a;
-  background: linear-gradient(135deg, #60a5fa 65%, #06b6d4 100%);
-  color: #fff;
-  font-size: 2em;
-  align-items: center;
-  justify-content: center;
-  display: flex;
-}
-@media (max-width: 575px) {
-  .ipinput-card { flex-direction: column; align-items: stretch; gap: 1em; }
-  .input-icon { margin-bottom: 0.4em; }
 }
