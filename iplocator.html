@@ -2,13 +2,12 @@
 <html lang="id" class="light-mode">
 <head>
   <meta charset="UTF-8">
-  <title>IP Locator – fadzdigital</title>
+  <title>IpLocator – fadzdigital</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Cari detail lokasi, negara, ASN, dan info lainnya dari alamat IP publik manapun secara instan!">
+  <meta name="description" content="Cek alamat IP publik Anda dengan cepat dan mudah.">
   <link rel="icon" href="https://raw.githubusercontent.com/fadzdigital/image/main/favicon.ico">
-  
-  
-<!-- Google Fonts -->
+
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -19,9 +18,8 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <!-- Custom Global CSS -->
   <link href="css/style.css" rel="stylesheet">
-  <!-- Custom Page CSS Hero -->
   <link href="css/clash-converter.css" rel="stylesheet">
-  <!-- Custom Page CSS IpLocator -->
+  <!-- Custom Page CSS -->
   <link href="css/iplocator.css" rel="stylesheet">
 </head>
 <body>
@@ -29,6 +27,7 @@
   <div class="loading-overlay" id="loadingOverlay">
     <div class="loading-spinner"></div>
   </div>
+
   <!-- Navbar: konsisten semua halaman -->
   <nav class="navbar navbar-expand-lg fixed-top">
     <div class="container">
@@ -57,66 +56,67 @@
   </nav>
 
   <main style="margin-top:90px;min-height:100vh;">
-    <section class="ip-locator-hero text-center font-display py-5 mb-0"
-      style="background: linear-gradient(180deg, #f9fafb 60%, #e0f2fe 100%);">
+    <!-- Hero khusus IP Locator -->
+    <section class="text-center font-display py-5 mb-0" style="background: linear-gradient(180deg, #f9fafb 60%, #e0f2fe 100%);">
       <div class="container">
         <span class="badge-tools mb-4 px-4 py-2 fs-6 d-inline-flex align-items-center">
-          <i class="bi bi-geo-alt me-2"></i>IP Locator Tool
+          <i class="bi bi-geo-alt me-2"></i>IP Locator
         </span>
-        <h1 class="display-5 fw-bold mb-3" style="letter-spacing:-1px; color: #333;">
-          Cari <span class="text-gradient" style="background: linear-gradient(90deg, #4285f4, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Info Lokasi</span> dari Alamat IP
+        <h1 class="display-5 fw-bold mb-3" style="letter-spacing:-1px; color:#333;">
+          Cek <span class="text-gradient" style="background: linear-gradient(90deg, #4285f4, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">IP Address</span> Anda
         </h1>
-        <p class="lead mx-auto mb-4" style="max-width:650px; font-size:1.1rem; color: #666;">
-          Cek lokasi, kota, negara, ASN, provider, koordinat, timezone, dan info detail lainnya dari IP publik manapun.
+        <p class="lead mx-auto mb-4" style="max-width:650px; font-size:1.1rem; color:#666;">
+          Masukkan alamat IP Address untuk mengetahui lokasi geografisnya secara cepat dan mudah. Atau biarkan kosong untuk mendeteksi IP publik Anda saat ini.
         </p>
       </div>
     </section>
 
-    <section class="container py-5">
-      <div class="row justify-content-center">
-        <div class="col-lg-7 col-md-10">
-          <div class="ip-locator-card p-4 mb-4">
-            <form id="ipForm" autocomplete="off">
-  <div class="mb-4">
-    <div class="ipinput-card shadow-sm rounded-4 px-3 py-4 mb-2 d-flex align-items-center gap-3" style="background: #f3f6fa;">
-      <span class="input-icon d-flex align-items-center justify-content-center rounded-3" style="width:50px;height:50px; background:linear-gradient(135deg,#93c5fd,#06b6d4); color:#fff; font-size:2rem;">
-        <i class="bi bi-globe2"></i>
-      </span>
-      <div class="flex-grow-1">
-        <label class="fw-bold font-display fs-5 mb-1" for="ipInput" style="color:#263056">
-          Masukkan IP Address
-        </label>
-        <input type="text" class="form-control mt-1 mb-1 shadow-sm ipinput-input" id="ipInput" placeholder="Contoh: 190.92.213.24" autocomplete="off" />
-        <div class="form-text small" style="color:#3182ce">
-          Bisa IPv4 / IPv6 publik. <b>Contoh:</b> 8.8.8.8 atau 2400:cb00:2048:1::c629:d7a2
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="d-grid">
-    <button type="submit" class="btn btn-primary px-4 py-3 fw-bold" id="lookupBtn">
-      <i class="bi bi-search me-2"></i>Cari Lokasi IP
-    </button>
-  </div>
-</form>
+    <!-- Form & Hasil -->
+    <section class="py-5 mb-4">
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-lg-7">
+            <div class="card shadow-lg border-0 rounded-4 p-4 ip-locator-card">
+              <h2 class="mb-3 fw-bold text-gradient font-display" style="font-size:2rem;">IP Locator</h2>
 
-            <div class="mt-4" id="resultSection" style="display:none;">
-              <div class="d-flex align-items-center gap-2 mb-3 flex-wrap">
-                <button class="btn btn-outline-success" id="copyResult">
-                  <i class="bi bi-clipboard me-1"></i>Copy Info
-                </button>
-                <a target="_blank" id="mapsBtn" class="btn btn-outline-primary d-none">
-                  <i class="bi bi-geo me-1"></i>Buka Maps
-                </a>
+              <form id="ipForm" class="mb-3" novalidate>
+                <div class="input-group ipinput-card">
+                  <span class="input-group-text input-icon"><i class="bi bi-hdd-network"></i></span>
+                  <input type="text" id="ipInput" class="form-control ipinput-input" placeholder="Masukkan IP address" autocomplete="off" aria-label="Input alamat IP">
+                  <button id="lookupBtn" class="btn btn-success" type="submit">
+                    <i class="bi bi-search me-2"></i>Cari Lokasi IP
+                  </button>
+                </div>
+                <div class="form-text">Contoh: 1.2.3.4 atau 2001:4860:4860::8888</div>
+              </form>
+
+              <!-- Error -->
+              <div id="errorSection" class="alert alert-danger d-none" role="alert" aria-live="assertive"></div>
+
+              <!-- Hasil -->
+              <div id="resultSection" class="d-none" aria-live="polite">
+                <div id="ipCardInfo" class="mb-3"></div>
+                <div class="d-flex gap-2 mb-2">
+                  <a id="mapsBtn" class="btn btn-info d-none" target="_blank" rel="noopener">
+                    <i class="bi bi-geo-alt me-2"></i>Lihat di Google Maps
+                  </a>
+                  <button id="copyResult" class="btn btn-outline-secondary" type="button">
+                    <i class="bi bi-clipboard me-2"></i>Copy Info
+                  </button>
+                </div>
               </div>
-              <div id="ipCardInfo"></div>
-              <div id="errorSection" class="error-list mt-3" style="display:none;"></div>
+
+              <noscript>
+                <div class="alert alert-warning mt-3">Aktifkan JavaScript untuk menggunakan IP Locator.</div>
+              </noscript>
             </div>
           </div>
         </div>
       </div>
     </section>
   </main>
+
+  <!-- FOOTER (sama dengan halaman lain) -->
   <footer class="py-4" style="background: var(--gray-900); color:var(--gray-100)">
     <div class="container text-center">
       <div class="mb-2">
@@ -135,19 +135,22 @@
       </div>
     </div>
   </footer>
+  <!-- end -->
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="js/main.js"></script>
   <script src="js/iplocator.js"></script>
   <script>
     // Overlay loading saat halaman dibuka
-window.addEventListener('load', function () {
-  setTimeout(function () {
-    document.getElementById('loadingOverlay').style.opacity = '0';
-    setTimeout(function () {
-      document.getElementById('loadingOverlay').style.display = 'none';
-    }, 600); // Waktu transisi hilang overlay
-  }, 400); // Lama tampil overlay loading
-});
+    window.addEventListener('load', function () {
+      setTimeout(function () {
+        const overlay = document.getElementById('loadingOverlay');
+        if (!overlay) return;
+        overlay.style.opacity = '0';
+        setTimeout(function () {
+          overlay.style.display = 'none';
+        }, 600);
+      }, 400);
+    });
   </script>
 </body>
 </html>
