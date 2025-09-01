@@ -143,3 +143,37 @@ document.getElementById('imagePopup').addEventListener('click', function(e) {
     closePopup();
   }
 });
+
+// ===== Kontak =====
+(function () {
+  const toast = document.getElementById('copyToast2');
+
+  function showToast(msg = 'Disalin') {
+    if (!toast) return;
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(() => toast.classList.remove('show'), 1600);
+  }
+
+  function getText(sel) {
+    const el = document.querySelector(sel);
+    if (!el) return '';
+    if (el.tagName === 'ADDRESS') return el.innerText.trim();
+    return (el.textContent || '').trim();
+  }
+
+  document.addEventListener('click', (e) => {
+    const chip = e.target.closest('.copy-chip');
+    if (!chip) return;
+    const sel = chip.getAttribute('data-copy');
+    if (!sel) return;
+    const txt = getText(sel);
+    if (!txt) return;
+
+    navigator.clipboard.writeText(txt)
+      .then(() => showToast('Disalin: ' + (txt.length > 24 ? txt.slice(0, 24) + '…' : txt)))
+      .catch(() => showToast('Gagal menyalin'));
+  });
+})();
+// ===== Akhir Kontak =====

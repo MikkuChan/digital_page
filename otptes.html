@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Login OTP dan cek sisa kuota XL secara terpisah. Mudah dan cepat!">
   <link rel="icon" href="https://raw.githubusercontent.com/fadzdigital/image/main/favicon.ico">
-  <!-- FONT GOOGLE SAMA PERSIS HOMEPAGE -->
+  <!-- FONT GOOGLE -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -32,7 +32,7 @@
       min-height: 100vh;
     }
     
-    .font-display { font-family: var(--font-display); }
+    .font-display, .navbar-brand, .produk-section-title { font-family: var(--font-display); }
     
     /* Loading Screen */
     .loading-overlay {
@@ -449,31 +449,31 @@
   </div>
   
   <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg fixed-top">
-    <div class="container">
-      <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
-        <img src="https://raw.githubusercontent.com/fadzdigital/image/main/fadzdigital.png" alt="fadzdigital Logo" style="height:38px; width:auto; object-fit:contain;" />
-        <span class="text-gradient" style="font-size:2rem; font-weight:700;">fadzdigital</span>
-      </a>
-      <button class="navbar-toggler border-0 p-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav mx-auto">
-          <li class="nav-item"><a class="nav-link" href="index.html">Beranda</a></li>
-          <li class="nav-item"><a class="nav-link" href="index.html#features">Fitur</a></li>
-          <li class="nav-item"><a class="nav-link" href="produk.html">Produk</a></li>
-          <li class="nav-item"><a class="nav-link" href="tutorial.html">Tutorial</a></li>
-          <li class="nav-item"><a class="nav-link active" href="tools.html">Tools</a></li>
-          <li class="nav-item"><a class="nav-link" href="index.html#contact">Kontak</a></li>
-        </ul>
-        <div class="d-flex align-items-center gap-3">
-          <a href="https://wa.me/6285727035336" class="btn btn-success d-none d-lg-inline-flex">WhatsApp</a>
-          <a href="https://t.me/fadzdigital" class="btn btn-primary">Telegram</a>
-        </div>
+  <nav class="navbar navbar-expand-lg fixed-top shadow-sm" style="background:rgba(255,255,255,0.97);backdrop-filter:blur(10px);border-bottom:1.5px solid #10b98120;">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center gap-2 font-display" href="index.html">
+      <img src="https://raw.githubusercontent.com/fadzdigital/image/main/fadzdigital.png" alt="fadzdigital Logo" style="height:38px; width:auto; object-fit:contain;" />
+      <span class="text-gradient" style="font-size:2rem; font-weight:700;">fadzdigital</span>
+    </a>
+    <button class="navbar-toggler border-0 p-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav mx-auto">
+        <li class="nav-item"><a class="nav-link" href="index.html">Beranda</a></li>
+        <li class="nav-item"><a class="nav-link" href="index.html#features">Fitur</a></li>
+        <li class="nav-item"><a class="nav-link" href="produk.html">Produk</a></li>
+        <li class="nav-item"><a class="nav-link" href="tutorial.html">Tutorial</a></li>
+        <li class="nav-item"><a class="nav-link active" href="tools.html">Tools</a></li>
+        <li class="nav-item"><a class="nav-link" href="index.html#contact">Kontak</a></li>
+      </ul>
+      <div class="d-flex align-items-center gap-3">
+        <a href="https://wa.me/6285727035336" class="btn btn-success d-none d-lg-inline-flex">WhatsApp</a>
+        <a href="https://t.me/fadzdigital" class="btn btn-primary">Telegram</a>
       </div>
     </div>
-  </nav>
+  </div>
+</nav>
 
   <!-- Hero Section -->
   <section class="hero-section">

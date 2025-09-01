@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="id" class="light-mode">
+<head>
+  <meta charset="UTF-8">
+  <title>Cek Area Paket Akrab</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Cek area paket akrab berdasarkan provinsi dan kota/kabupaten. Cari area dengan mudah!">
+  <link rel="icon" href="https://raw.githubusercontent.com/fadzdigital/image/main/favicon.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/cekarea.css">
+</head>
+<body>
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+  </div>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg fixed-top">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
+        <img src="https://raw.githubusercontent.com/fadzdigital/image/main/fadzdigital.png" alt="fadzdigital Logo" style="height:38px; width:auto; object-fit:contain;" />
+        <span class="text-gradient" style="font-size:2rem; font-weight:700;">fadzdigital</span>
+      </a>
+      <button class="navbar-toggler border-0 p-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav mx-auto">
+          <li class="nav-item"><a class="nav-link" href="index.html">Beranda</a></li>
+          <li class="nav-item"><a class="nav-link" href="index.html#features">Fitur</a></li>
+          <li class="nav-item"><a class="nav-link" href="ordervpn.html">Order VPN</a></li>
+          <li class="nav-item"><a class="nav-link" href="tutorial.html">Tutorial</a></li>
+          <li class="nav-item"><a class="nav-link" href="tools.html">Tools</a></li>
+          <li class="nav-item"><a class="nav-link active" href="cekarea.html">Cek Area</a></li>
+          <li class="nav-item"><a class="nav-link" href="index.html#contact">Kontak</a></li>
+        </ul>
+        <div class="d-flex align-items-center gap-3">
+          <a href="https://wa.me/6285727035336" class="btn btn-success d-none d-lg-inline-flex">WhatsApp</a>
+          <a href="https://t.me/fadzdigital" class="btn btn-primary">Telegram</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+  <main style="margin-top:60px;min-height:100vh;">
+    <section class="cekarea-hero-section text-center font-display pb-3">
+      <div class="container position-relative">
+        <span class="badge-cekarea mb-3 px-3 py-2 fs-6 shadow">
+          <i class="bi bi-map me-2"></i>Cek Area Paket Akrab
+        </span>
+        <h1 class="display-5 fw-bold mb-3 gradient-headline">Cek <span class="text-gradient">Area</span> Paket Akrab</h1>
+        <p class="lead mx-auto" style="max-width:660px;">
+          Cari area paket akrab berdasarkan provinsi dan kota/kabupaten.<br>
+          Tulis nama kota/kabupaten untuk cek area.
+        </p>
+        <div class="cekarea-searchbar mt-4 mx-auto" style="max-width:370px;">
+          <div class="input-group shadow-sm rounded-pill">
+            <span class="input-group-text bg-white border-0"><i class="bi bi-search"></i></span>
+            <input type="search" id="searchInput" class="form-control border-0 rounded-end-pill" placeholder="Tulis nama kota/kabupaten..." autocomplete="off" />
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="cekarea-list-section section-padding">
+      <div class="container">
+        <div class="row g-4 justify-content-center" id="cekareaList">
+          <!-- Card area akan di-generate oleh JS -->
+        </div>
+        <div id="cekareaEmptyResult" class="text-center text-muted fw-semibold py-5 d-none">
+          <i class="bi bi-emoji-frown" style="font-size:2.5rem;"></i><br>
+          Area tidak ditemukan.<br>
+          Coba kata kunci lain.
+        </div>
+      </div>
+    </section>
+  </main>
+  <!-- Footer -->
+  <footer class="py-4" style="background: var(--gray-900); color:var(--gray-100)">
+    <div class="container text-center">
+      <div class="mb-2">
+        <span class="fw-bold font-display text-gradient" style="font-size:1.3rem;">fadzdigital</span>
+      </div>
+      <div class="mb-2 small">
+        &copy; 2025 fadzdigital. All rights reserved.<br>
+        Made with 💙 in Indonesia
+      </div>
+      <div>
+        <a href="index.html" class="text-primary small text-decoration-none mx-2">Beranda</a>
+        <a href="ordervpn.html" class="text-primary small text-decoration-none mx-2">Order VPN</a>
+        <a href="tutorial.html" class="text-primary small text-decoration-none mx-2">Tutorial</a>
+        <a href="tools.html" class="text-primary small text-decoration-none mx-2">Tools</a>
+        <a href="cekarea.html" class="text-primary small text-decoration-none mx-2">Cek Area</a>
+        <a href="index.html#contact" class="text-primary small text-decoration-none mx-2">Kontak</a>
+      </div>
+    </div>
+  </footer>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/cekarea.js"></script>
+  <script>
+    window.addEventListener('load', function () {
+      setTimeout(function () {
+        document.getElementById('loadingOverlay').style.opacity = '0';
+        setTimeout(function () {
+          document.getElementById('loadingOverlay').style.display = 'none';
+        }, 600);
+      }, 400);
+    });
+  </script>
+</body>
+</html>

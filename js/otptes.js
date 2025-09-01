@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Remove any non-digit characters
     phone = phone.replace(/\D/g, '');
     
-    // Convert to 08xxxx format (yang dibutuhkan API Hesda)
+    // Convert to 08xxxx format
     if (phone.startsWith('62')) {
       // 628xxxx → 08xxxx
       phone = '0' + phone.substring(2);
@@ -289,7 +289,7 @@ document.addEventListener('DOMContentLoaded', function () {
       console.error('Error saat request OTP:', error);
       return {
         success: false,
-        message: 'Terjadi kesalahan koneksi. Pastikan server gateway berjalan.'
+        message: 'Terjadi kesalahan koneksi. Silakan hubungi ADMIN.'
       };
     }
   }
@@ -325,7 +325,7 @@ document.addEventListener('DOMContentLoaded', function () {
       console.error('Error saat verifikasi OTP:', error);
       return {
         success: false,
-        message: 'Terjadi kesalahan koneksi. Pastikan server gateway berjalan.'
+        message: 'Terjadi kesalahan koneksi. Silakan hubungi ADMIN.'
       };
     }
   }
@@ -364,7 +364,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function displayQuotaResults(quotaData) {
-    // Process real data dari API
+    // Process real data
     const phoneNumber = quotaData.msisdn || quotaState.phoneNumber;
     const quotas = quotaData.quotas || [];
     

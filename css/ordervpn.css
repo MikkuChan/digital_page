@@ -1,0 +1,121 @@
+/* =========================
+   ordervpn.css (konten saja)
+   ========================= */
+
+/* ---- Card umum ---- */
+.card-elev,
+#waitingBox,
+#resultBox {
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+}
+
+/* ---- Pilihan Paket ---- */
+.pkg-radio input[type="radio"] { display: none; }
+
+.pkg-card {
+  border: 2px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 1rem;
+  text-align: center;
+  background: #fff;
+  cursor: pointer;
+  transition: .2s;
+}
+.pkg-card:hover {
+  border-color: #cbd5e1;
+  transform: translateY(-2px);
+}
+.pkg-radio input[type="radio"]:checked + .pkg-card {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37,99,235,.15);
+}
+.pkg-title { font-weight: 600; }
+.pkg-sub { font-size: .9rem; color: #6b7280; margin: .25rem 0; }
+.pkg-price {
+  font-weight: 700;
+  font-size: 1rem;
+  color: #2563eb;
+}
+
+/* ---- Preview checkout ---- */
+.preview-box {
+  border: 1px dashed #d1d5db;
+  border-radius: 12px;
+  background: #f9fafb;
+  padding: .8rem 1rem;
+  font-size: .9rem;
+}
+.preview-box code { font-family: monospace; }
+
+/* ---- Ringkasan akun ---- */
+.acc-summary {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #f9fafb;
+  padding: .8rem;
+}
+.kv {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: .5rem .75rem;
+  border-radius: 10px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  font-size: .9rem;
+  margin-bottom: .5rem;
+}
+.kv .k { color: #6b7280; }
+.kv .v { font-weight: 600; text-align: right; word-break: break-all; }
+
+/* ---- Blok konfigurasi ---- */
+.cfg-block {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #fff;
+  padding: .8rem;
+}
+.cfg-title { font-weight: 600; margin-bottom: .5rem; }
+.cfg-row {
+  display: flex;
+  gap: .5rem;
+  align-items: center;
+}
+.cfg-code {
+  flex: 1;
+  background: #f1f5f9;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: .5rem;
+  font-family: monospace;
+  font-size: .85rem;
+  word-break: break-all;
+}
+
+/* ---- Tombol aksi ---- */
+#copyAllBtn, #downloadConfigBtn {
+  border-radius: 10px;
+  font-weight: 500;
+  padding: .6rem 1rem;
+}
+
+/* ---- Textarea fallback ---- */
+#configText {
+  font-family: monospace;
+  font-size: .85rem;
+  border-radius: 10px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  margin-top: .75rem;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+  .pkg-card { padding: .8rem; }
+  .kv { flex-direction: column; align-items: flex-start; }
+  .kv .v { text-align: left; }
+  .cfg-row { flex-direction: column; align-items: stretch; }
+}
