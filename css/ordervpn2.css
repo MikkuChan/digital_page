@@ -1,0 +1,23 @@
+.card-elev {
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+}
+
+.preview-box {
+  border: 1px dashed #cbd5e1;
+  border-radius: 12px;
+  background: #f9fafb;
+  padding: 1rem;
+}
+.preview-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: .5rem;
+}
+.preview-foot {
+  font-size: .85rem;
+  color: #6b7280;
+  margin-top: .25rem;
+}
