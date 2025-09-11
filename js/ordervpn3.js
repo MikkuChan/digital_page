@@ -1,5 +1,5 @@
 /* =========================================================
-   ordervpn2.js — FE untuk struktur API baru
+   ordervpn2.js — FE untuk struktur API baru (FIXED)
    ========================================================= */
 
 const API_BASE = (window.API_BASE || '').replace(/\/+$/, '') || `${location.origin}`;
@@ -92,8 +92,8 @@ async function initializeForm() {
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         CFG = await response.json();
         
-        populateServers();
-        updatePreview();
+        // Panggil handler utama untuk pertama kali
+        handleSelectionChange();
     } catch (error) {
         console.error("Gagal memuat konfigurasi dari API:", error);
         showError("Gagal memuat daftar server. Silakan muat ulang halaman.");
@@ -160,6 +160,12 @@ function updatePreview() {
     setText(detailsPreview, `${regionLabel} • ${variantLabel} • ${selectedOption.dataset.label}`);
 }
 
+// [BARU] Fungsi handler utama yang dipanggil saat ada perubahan pilihan
+function handleSelectionChange() {
+    populateServers(); // Langkah 1: Muat ulang daftar server
+    updatePreview();   // Langkah 2: Update harga dan detail
+}
+
 async function handleSubmit(event) {
     event.preventDefault();
     clearError();
@@ -172,7 +178,9 @@ async function handleSubmit(event) {
     const email = (emailEl.value || '').trim();
     if (email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return showError('Format email tidak valid.');
 
-    if (!serverSel.value) return showError('Server belum dipilih.');
+    if (!serverSel.value || serverSel.options[serverSel.selectedIndex]?.disabled) {
+        return showError('Server belum dipilih atau tidak tersedia.');
+    }
 
     const payload = {
         variant: variantSel.value,
@@ -248,7 +256,6 @@ async function pollStatus(orderId) {
                 setText(statusText, 'Menunggu pembayaran...');
             }
         } catch (error) {
-            // Abaikan error koneksi, coba lagi nanti
             console.warn("Polling error (akan dicoba lagi):", error);
         }
     };
@@ -352,10 +359,13 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 formEl.addEventListener('submit', handleSubmit);
-[variantSel, regionSel, serverSel, promoEl, usernameEl].forEach(el => {
-    if (el) el.addEventListener('change', updatePreview);
-    if (el) el.addEventListener('input', updatePreview); // 'input' untuk username & promo
-});
+
+// [DIUBAH] Event listener dipisahkan agar logikanya benar
+variantSel.addEventListener('change', handleSelectionChange);
+regionSel.addEventListener('change', handleSelectionChange);
+serverSel.addEventListener('change', updatePreview);
+promoEl.addEventListener('input', updatePreview);
+usernameEl.addEventListener('input', updatePreview);
 
 document.addEventListener('click', async (e) => {
     const copyBtn = e.target.closest('.cfg-copy');
