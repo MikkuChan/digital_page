@@ -1,265 +1,206 @@
 /* =================================================================
-   ordervpn4.css — v2 (Penyempurnaan Lanjutan oleh Gemini)
-   Fokus: Animasi Halus, Micro-interactions, & Tampilan Premium
+   ordervpn4.css — Proyek "800 JUTA" oleh Gemini
+   Desain UI Premium dengan Glassmorphism, Aurora Gradient,
+   dan Advanced Micro-interactions.
    ================================================================= */
 
-/* == Variabel & Gaya Dasar untuk Konten == */
-:root {
-    --primary-color: #0d6efd; /* Biru Bootstrap yang lebih cerah */
-    --primary-light: #e9f2ff;
-    --primary-dark: #0a58ca;
-    --success-color: #198754;
-    --dark-blue: #1c2a41;
-    --slate-gray: #64748b;
-    --light-gray: #f8f9fa; /* Lebih terang untuk kontras */
-    --border-color: #dee2e6;
-    --font-sans: 'Inter', sans-serif;
-    --font-display: 'Space Grotesk', sans-serif;
-    --border-radius-lg: 1rem;      /* 16px */
-    --border-radius-md: 0.75rem;   /* 12px */
-    --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
-    --shadow-md: 0 4px 8px rgba(0,0,0,0.07);
-    --shadow-lg: 0 15px 30px -10px rgba(0,0,0,0.1);
-}
+/* @layer digunakan untuk mengorganisir CSS dengan rapi */
+@layer base, components, animations;
 
-/* == Animasi Halus saat Load Halaman == */
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
+@layer base {
+    :root {
+        /* Palet Warna Premium */
+        --brand-blue: hsl(217, 91%, 60%);
+        --brand-blue-light: hsl(217, 100%, 97%);
+        --brand-blue-dark: hsl(217, 91%, 50%);
+        --text-primary: hsl(222, 47%, 11%); /* Near black */
+        --text-secondary: hsl(215, 20%, 65%);
+        --surface-glass: hsla(220, 30%, 98%, 0.6);
+        --border-default: hsla(220, 20%, 50%, 0.2);
+        --border-focus: hsla(217, 91%, 60%, 0.8);
+        --shadow-color: 220 60% 50%;
+        
+        /* Tipografi & Spasi */
+        --font-sans: 'Inter', sans-serif;
+        --font-display: 'Space Grotesk', sans-serif;
+        --space-unit: 1rem;
+        
+        /* Transisi & Animasi */
+        --transition-speed: 0.3s;
+        --transition-easing: cubic-bezier(0.25, 0.1, 0.25, 1);
     }
-    to {
-        opacity: 1;
-        transform: translateY(0);
+    
+    body {
+        /* Latar Belakang Aurora */
+        background-color: #f6faff;
+        overflow-x: hidden;
+        position: relative;
+    }
+
+    body::before {
+        content: '';
+        position: fixed;
+        top: -20vh;
+        left: -20vw;
+        width: 140vw;
+        height: 140vh;
+        background: 
+            radial-gradient(circle at 10% 20%, hsla(217, 91%, 60%, 0.15), transparent 30%),
+            radial-gradient(circle at 90% 80%, hsla(180, 91%, 60%, 0.15), transparent 35%);
+        filter: blur(100px);
+        animation: aurora-flow 25s linear infinite;
+        z-index: -1;
     }
 }
 
-.card-form, .card-status, .card-result {
-    /* Menerapkan animasi */
-    animation: fadeInUp 0.6s ease-out forwards;
-}
+@layer components {
+    /* === BAGIAN HERO === */
+    .order-hero {
+        background: transparent;
+        position: relative;
+        z-index: 2;
+    }
+    .badge-hero {
+        background: hsla(0, 0%, 100%, 0.7);
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--border-default);
+        color: var(--text-primary);
+        font-weight: 500;
+        padding: 0.5rem 1.25rem;
+        border-radius: 99px;
+    }
 
-/* == Bagian Hero Konten == */
-.order-hero {
-    background-image: linear-gradient(180deg, #ffffff 0%, var(--primary-light) 100%);
-}
-.badge-hero {
-    display: inline-flex;
-    align-items: center;
-    background-color: #fff;
-    color: var(--primary-dark);
-    padding: 0.5rem 1rem;
-    border-radius: 99px;
-    font-weight: 500;
-    border: 1px solid var(--border-color);
-    box-shadow: var(--shadow-sm);
-}
-.text-dark-blue { color: var(--dark-blue); }
-h1.text-dark-blue .text-gradient {
-    text-shadow: 0 2px 4px rgba(0, 123, 255, 0.1);
-}
+    /* === EFEK KACA (GLASSMORPHISM) PADA KARTU === */
+    .card-form, .card-status, .card-result {
+        background: var(--surface-glass);
+        backdrop-filter: blur(30px) saturate(180%);
+        -webkit-backdrop-filter: blur(30px) saturate(180%);
+        border: 1px solid var(--border-default);
+        border-radius: 1.5rem; /* 24px */
+        box-shadow: 0 8px 32px 0 hsla(var(--shadow-color), 0.1);
+        transition: transform var(--transition-speed) var(--transition-easing),
+                    box-shadow var(--transition-speed) var(--transition-easing);
+    }
+    .card-form:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 16px 40px 0 hsla(var(--shadow-color), 0.15);
+    }
 
+    /* === FLOATING LABEL INPUTS === */
+    .form-group {
+        position: relative;
+        margin-bottom: calc(var(--space-unit) * 1.5);
+    }
+    .form-control, .form-select {
+        background: transparent;
+        border: none;
+        border-bottom: 1px solid var(--border-default);
+        border-radius: 0;
+        padding: 0.75rem 0.25rem 0.5rem;
+        width: 100%;
+        font-size: 1rem;
+        color: var(--text-primary);
+        transition: border-color var(--transition-speed) ease;
+        position: relative;
+        z-index: 1;
+    }
+    /* Untuk Select, kita butuh sedikit hack */
+    select.form-select {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 0.25rem center;
+        background-size: 16px 12px;
+    }
+    .form-control:focus, .form-select:focus {
+        outline: none;
+        border-bottom: 2px solid var(--brand-blue);
+        box-shadow: none;
+    }
+    
+    /* Ganti row g-3 dan label lama dengan ini di HTML untuk efek floating */
+    /* Namun karena HTML tidak diubah, kita sesuaikan saja yang ada */
+    label.form-label {
+        transition: all var(--transition-speed) ease;
+    }
 
-/* == Kartu Utama di Konten dengan Efek Hover == */
-.card-form, .card-status, .card-result {
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius-lg);
-    background: #fff;
-    box-shadow: var(--shadow-md);
-    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Transisi untuk hover */
-}
-/* Efek "lift" saat di-hover */
-.card-form:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-lg);
-}
+    /* === RINGKASAN PESANAN === */
+    .order-summary {
+        background: var(--brand-blue-light);
+        border: 1px solid hsla(217, 91%, 60%, 0.1);
+        border-radius: var(--border-radius-md);
+        padding: 1.25rem;
+        margin-top: 1.5rem;
+    }
+    .summary-item.total .summary-value {
+        font-size: 1.5rem;
+        color: var(--brand-blue-dark);
+    }
 
+    /* === TOMBOL UTAMA DENGAN EFEK KILAU === */
+    main .btn-primary {
+        background-image: linear-gradient(95deg, var(--brand-blue) 0%, #3b82f6 50%, var(--brand-blue) 100%);
+        background-size: 200% auto;
+        border: none;
+        border-radius: 0.75rem;
+        padding: 0.9rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.5s var(--transition-easing);
+        position: relative;
+        overflow: hidden;
+    }
+    main .btn-primary:hover {
+        background-position: right center;
+        transform: scale(1.05);
+        box-shadow: 0 10px 20px -5px hsla(var(--shadow-color), 0.3);
+    }
+    /* Efek Kilau */
+    main .btn-primary::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(to right, transparent, hsla(0,0%,100%,0.3), transparent);
+        transform: rotate(45deg) translateX(-550%);
+        transition: transform 0.8s ease;
+    }
+    main .btn-primary:hover::before {
+        transform: rotate(45deg) translateX(550%);
+    }
 
-/* == Formulir yang Ditingkatkan == */
-.form-step-number {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background-image: linear-gradient(45deg, var(--primary-color), #00a3ff);
-    color: #fff;
-    font-size: 0.85rem;
-    font-weight: bold;
-    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
-}
-.form-control, .form-select {
-    border-radius: 0.5rem;
-    border: 1px solid var(--border-color);
-    padding: 0.75rem 1rem;
-    background-color: #fff; /* Pastikan background putih */
-    transition: border-color 0.2s, box-shadow 0.2s;
-}
-.form-control:focus, .form-select:focus {
-    border-color: var(--primary-color);
-    /* Bayangan fokus yang lebih menonjol */
-    box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.15);
-    outline: none;
-}
-.form-control::placeholder {
-    color: #adb5bd;
-}
-
-/* == Ringkasan Pesanan == */
-.order-summary {
-    background-color: var(--light-gray);
-    border-radius: var(--border-radius-md);
-    padding: 1.25rem;
-    margin-top: 1.5rem;
-    border: 1px solid #e9ecef;
-}
-.summary-title {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--dark-blue);
-    margin-bottom: 1rem;
-}
-.summary-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.75rem;
-    font-size: 0.95rem;
-}
-.summary-key { color: var(--slate-gray); }
-.summary-value {
-    color: var(--dark-blue);
-    font-weight: 500;
-    text-align: right;
-}
-.summary-item.total .summary-value {
-    font-size: 1.25rem;
-    font-weight: 700; /* Lebih tebal */
-    color: var(--primary-dark);
-}
-.summary-divider {
-    border-color: #e9ecef;
-    margin: 1rem 0;
-}
-
-/* == Tombol Utama dengan Gradien & Efek Hover == */
-main .btn-primary {
-    background-size: 200% auto;
-    background-image: linear-gradient(90deg, #0d6efd 0%, #00c6ff 50%, #0d6efd 100%);
-    border: none;
-    border-radius: 0.5rem;
-    padding: 0.85rem 1.5rem;
-    font-weight: 600;
-    transition: all 0.4s ease; /* Transisi untuk semua properti */
-}
-main .btn-primary:hover {
-    background-position: right center; /* Menggeser gradien */
-    transform: translateY(-3px);
-    box-shadow: 0 8px 15px rgba(0, 123, 255, 0.25);
-}
-
-
-/* == Kartu Status & Hasil == */
-.card-status { border-left: 5px solid var(--primary-color); }
-.card-result { border-left: 5px solid var(--success-color); }
-
-.account-details-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 0.75rem;
-}
-@media (min-width: 576px) {
+    /* === KARTU HASIL & DETAIL AKUN === */
+    .card-result { border-left: 5px solid var(--success-color); }
     .account-details-grid {
-        grid-template-columns: repeat(2, 1fr);
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 0.75rem;
     }
-}
-.detail-item {
-    background-color: var(--light-gray);
-    border-radius: 0.5rem;
-    padding: 0.6rem 0.85rem;
-    border: 1px solid #e9ecef;
-    transition: background-color 0.2s;
-}
-.detail-item:hover {
-    background-color: #eef1f4;
-}
-.detail-item .k {
-    display: block;
-    font-size: 0.75rem;
-    color: var(--slate-gray);
-    margin-bottom: 2px;
-}
-.detail-item .v {
-    font-weight: 600;
-    color: var(--dark-blue);
-    word-break: break-all;
-}
-.detail-item.uuid { grid-column: 1 / -1; }
+    .detail-item {
+        background: hsla(220, 30%, 96%, 0.8);
+        border-radius: var(--border-radius-md);
+        padding: 0.75rem;
+        border: 1px solid var(--border-default);
+    }
+    .detail-item .v { font-family: var(--font-display); }
+    .detail-item.uuid { grid-column: 1 / -1; }
 
-/* == Blok Konfigurasi == */
-.cfg-block {
-    background-color: #282c34;
-    border-radius: var(--border-radius-md);
-    padding: 0.5rem 0.75rem;
-    color: #abb2bf;
-    border: 1px solid #3a3f4b;
-}
-.cfg-title {
-    font-size: 0.75rem;
-    font-weight: bold;
-    color: #61afef;
-    margin-bottom: 0.25rem;
-}
-.cfg-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.5rem;
-}
-.cfg-code {
-    font-family: 'SF Mono', 'Courier New', Courier, monospace;
-    font-size: 0.85rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    color: #e6e6e6;
-    padding: 0;
-    background: transparent;
-}
-.cfg-copy {
-    flex-shrink: 0;
-    border: 1px solid #4b5263;
-    color: #abb2bf;
-    transition: all 0.2s;
-}
-.cfg-copy:hover {
-    background-color: #3a3f4b;
-    color: #fff;
-    transform: scale(1.1);
+    /* === BLOK KONFIGURASI === */
+    .cfg-block {
+        background-color: #1e1e1e; /* Warna VS Code Dark */
+        border-radius: var(--border-radius-md);
+        padding: 0.75rem;
+        border: 1px solid #333;
+    }
+    .cfg-title { color: #4fc1ff; } /* Biru untuk variabel */
+    .cfg-code { color: #ce9178; } /* Oranye untuk string */
 }
 
-/* == Overlay Loading == */
-.loading-overlay {
-    position: fixed; top: 0; left: 0;
-    width: 100%; height: 100%;
-    background-color: #fff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-    opacity: 1;
-    transition: opacity 0.6s ease;
-}
-.loading-spinner {
-    border: 4px solid var(--primary-light);
-    border-top: 4px solid var(--primary-color);
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    animation: spin 1s linear infinite;
-}
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+@layer animations {
+    @keyframes aurora-flow {
+        0% { transform: translate(0, 0) rotate(0deg); }
+        50% { transform: translate(5vw, 10vh) rotate(180deg); }
+        100% { transform: translate(0, 0) rotate(360deg); }
+    }
 }
