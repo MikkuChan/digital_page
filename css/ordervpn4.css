@@ -1,8 +1,8 @@
 /* =========================================================
-   ordervpn4.css — Desain UI Modern oleh Gemini
+   ordervpn4.css — Desain UI Modern untuk Konten Halaman
    ========================================================= */
 
-/* == Konfigurasi Dasar & Variabel == */
+/* == Variabel & Gaya Dasar untuk Konten == */
 :root {
     --primary-color: #007bff;
     --primary-light: #e0f2fe;
@@ -20,33 +20,9 @@
     --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.1);
 }
 
-body {
-    font-family: var(--font-sans);
-    background-color: #f8fafc;
-    color: #334155;
-}
-
-/* == Navbar & Footer == */
-.navbar {
-    background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid var(--border-color);
-}
-.footer-link {
-    color: #9ca3af;
-    text-decoration: none;
-    margin: 0 0.75rem;
-    transition: color 0.2s ease;
-}
-.footer-link:hover {
-    color: #fff;
-}
-
-/* == Bagian Hero == */
+/* == Bagian Hero Konten == */
 .order-hero {
-    padding: 6rem 0;
     background-image: linear-gradient(180deg, #ffffff 0%, var(--primary-light) 100%);
-    margin-top: 70px;
 }
 .badge-hero {
     display: inline-flex;
@@ -59,15 +35,8 @@ body {
     border: 1px solid var(--border-color);
 }
 .text-dark-blue { color: var(--dark-blue); }
-.text-gradient {
-    background: linear-gradient(90deg, #007BFF, #00C6FF);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    text-fill-color: transparent;
-}
 
-/* == Kartu Utama == */
+/* == Kartu Utama di Konten == */
 .card-form, .card-status, .card-result {
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius-lg);
@@ -101,7 +70,7 @@ body {
     outline: none;
 }
 
-/* == Ringkasan Pesanan == */
+/* == Ringkasan Pesanan (Pengganti .preview-box) == */
 .order-summary {
     background-color: var(--light-gray);
     border: 1px solid var(--border-color);
@@ -139,8 +108,8 @@ body {
     margin: 1rem 0;
 }
 
-/* == Tombol Utama == */
-.btn-primary {
+/* == Tombol Utama di Konten == */
+main .btn-primary {
     background: linear-gradient(90deg, #007BFF, #00A3FF);
     border: none;
     border-radius: 0.5rem;
@@ -148,7 +117,7 @@ body {
     font-weight: 600;
     transition: transform 0.2s, box-shadow 0.2s;
 }
-.btn-primary:hover {
+main .btn-primary:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
 }
@@ -189,7 +158,7 @@ body {
 
 /* == Blok Konfigurasi == */
 .cfg-block {
-    background-color: #282c34; /* Warna gelap seperti editor kode */
+    background-color: #282c34;
     border-radius: var(--border-radius-md);
     padding: 0.5rem 0.75rem;
     color: #abb2bf;
@@ -197,7 +166,7 @@ body {
 .cfg-title {
     font-size: 0.75rem;
     font-weight: bold;
-    color: #61afef; /* Biru terang untuk judul */
+    color: #61afef;
     margin-bottom: 0.25rem;
 }
 .cfg-row {
@@ -225,7 +194,6 @@ body {
     background-color: #3a3f4b;
     color: #fff;
 }
-
 
 /* == Overlay Loading == */
 .loading-overlay {
