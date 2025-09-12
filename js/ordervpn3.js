@@ -1,5 +1,5 @@
 /* =========================================================
-   ordervpn2.js — FE untuk struktur API baru (FIXED)
+   ordervpn2.js — FE dengan logika Chained Dropdown
    ========================================================= */
 
 const API_BASE = (window.API_BASE || '').replace(/\/+$/, '') || `${location.origin}`;
@@ -85,59 +85,104 @@ const baseSanitize = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9\-]/g
 const buildUsernameFinal = (base) => `${baseSanitize(base)}-${randomSuffix3()}`.slice(0, 24);
 const rupiah = (n) => (n || 0).toLocaleString('id-ID');
 
-// ---------- LOGIC ----------
+// ---------- [LOGIKA BARU] CHAINED DROPDOWN LOGIC ----------
+
 async function initializeForm() {
     try {
         const response = await fetch(`${API_BASE}/config`);
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         CFG = await response.json();
         
-        // Panggil handler utama untuk pertama kali
-        handleSelectionChange();
+        // Langkah 1: Isi Varian, nonaktifkan sisanya
+        variantSel.disabled = false;
+        regionSel.disabled = true;
+        serverSel.disabled = true;
+        
+        regionSel.innerHTML = '<option>Pilih Varian Dahulu</option>';
+        serverSel.innerHTML = '<option>Pilih Region Dahulu</option>';
+        
+        updatePreview();
     } catch (error) {
         console.error("Gagal memuat konfigurasi dari API:", error);
         showError("Gagal memuat daftar server. Silakan muat ulang halaman.");
     }
 }
 
-function populateServers() {
-    if (!CFG || !variantSel || !regionSel || !serverSel) return;
+function onVariantChange() {
+    const selectedVariant = variantSel.value;
     
-    const variant = variantSel.value;
-    const region = regionSel.value;
+    // Reset dan nonaktifkan server
+    serverSel.innerHTML = '<option>Pilih Region Dahulu</option>';
+    serverSel.disabled = true;
     
-    const servers = CFG.variants?.[variant]?.[region] || [];
-    serverSel.innerHTML = ''; // Kosongkan pilihan lama
+    // Isi Region berdasarkan Varian yang dipilih
+    regionSel.innerHTML = '';
+    const regions = CFG.variants?.[selectedVariant] || {};
     
-    if (servers.length === 0) {
-        const option = document.createElement('option');
-        option.textContent = `Tidak ada server untuk ${region} ${variant}`;
-        option.disabled = true;
-        serverSel.appendChild(option);
-        return;
+    // Cek region mana yang punya server
+    const availableRegions = [];
+    if (regions.ID && regions.ID.length > 0) availableRegions.push({ value: 'ID', text: 'Indonesia' });
+    if (regions.SG && regions.SG.length > 0) availableRegions.push({ value: 'SG', text: 'Singapore' });
+    
+    if (availableRegions.length > 0) {
+        regionSel.innerHTML = '<option value="">-- Pilih Region --</option>';
+        availableRegions.forEach(reg => {
+            const option = document.createElement('option');
+            option.value = reg.value;
+            option.textContent = reg.text;
+            regionSel.appendChild(option);
+        });
+        regionSel.disabled = false;
+    } else {
+        regionSel.innerHTML = '<option>Varian ini tidak tersedia</option>';
+        regionSel.disabled = true;
     }
 
-    servers.forEach(server => {
-        const option = document.createElement('option');
-        option.value = server.id;
-        option.textContent = `${server.label} — Rp ${rupiah(server.price)}`;
-        option.dataset.price = server.price;
-        option.dataset.label = server.label;
-        serverSel.appendChild(option);
-    });
+    updatePreview();
+}
+
+function onRegionChange() {
+    const selectedVariant = variantSel.value;
+    const selectedRegion = regionSel.value;
+    
+    if (!selectedRegion) {
+        serverSel.innerHTML = '<option>Pilih Region Dahulu</option>';
+        serverSel.disabled = true;
+        updatePreview();
+        return;
+    }
+    
+    // Isi Server berdasarkan Varian dan Region
+    const servers = CFG.variants?.[selectedVariant]?.[selectedRegion] || [];
+    serverSel.innerHTML = '';
+    
+    if (servers.length > 0) {
+        servers.forEach(server => {
+            const option = document.createElement('option');
+            option.value = server.id;
+            option.textContent = `${server.label} — Rp ${rupiah(server.price)}`;
+            option.dataset.price = server.price;
+            option.dataset.label = server.label;
+            serverSel.appendChild(option);
+        });
+        serverSel.disabled = false;
+    } else {
+        serverSel.innerHTML = '<option>Tidak ada server</option>';
+        serverSel.disabled = true;
+    }
+    
+    updatePreview();
 }
 
 function updatePreview() {
-    if (!usernameEl || !usernameFinalPreview || !serverSel || !pricePreview || !detailsPreview) return;
-
     // 1. Update Username Final
     setText(usernameFinalPreview, buildUsernameFinal(usernameEl.value || 'user'));
 
     // 2. Kalkulasi Harga
     const selectedOption = serverSel.options[serverSel.selectedIndex];
-    if (!selectedOption || !selectedOption.dataset.price) {
+    if (serverSel.disabled || !selectedOption || !selectedOption.dataset.price) {
         setText(pricePreview, `Rp 0 / 30 hari`);
-        setText(detailsPreview, "Pilih server terlebih dahulu");
+        setText(detailsPreview, "Lengkapi pilihan di atas");
         return;
     }
     
@@ -155,17 +200,14 @@ function updatePreview() {
     
     // 3. Update Tampilan Harga dan Detail
     setText(pricePreview, `Rp ${rupiah(finalPrice)} / 30 hari`);
-    const regionLabel = regionSel.options[regionSel.selectedIndex].text;
-    const variantLabel = variantSel.options[variantSel.selectedIndex].text;
+    const regionLabel = regionSel.options[regionSel.selectedIndex]?.text || '';
+    const variantLabel = variantSel.options[variantSel.selectedIndex]?.text || '';
     setText(detailsPreview, `${regionLabel} • ${variantLabel} • ${selectedOption.dataset.label}`);
 }
 
-// [BARU] Fungsi handler utama yang dipanggil saat ada perubahan pilihan
-function handleSelectionChange() {
-    populateServers(); // Langkah 1: Muat ulang daftar server
-    updatePreview();   // Langkah 2: Update harga dan detail
-}
-
+// ----------------------------------------------------
+// FUNGSI-FUNGSI LAIN (Submit, Poll, Tampilkan Hasil)
+// ----------------------------------------------------
 async function handleSubmit(event) {
     event.preventDefault();
     clearError();
@@ -178,8 +220,8 @@ async function handleSubmit(event) {
     const email = (emailEl.value || '').trim();
     if (email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return showError('Format email tidak valid.');
 
-    if (!serverSel.value || serverSel.options[serverSel.selectedIndex]?.disabled) {
-        return showError('Server belum dipilih atau tidak tersedia.');
+    if (!serverSel.value || serverSel.disabled || serverSel.options[serverSel.selectedIndex]?.disabled) {
+        return showError('Varian, Region, dan Server harus dipilih.');
     }
 
     const payload = {
@@ -225,7 +267,7 @@ async function handleSubmit(event) {
 
 async function pollStatus(orderId) {
     const startTime = Date.now();
-    stopPoll(); // Hentikan poller sebelumnya jika ada
+    stopPoll();
 
     const tick = async () => {
         if (Date.now() - startTime > POLL_TIMEOUT_MS) {
@@ -274,12 +316,10 @@ function stopPoll() {
 function showResultConfig(data) {
     hide(waitingBox);
     show(resultBox);
-
     const account = data.accountFields;
     const rawConfig = (data.accountConfig || '').trim();
 
     if (account && account.username) {
-        // Tampilkan data terstruktur
         hide(configTextEl);
         setText(accUsername, account.username);
         setText(accUUID, account.uuid);
@@ -287,14 +327,11 @@ function showResultConfig(data) {
         setText(accQuota, `${account.quota_gb || '?'} GB`);
         setText(accCreated, account.created);
         setText(accExpired, account.expired);
-
         account.ws_tls ? (setText(accWsTls, account.ws_tls), show(blkWsTls)) : hide(blkWsTls);
         account.ws_ntls ? (setText(accWsNtls, account.ws_ntls), show(blkWsNtls)) : hide(blkWsNtls);
         account.grpc ? (setText(accGrpc, account.grpc), show(blkGrpc)) : hide(blkGrpc);
-
         setupActions(data);
     } else {
-        // Fallback ke teks mentah jika data terstruktur tidak ada
         show(configTextEl);
         configTextEl.value = rawConfig || 'Akun berhasil dibuat. Jika detail tidak muncul, hubungi admin.';
         setupActions(data);
@@ -360,9 +397,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 formEl.addEventListener('submit', handleSubmit);
 
-// [DIUBAH] Event listener dipisahkan agar logikanya benar
-variantSel.addEventListener('change', handleSelectionChange);
-regionSel.addEventListener('change', handleSelectionChange);
+// [DIUBAH] Event listener dibuat lebih spesifik untuk alur berantai
+variantSel.addEventListener('change', onVariantChange);
+regionSel.addEventListener('change', onRegionChange);
 serverSel.addEventListener('change', updatePreview);
 promoEl.addEventListener('input', updatePreview);
 usernameEl.addEventListener('input', updatePreview);
