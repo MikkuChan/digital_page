@@ -1,421 +1,419 @@
-/* ordervpn.js — fadzdigital */
+/* ordervpn.js */
 
 const API_BASE = (window.API_BASE || '').replace(/\/+$/, '') || `${location.origin}`;
 const POLL_INTERVAL_MS = 5000;
 const POLL_TIMEOUT_MS  = 10 * 60 * 1000;
 
-// Elemen
-const formEl = document.getElementById('orderForm');
-const usernameEl = document.getElementById('username');
-const emailEl = document.getElementById('email');
-const protocolEl = document.getElementById('protocol');
-const packageRadios = document.querySelectorAll('input[name="packageId"]');
+// ---------- GET ELEMENTS ----------
+const formEl      = document.getElementById('orderForm');
+const usernameEl  = document.getElementById('username');
+const emailEl     = document.getElementById('email');
+const protocolEl  = document.getElementById('protocol');
+const variantSel  = document.getElementById('variant');
+const regionSel   = document.getElementById('region');
+const serverSel   = document.getElementById('serverId');
+const promoEl     = document.getElementById('promoCode');
 
+// Preview
 const usernameFinalPreview = document.getElementById('usernameFinalPreview');
-const pricePreview = document.getElementById('pricePreview');
+const pricePreview   = document.getElementById('pricePreview');
 const detailsPreview = document.getElementById('detailsPreview');
 
-const submitBtn = document.getElementById('submitBtn');
-const waitingBox = document.getElementById('waitingBox');
-const orderIdText = document.getElementById('orderIdText');
-const statusText = document.getElementById('statusText');
-const payLink = document.getElementById('payLink');
-
-const resultBox = document.getElementById('resultBox');
+// Status & Hasil
+const submitBtn    = document.getElementById('submitBtn');
+const waitingBox   = document.getElementById('waitingBox');
+const orderIdText  = document.getElementById('orderIdText');
+const statusText   = document.getElementById('statusText');
+const payLink      = document.getElementById('payLink');
+const resultBox    = document.getElementById('resultBox');
 const configTextEl = document.getElementById('configText');
+const errorBox     = document.getElementById('errorBox');
 
-// Detail akun
-const accUsername = document.getElementById('accUsername');
-const accUUID = document.getElementById('accUUID');
-const accDomain = document.getElementById('accDomain');
-const accQuota = document.getElementById('accQuota');
-const accCreated = document.getElementById('accCreated');
-const accExpired = document.getElementById('accExpired');
+// Detail Akun
+const accUsername  = document.getElementById('accUsername');
+const accUUID      = document.getElementById('accUUID');
+const accDomain    = document.getElementById('accDomain');
+const accQuota     = document.getElementById('accQuota');
+const accCreated   = document.getElementById('accCreated');
+const accExpired   = document.getElementById('accExpired');
+const blkWsTls     = document.getElementById('blk-ws-tls');
+const blkWsNtls    = document.getElementById('blk-ws-ntls');
+const blkGrpc      = document.getElementById('blk-grpc');
+const accWsTls     = document.getElementById('accWsTls');
+const accWsNtls    = document.getElementById('accWsNtls');
+const accGrpc      = document.getElementById('accGrpc');
+const copyAllBtn   = document.getElementById('copyAllBtn');
+const downloadBtn  = document.getElementById('downloadConfigBtn');
 
-const blkWsTls = document.getElementById('blk-ws-tls');
-const blkWsNtls = document.getElementById('blk-ws-ntls');
-const blkGrpc = document.getElementById('blk-grpc');
+// ---------- STATE ----------
+let CFG = null; // Hasil dari GET /config
+let pollTimer = null;
 
-const accWsTls = document.getElementById('accWsTls');
-const accWsNtls = document.getElementById('accWsNtls');
-const accGrpc = document.getElementById('accGrpc');
+// ---------- UI UTILS ----------
+const show = (el) => { if (el) el.style.display = ''; };
+const hide = (el) => { if (el) el.style.display = 'none'; };
+const setText = (el, t) => { if (el) el.textContent = t ?? ''; };
+const htmlEscape = (s) => String(s || '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
 
-const copyAllBtn = document.getElementById('copyAllBtn');
-const downloadBtn = document.getElementById('downloadConfigBtn');
-
-const errorBox = document.getElementById('errorBox');
-
-// packages
-const PACKAGES = {
-  SG_HP_10K:  { id:'SG_HP_10K',  label:'SG HP 300GB/30h',  region:'SG', type:'HP',  price:10000, quota:300, expDays:30 },
-  ID_HP_15K:  { id:'ID_HP_15K',  label:'ID HP 300GB/30h',  region:'ID', type:'HP',  price:15000, quota:300, expDays:30 },
-  SG_STB_15K: { id:'SG_STB_15K', label:'SG STB 600GB/30h', region:'SG', type:'STB', price:15000, quota:600, expDays:30 },
-  ID_STB_20K: { id:'ID_STB_20K', label:'ID STB 600GB/30h', region:'ID', type:'STB', price:20000, quota:600, expDays:30 },
-};
-
-// Utils tampilan
-function show(el){ if(el) el.style.display=''; }
-function hide(el){ if(el) el.style.display='none'; }
-function setText(el, t){ if(el) el.textContent = t ?? ''; }
-
-function showError(msg){
-  if(!errorBox) return;
-  errorBox.innerHTML = `<div class="alert alert-danger">${escapeHtml(msg)}</div>`;
-  show(errorBox);
-  setLoading(false);
-}
-function clearError(){ if(errorBox){ errorBox.innerHTML=''; hide(errorBox); } }
-
-function setLoading(b){
-  if(!submitBtn) return;
-  submitBtn.disabled = b;
-  submitBtn.innerHTML = b
-    ? `<span class="spinner-border spinner-border-sm me-2"></span> Memproses...`
-    : `<i class="bi bi-cart-check me-2"></i> Checkout & Bayar`;
+function showError(msg) {
+    if (!errorBox) return;
+    errorBox.innerHTML = `<div class="alert alert-danger">${htmlEscape(msg)}</div>`;
+    show(errorBox);
+    setLoading(false);
 }
 
-function escapeHtml(s){ return String(s||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
+function clearError() {
+    if (errorBox) {
+        errorBox.innerHTML = '';
+        hide(errorBox);
+    }
+}
 
-// Username final
-function randomSuffix3(){ return Math.floor(100+Math.random()*900).toString(); }
-function baseSanitize(s){ return String(s||'').toLowerCase().replace(/[^a-z0-9\-]/g,'').slice(0,20); }
-function buildUsernameFinal(base){ return `${baseSanitize(base)}-${randomSuffix3()}`.slice(0,24); }
+function setLoading(isLoading) {
+    if (!submitBtn) return;
+    submitBtn.disabled = isLoading;
+    submitBtn.innerHTML = isLoading
+        ? `<span class="spinner-border spinner-border-sm me-2"></span> Memproses...`
+        : `<i class="bi bi-shield-check me-2"></i>Lanjutkan ke Pembayaran`;
+}
 
-function refreshPreview(){
-  const pkg = resolvePackage();
-  if(pkg){
-    setText(pricePreview, `Rp ${formatRupiah(pkg.price)} / ${pkg.expDays} hari`);
-    setText(detailsPreview, `${pkg.region} • ${pkg.type} • Kuota ${pkg.quota}GB`);
-  }
-  if(usernameEl && usernameFinalPreview){
+// ---------- HELPERS ----------
+const randomSuffix3 = () => Math.floor(100 + Math.random() * 900).toString();
+const baseSanitize = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9\-]/g, '').slice(0, 20);
+const buildUsernameFinal = (base) => `${baseSanitize(base)}-${randomSuffix3()}`.slice(0, 24);
+const rupiah = (n) => (n || 0).toLocaleString('id-ID');
+
+// ---------- CHAINED DROPDOWN LOGIC ----------
+
+async function initializeForm() {
+    try {
+        const response = await fetch(`${API_BASE}/config`);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        CFG = await response.json();
+        
+        variantSel.disabled = false;
+        regionSel.disabled = true;
+        serverSel.disabled = true;
+        
+        regionSel.innerHTML = '<option>Pilih Varian Dahulu</option>';
+        serverSel.innerHTML = '<option>Pilih Region Dahulu</option>';
+        
+        updatePreview();
+    } catch (error) {
+        console.error("Gagal memuat konfigurasi dari API:", error);
+        showError("Gagal memuat daftar server. Silakan muat ulang halaman.");
+    }
+}
+
+function onVariantChange() {
+    const selectedVariant = variantSel.value;
+
+    if (!selectedVariant) {
+        regionSel.innerHTML = '<option>Pilih Varian Dahulu</option>';
+        serverSel.innerHTML = '<option>Pilih Region Dahulu</option>';
+        regionSel.disabled = true;
+        serverSel.disabled = true;
+        updatePreview();
+        return;
+    }
+    
+    const regions = CFG.variants?.[selectedVariant] || {};
+    const availableRegions = [];
+    if (regions.ID && regions.ID.length > 0) availableRegions.push({ value: 'ID', text: 'Indonesia' });
+    if (regions.SG && regions.SG.length > 0) availableRegions.push({ value: 'SG', text: 'Singapore' });
+    
+    regionSel.innerHTML = ''; 
+    if (availableRegions.length > 0) {
+        regionSel.innerHTML = '<option value="">-- Pilih Region --</option>';
+        availableRegions.forEach(reg => {
+            const option = document.createElement('option');
+            option.value = reg.value;
+            option.textContent = reg.text;
+            regionSel.appendChild(option);
+        });
+        regionSel.disabled = false;
+    } else {
+        regionSel.innerHTML = '<option>Varian ini tidak tersedia</option>';
+        regionSel.disabled = true;
+    }
+    
+    serverSel.innerHTML = '<option>Pilih Region Dahulu</option>';
+    serverSel.disabled = true;
+    
+    updatePreview();
+}
+
+function onRegionChange() {
+    const selectedVariant = variantSel.value;
+    const selectedRegion = regionSel.value;
+    
+    if (!selectedRegion) {
+        serverSel.innerHTML = '<option>Pilih Region Dahulu</option>';
+        serverSel.disabled = true;
+        updatePreview();
+        return;
+    }
+    
+    const servers = CFG.variants?.[selectedVariant]?.[selectedRegion] || [];
+    serverSel.innerHTML = '';
+    
+    if (servers.length > 0) {
+        servers.forEach(server => {
+            const option = document.createElement('option');
+            option.value = server.id;
+            option.textContent = `${server.label} — Rp ${rupiah(server.price)}`;
+            option.dataset.price = server.price;
+            option.dataset.label = server.label;
+            serverSel.appendChild(option);
+        });
+        serverSel.disabled = false;
+        updatePreview();  
+    } else {
+        serverSel.innerHTML = '<option>Tidak ada server</option>';
+        serverSel.disabled = true;
+        updatePreview();
+    }
+}
+
+function updatePreview() {
     setText(usernameFinalPreview, buildUsernameFinal(usernameEl.value || 'user'));
-  }
+
+    const selectedOption = serverSel.options[serverSel.selectedIndex];
+    if (serverSel.disabled || !selectedOption || !selectedOption.dataset.price) {
+        setText(pricePreview, `Rp 0 / 30 hari`);
+        setText(detailsPreview, "Lengkapi pilihan di atas");
+        return;
+    }
+    
+    const basePrice = parseInt(selectedOption.dataset.price, 10);
+    let finalPrice = basePrice;
+
+    const promoCode = promoEl.value.trim().toLowerCase();
+    if (promoCode && CFG.promo?.status === 'online') {
+        const validCodes = CFG.promo.codes.map(c => c.toLowerCase());
+        if (validCodes.includes(promoCode)) {
+            finalPrice = Math.max(0, basePrice - (CFG.promo.discount || 0));
+        }
+    }
+    
+    setText(pricePreview, `Rp ${rupiah(finalPrice)} / 30 hari`);
+    const regionLabel = regionSel.options[regionSel.selectedIndex]?.text || '';
+    const variantLabel = variantSel.options[variantSel.selectedIndex]?.text || '';
+    setText(detailsPreview, `${variantLabel} • ${regionLabel} • ${selectedOption.dataset.label}`);
 }
-function formatRupiah(n){ return (n||0).toLocaleString('id-ID'); }
 
-function getCheckedPackageId(){
-  const r = Array.from(packageRadios || []).find(x=>x.checked);
-  return r ? r.value : null;
-}
-function resolvePackage(){
-  const id = getCheckedPackageId();
-  return id && PACKAGES[id] ? PACKAGES[id] : null;
-}
+// ---------- Submit, Poll, Show Result ----------
+async function handleSubmit(event) {
+    event.preventDefault();
+    clearError();
+    hide(resultBox);
+    hide(waitingBox);
 
-if(usernameEl) usernameEl.addEventListener('input', refreshPreview);
-(packageRadios||[]).forEach(r=>r.addEventListener('change', refreshPreview));
-document.addEventListener('DOMContentLoaded', refreshPreview);
+    const username = baseSanitize(usernameEl.value || '');
+    if (!username) return showError('Username wajib diisi.');
+    
+    const email = (emailEl.value || '').trim();
+    if (email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return showError('Format email tidak valid.');
 
-// Submit form
-if(formEl){
-  formEl.addEventListener('submit', async (e)=>{
-    e.preventDefault();
-    clearError(); hide(resultBox); hide(waitingBox);
+    if (!serverSel.value || serverSel.disabled || serverSel.options[serverSel.selectedIndex]?.disabled) {
+        return showError('Varian, Region, dan Server harus dipilih.');
+    }
 
-    const pkg = resolvePackage();
-    if(!pkg) return showError('Silakan pilih paket.');
-
-    const protocol = (protocolEl?.value || 'vmess').toLowerCase();
-    const username = baseSanitize(usernameEl?.value || '');
-    const email = (emailEl?.value || '').trim();
-
-    if(!username) return showError('Username wajib diisi.');
-    if(email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return showError('Format email tidak valid.');
-
-    const usernameFinal = (usernameFinalPreview?.textContent || buildUsernameFinal(username)).toLowerCase();
-
-    const payload = { packageId: pkg.id, protocol, username, usernameFinal, email };
+    const payload = {
+        variant: variantSel.value,
+        region: regionSel.value,
+        serverId: serverSel.value,
+        promoCode: promoEl.value.trim(),
+        protocol: protocolEl.value,
+        username,
+        usernameFinal: usernameFinalPreview.textContent,
+        email
+    };
 
     setLoading(true);
-    try{
-      const res = await fetch(`${API_BASE}/pay/create`, {
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify(payload)
-      });
-      const txt = await res.text();
-      let data; try{ data = JSON.parse(txt);}catch{ data = { raw: txt }; }
-      setLoading(false);
+    try {
+        const response = await fetch(`${API_BASE}/pay/create`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
 
-      if(!res.ok) return showError(data?.message || 'Gagal membuat invoice.');
+        const data = await response.json();
+        setLoading(false);
 
-      const { orderId, paymentUrl } = data;
-      if(!orderId || !paymentUrl) return showError('Response tidak lengkap dari server.');
+        if (!response.ok) {
+            return showError(data?.message || 'Gagal membuat invoice.');
+        }
 
-      localStorage.setItem('fdz_last_order', orderId);
-      setText(orderIdText, orderId);
-      setText(statusText, 'Menunggu pembayaran...');
-      if(payLink){ payLink.href = paymentUrl; payLink.target = '_blank'; }
-      show(waitingBox);
-      window.open(paymentUrl, '_blank', 'noopener');
-      pollStatus(orderId);
-    }catch(err){
-      setLoading(false);
-      showError('Gagal terhubung ke API.');
+        const { orderId, paymentUrl } = data;
+        localStorage.setItem('fdz_last_order', orderId);
+        setText(orderIdText, orderId);
+        statusText.textContent = 'Menunggu pembayaran...';
+        statusText.className = 'badge bg-warning text-dark';
+        payLink.href = paymentUrl;
+        show(waitingBox);
+        window.open(paymentUrl, '_blank', 'noopener');
+        pollStatus(orderId);
+    } catch (error) {
+        setLoading(false);
+        showError('Gagal terhubung ke API. Periksa koneksi Anda.');
+        console.error("Submit error:", error);
     }
-  });
 }
 
-// Poll status
-let pollTimer=null;
-async function pollStatus(orderId){
-  const started = Date.now();
-  const tick = async ()=>{
-    try{
-      const res = await fetch(`${API_BASE}/pay/status?orderId=${encodeURIComponent(orderId)}`);
-      const txt = await res.text();
-      let data; try{ data = JSON.parse(txt);}catch{ data = { raw: txt }; }
+async function pollStatus(orderId) {
+    const startTime = Date.now();
+    stopPoll();
 
-      if(!res.ok){ setText(statusText,'Order tidak ditemukan / error.'); return stopPoll(); }
+    const tick = async () => {
+        if (Date.now() - startTime > POLL_TIMEOUT_MS) {
+            statusText.textContent = 'Timeout. Silakan buka halaman pembayaran lagi.';
+            statusText.className = 'badge bg-secondary';
+            stopPoll();
+            return;
+        }
 
-      setText(orderIdText, data.orderId || orderId);
-      const st = (data.status||'').toUpperCase();
+        try {
+            const response = await fetch(`${API_BASE}/pay/status?orderId=${encodeURIComponent(orderId)}`);
+            const data = await response.json();
+            
+            if (!response.ok) {
+                statusText.textContent = 'Order tidak ditemukan / error.';
+                statusText.className = 'badge bg-danger';
+                stopPoll();
+                return;
+            }
 
-      if(st === 'PAID'){
-        setText(statusText,'Pembayaran diterima ✔');
-        showResultConfig(data);
-        return stopPoll();
-      }else if(st === 'FAILED'){
-        setText(statusText,'Pembayaran gagal ✖');
-        return stopPoll();
-      }else{
-        setText(statusText,'Menunggu pembayaran...');
-      }
+            const status = (data.status || '').toUpperCase();
+            if (status === 'PAID') {
+                statusText.textContent = 'Pembayaran diterima ✔';
+                statusText.className = 'badge bg-success';
+                showResultConfig(data);
+                stopPoll();
+            } else if (status === 'FAILED') {
+                statusText.textContent = 'Pembayaran gagal ✖';
+                statusText.className = 'badge bg-danger';
+                stopPoll();
+            } else {
+                statusText.textContent = 'Menunggu pembayaran...';
+                statusText.className = 'badge bg-warning text-dark';
+            }
+        } catch (error) {
+            console.warn("Polling error (akan dicoba lagi):", error);
+        }
+    };
 
-      if(Date.now()-started > POLL_TIMEOUT_MS){
-        setText(statusText,'Timeout menunggu pembayaran. Coba klik “Buka Halaman Pembayaran” lagi.');
-        return stopPoll();
-      }
-    }catch(e){ /* retry */ }
-  };
-  await tick();
-  pollTimer = setInterval(tick, POLL_INTERVAL_MS);
+    await tick();
+    pollTimer = setInterval(tick, POLL_INTERVAL_MS);
 }
-function stopPoll(){ if(pollTimer){ clearInterval(pollTimer); pollTimer=null; } }
 
-// ----- Render hasil akun -----
-function showResultConfig(data){
-  hide(waitingBox); show(resultBox);
-
-  const raw = (data.accountConfig || '').trim();
-  if(!raw){
-    // belum ada
-    configTextEl.classList.remove('d-none');
-    configTextEl.value = 'Akun berhasil dibuat, Silakan Refresh Halaman, untuk notifikasi ke email ada sedikit jeda sekitar 5-10menit.\nJika mendapat response --username already exist-- silakan hubungi admin.';
-    // kosongkan blok structured
-    fillSummary({}, true);
-    fillConn({}, true);
-    return;
-  }
-
-  // parse JSON dari API VPN
-  let parsed = null;
-  try{ parsed = JSON.parse(raw); }catch{ /* bisa bukan JSON */ }
-
-  if(parsed && typeof parsed === 'object' && (parsed.username || parsed.uuid)){
-    // tampil structured
-    configTextEl.classList.add('d-none');
-
-    // domain fallback: kalau tidak ada domain di payload, coba deteksi dari link
-    if(!parsed.domain){
-      parsed.domain = guessDomainFromLinks(parsed) || '';
+function stopPoll() {
+    if (pollTimer) {
+        clearInterval(pollTimer);
+        pollTimer = null;
     }
-
-    fillSummary(parsed, false);
-    fillConn(parsed, false);
-    // siapkan copy all / download
-    setupActions(parsed);
-  }else{
-    // fallback textarea
-    configTextEl.classList.remove('d-none');
-    configTextEl.value = raw;
-    // kosongkan structured view
-    fillSummary({}, true);
-    fillConn({}, true);
-    setupActions(null, raw);
-  }
 }
 
-// Ringkasan
-function fillSummary(p, hideAll){
-  if(hideAll){
-    setText(accUsername,'-'); setText(accUUID,'-'); setText(accDomain,'-');
-    setText(accQuota,'-'); setText(accCreated,'-'); setText(accExpired,'-');
-    return;
-  }
-  setText(accUsername, p.username || '-');
-  setText(accUUID, p.uuid || '-');
-  setText(accDomain, p.domain || '-');
-  setText(accQuota, (p.quota_gb ? `${p.quota_gb} GB` : (p.quota ? `${p.quota} GB` : '-')));
-  setText(accCreated, p.created || '-');
-  setText(accExpired, p.expired || '-');
-}
+function showResultConfig(data) {
+    hide(waitingBox);
+    show(resultBox);
+    const account = data.accountFields;
+    const rawConfig = (data.accountConfig || '').trim();
 
-// Koneksi
-function fillConn(p, hideAll){
-  // ws_tls
-  if(!hideAll && p.ws_tls){
-    accWsTls.textContent = p.ws_tls;
-    show(blkWsTls);
-  }else{
-    hide(blkWsTls); accWsTls.textContent='';
-  }
-
-  // ws_ntls (tidak semua protokol punya)
-  if(!hideAll && p.ws_ntls){
-    accWsNtls.textContent = p.ws_ntls;
-    show(blkWsNtls);
-  }else{
-    hide(blkWsNtls); accWsNtls.textContent='';
-  }
-
-  // grpc
-  if(!hideAll && p.grpc){
-    accGrpc.textContent = p.grpc;
-    show(blkGrpc);
-  }else{
-    hide(blkGrpc); accGrpc.textContent='';
-  }
-}
-
-// ----- Fallback deteksi domain dari link-link -----
-function guessDomainFromLinks(p){
-  // Prioritas: ws_tls -> ws_ntls -> grpc
-  const candidates = [p?.ws_tls, p?.ws_ntls, p?.grpc].filter(Boolean);
-
-  for(const link of candidates){
-    if(/^vmess:\/\//i.test(link)){
-      const b64 = link.replace(/^vmess:\/\//i, '').trim();
-      const json = tryDecodeVmessBase64(b64);
-      if(json){
-        // 'add' biasanya hostname; kalau tidak ada, coba 'host'
-        const host = json.add || json.host;
-        if(host) return host;
-      }
-    } else if(/^vless:\/\//i.test(link) || /^trojan:\/\//i.test(link)){
-      try{
-        const u = new URL(link);
-        if(u.hostname) return u.hostname;
-        // beberapa klien menaruh host di param 'host' / 'sni'
-        const host = u.searchParams.get('host') || u.searchParams.get('sni');
-        if(host) return host;
-      }catch{ /* ignore */ }
+    if (account && account.username) {
+        hide(configTextEl);
+        setText(accUsername, account.username);
+        setText(accUUID, account.uuid);
+        setText(accDomain, account.domain);
+        setText(accQuota, `${account.quota_gb || '?'} GB`);
+        setText(accCreated, account.created);
+        setText(accExpired, account.expired);
+        account.ws_tls ? (setText(accWsTls, account.ws_tls), show(blkWsTls)) : hide(blkWsTls);
+        account.ws_ntls ? (setText(accWsNtls, account.ws_ntls), show(blkWsNtls)) : hide(blkWsNtls);
+        account.grpc ? (setText(accGrpc, account.grpc), show(blkGrpc)) : hide(blkGrpc);
+        setupActions(data);
+    } else {
+        show(configTextEl);
+        configTextEl.value = rawConfig || 'Akun berhasil dibuat. Jika detail tidak muncul, hubungi admin.';
+        setupActions(data);
     }
-  }
-  return '';
 }
 
-function tryDecodeVmessBase64(b64){
-  try{
-    // perbaiki padding base64
-    let s = b64.replace(/\s+/g,'').replace(/-/g,'+').replace(/_/g,'/');
-    if(s.length % 4 !== 0) s += '='.repeat(4 - (s.length % 4));
-    const decoded = atob(s);
-    return JSON.parse(decoded);
-  }catch{
-    return null;
-  }
+function buildTextDump(data) {
+    if (data.accountFields && data.accountFields.username) {
+        const p = data.accountFields;
+        const lines = [
+            '=== FADZDIGITAL VPN ACCOUNT ===',
+            `Username : ${p.username || ''}`,
+            `UUID     : ${p.uuid || ''}`,
+            `Domain   : ${p.domain || ''}`,
+            `Quota    : ${p.quota_gb || '?'} GB`,
+            `Created  : ${p.created || ''}`,
+            `Expired  : ${p.expired || ''}`,
+            '',
+            p.ws_tls ? `[WS TLS]\n${p.ws_tls}\n` : '',
+            p.ws_ntls ? `[WS Non-TLS]\n${p.ws_ntls}\n` : '',
+            p.grpc ? `[gRPC]\n${p.grpc}\n` : '',
+            'Simpan file ini untuk impor konfigurasi.'
+        ];
+        return lines.filter(Boolean).join('\n');
+    }
+    return data.accountConfig || '';
 }
 
-// Copy tombol per baris
-document.addEventListener('click', async (e)=>{
-  const btn = e.target.closest('.cfg-copy');
-  if(!btn) return;
-  const id = btn.getAttribute('data-target');
-  const el = document.getElementById(id);
-  if(!el) return;
-  try{
-    await navigator.clipboard.writeText(el.textContent || '');
-    btn.innerHTML = `<i class="bi bi-clipboard-check"></i> Disalin!`;
-    setTimeout(()=> btn.innerHTML = `<i class="bi bi-clipboard"></i> Copy`, 1200);
-  }catch{ alert('Gagal menyalin. Salin manual ya.'); }
+function setupActions(data) {
+    const textContent = buildTextDump(data);
+    
+    copyAllBtn.onclick = async () => {
+        await navigator.clipboard.writeText(textContent);
+        const originalText = copyAllBtn.innerHTML;
+        copyAllBtn.innerHTML = `<i class="bi bi-clipboard-check"></i> Disalin!`;
+        setTimeout(() => copyAllBtn.innerHTML = originalText, 1500);
+    };
+
+    downloadBtn.onclick = () => {
+        const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${data.orderId || 'vpn-account'}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    };
+}
+
+// ---------- Event Listeners ----------
+document.addEventListener('DOMContentLoaded', () => {
+    initializeForm();
+    const lastOrder = localStorage.getItem('fdz_last_order');
+    if (lastOrder) {
+        setText(orderIdText, lastOrder);
+        statusText.textContent = 'Memeriksa status terakhir...';
+        statusText.className = 'badge bg-info';
+        show(waitingBox);
+        pollStatus(lastOrder);
+    }
 });
 
-// Copy semua & download
-function setupActions(parsed, rawText){
-  if(copyAllBtn){
-    copyAllBtn.onclick = async ()=>{
-      const text = parsed ? buildTextDump(parsed) : (rawText || configTextEl.value || '');
-      try{
-        await navigator.clipboard.writeText(text);
-        copyAllBtn.innerHTML = `<i class="bi bi-clipboard-check"></i> Disalin!`;
-        setTimeout(()=> copyAllBtn.innerHTML = `<i class="bi bi-clipboard-check"></i> Copy Semua`, 1200);
-      }catch{ alert('Gagal menyalin.'); }
-    };
-  }
+formEl.addEventListener('submit', handleSubmit);
+variantSel.addEventListener('change', onVariantChange);
+regionSel.addEventListener('change', onRegionChange);
+serverSel.addEventListener('change', updatePreview);
+promoEl.addEventListener('input', updatePreview);
+usernameEl.addEventListener('input', updatePreview);
 
-  if(downloadBtn){
-    downloadBtn.onclick = ()=>{
-      const text = parsed ? buildTextDump(parsed) : (rawText || configTextEl.value || '');
-      const blob = new Blob([text], {type:'text/plain'});
-      const a = document.createElement('a');
-      const orderId = (orderIdText?.textContent || 'vpn-account').replace(/\s+/g,'');
-      a.href = URL.createObjectURL(blob);
-      a.download = `${orderId}.txt`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
-    };
-  }
-}
-
-//----- Susun isi .txt ----
-function buildTextDump(p){
-  const lines = [];
-  lines.push('=== FADZDIGITAL VPN ACCOUNT ===');
-  if(p.username) lines.push(`Username : ${p.username}`);
-  if(p.uuid)     lines.push(`UUID     : ${p.uuid}`);
-  if(p.domain)   lines.push(`Domain   : ${p.domain}`);
-  if(p.quota_gb) lines.push(`Quota    : ${p.quota_gb} GB`);
-  if(p.created)  lines.push(`Created  : ${p.created}`);
-  if(p.expired)  lines.push(`Expired  : ${p.expired}`);
-  lines.push('');
-
-  if(p.ws_tls){
-    lines.push('[WS TLS]');
-    lines.push(p.ws_tls);
-    lines.push('');
-  }
-  if(p.ws_ntls){
-    lines.push('[WS Non-TLS]');
-    lines.push(p.ws_ntls);
-    lines.push('');
-  }
-  if(p.grpc){
-    lines.push('[gRPC]');
-    lines.push(p.grpc);
-    lines.push('');
-  }
-
-  if(p.config_url){ // khususon trojan
-    lines.push(`Config URL: ${p.config_url}`);
-    lines.push('');
-  }
-
-  lines.push('Simpan file ini untuk impor konfigurasi.');
-  return lines.join('\n');
-}
-
-// Copy & Download (fallback raw tetap bekerja)
-if(downloadBtn && !downloadBtn.onclick){
-  downloadBtn.addEventListener('click', ()=>{
-    const txt = configTextEl.value || '';
-    const blob = new Blob([txt], {type:'text/plain'});
-    const a = document.createElement('a');
-    const orderId = (orderIdText?.textContent || 'vpn-account').replace(/\s+/g,'');
-    a.href = URL.createObjectURL(blob);
-    a.download = `${orderId}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
-  });
-}
-
-document.addEventListener('DOMContentLoaded', async ()=>{
-  const last = localStorage.getItem('fdz_last_order');
-  if(last){
-    if(waitingBox){ setText(orderIdText,last); setText(statusText,'Memeriksa status terakhir...'); show(waitingBox); }
-    pollStatus(last);
-  }
+document.addEventListener('click', async (e) => {
+    const copyBtn = e.target.closest('.cfg-copy');
+    if (copyBtn) {
+        const targetId = copyBtn.dataset.target;
+        const targetEl = document.getElementById(targetId);
+        if (targetEl) {
+            await navigator.clipboard.writeText(targetEl.textContent);
+            const originalText = copyBtn.innerHTML;
+            copyBtn.innerHTML = `<i class="bi bi-check-lg"></i>`;
+            setTimeout(() => copyBtn.innerHTML = originalText, 1500);
+        }
+    }
 });
