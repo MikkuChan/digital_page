@@ -78,60 +78,63 @@
 
                             <form id="orderForm" class="order-form">
                                 <div class="mb-3">
-                                    <label class="form-label fw-semibold">Pilih Varian & Server</label>
+                                    <label class="form-label fw-semibold">1. Pilih Varian & Server</label>
                                     <div class="row g-3">
                                         <div class="col-sm-6">
                                             <label class="form-label small text-muted">Varian</label>
                                             <select id="variant" class="form-select">
+                                                <option value="" disabled selected>-- Pilih Varian --</option>
                                                 <option value="HP">HP (Handphone)</option>
                                                 <option value="STB">STB (TV Box)</option>
                                             </select>
                                         </div>
                                         <div class="col-sm-6">
                                             <label class="form-label small text-muted">Region</label>
-                                            <select id="region" class="form-select">
-                                                <option value="ID">Indonesia</option>
-                                                <option value="SG">Singapore</option>
+                                            <select id="region" class="form-select" disabled>
+                                                <option>Pilih Varian Dahulu</option>
                                             </select>
                                         </div>
                                         <div class="col-12">
                                             <label class="form-label small text-muted">Server</label>
-                                            <select id="serverId" class="form-select">
-                                                </select>
+                                            <select id="serverId" class="form-select" disabled>
+                                                <option>Pilih Region Dahulu</option>
+                                            </select>
                                             <div class="form-text">Harga dan spesifikasi sesuai server yang dipilih.</div>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="mb-3">
-                                     <label class="form-label fw-semibold">Kode Promo (opsional)</label>
+                                     <label class="form-label fw-semibold">2. Kode Promo (opsional)</label>
                                      <input id="promoCode" class="form-control" placeholder="contoh: fadznewws" />
                                      <div class="form-text">Diskon akan diterapkan jika kode valid.</div>
                                 </div>
 
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <label for="protocol" class="form-label fw-semibold">Protocol</label>
-                                        <select id="protocol" class="form-select">
-                                            <option value="vmess">VMess</option>
-                                            <option value="vless">VLESS</option>
-                                            <option value="trojan">Trojan</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="username" class="form-label fw-semibold">Username</label>
-                                        <input id="username" class="form-control" placeholder="misal: user" required />
-                                        <div class="form-text">Sistem akan menambah <code>-XYZ</code> agar unik.</div>
+                                <div>
+                                    <label class="form-label fw-semibold">3. Detail Akun</label>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label for="protocol" class="form-label small text-muted">Protocol</label>
+                                            <select id="protocol" class="form-select">
+                                                <option value="vmess">VMess</option>
+                                                <option value="vless">VLESS</option>
+                                                <option value="trojan">Trojan</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="username" class="form-label small text-muted">Username</label>
+                                            <input id="username" class="form-control" placeholder="misal: user" required />
+                                            <div class="form-text">Sistem akan menambah <code>-XYZ</code> agar unik.</div>
+                                        </div>
+                                        <div class="col-12">
+                                            <label for="email" class="form-label small text-muted">Email (opsional)</label>
+                                            <input id="email" type="email" class="form-control" placeholder="contoh@mail.com" />
+                                            <div class="form-text">Detail akun akan dikirim ke email ini.</div>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div class="mt-3">
-                                    <label for="email" class="form-label fw-semibold">Email (opsional)</label>
-                                    <input id="email" type="email" class="form-control" placeholder="contoh@mail.com" />
-                                    <div class="form-text">Detail akun akan dikirim ke email ini.</div>
-                                </div>
-
-                                <div class="preview-box mt-3">
+                                <div class="preview-box mt-4">
                                     <div class="preview-row">
                                         <span class="pre-k"><i class="bi bi-person-badge me-1"></i> Username final</span>
                                         <code id="usernameFinalPreview" class="pre-v">user-123</code>
