@@ -1,23 +1,42 @@
-/* =========================================================
-   ordervpn4.css — Desain UI Modern untuk Konten Halaman
-   ========================================================= */
+/* =================================================================
+   ordervpn4.css — v2 (Penyempurnaan Lanjutan oleh Gemini)
+   Fokus: Animasi Halus, Micro-interactions, & Tampilan Premium
+   ================================================================= */
 
 /* == Variabel & Gaya Dasar untuk Konten == */
 :root {
-    --primary-color: #007bff;
-    --primary-light: #e0f2fe;
-    --primary-dark: #0056b3;
+    --primary-color: #0d6efd; /* Biru Bootstrap yang lebih cerah */
+    --primary-light: #e9f2ff;
+    --primary-dark: #0a58ca;
     --success-color: #198754;
-    --dark-blue: #1e293b;
+    --dark-blue: #1c2a41;
     --slate-gray: #64748b;
-    --light-gray: #f1f5f9;
-    --border-color: #e2e8f0;
+    --light-gray: #f8f9fa; /* Lebih terang untuk kontras */
+    --border-color: #dee2e6;
     --font-sans: 'Inter', sans-serif;
     --font-display: 'Space Grotesk', sans-serif;
-    --border-radius-lg: 16px;
-    --border-radius-md: 12px;
-    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.1);
+    --border-radius-lg: 1rem;      /* 16px */
+    --border-radius-md: 0.75rem;   /* 12px */
+    --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 8px rgba(0,0,0,0.07);
+    --shadow-lg: 0 15px 30px -10px rgba(0,0,0,0.1);
+}
+
+/* == Animasi Halus saat Load Halaman == */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card-form, .card-status, .card-result {
+    /* Menerapkan animasi */
+    animation: fadeInUp 0.6s ease-out forwards;
 }
 
 /* == Bagian Hero Konten == */
@@ -33,17 +52,28 @@
     border-radius: 99px;
     font-weight: 500;
     border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
 }
 .text-dark-blue { color: var(--dark-blue); }
+h1.text-dark-blue .text-gradient {
+    text-shadow: 0 2px 4px rgba(0, 123, 255, 0.1);
+}
 
-/* == Kartu Utama di Konten == */
+
+/* == Kartu Utama di Konten dengan Efek Hover == */
 .card-form, .card-status, .card-result {
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius-lg);
     background: #fff;
-    box-shadow: var(--shadow-lg);
-    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Transisi untuk hover */
 }
+/* Efek "lift" saat di-hover */
+.card-form:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+}
+
 
 /* == Formulir yang Ditingkatkan == */
 .form-step-number {
@@ -53,30 +83,36 @@
     width: 24px;
     height: 24px;
     border-radius: 50%;
-    background-color: var(--primary-color);
+    background-image: linear-gradient(45deg, var(--primary-color), #00a3ff);
     color: #fff;
     font-size: 0.85rem;
     font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
 }
 .form-control, .form-select {
     border-radius: 0.5rem;
     border: 1px solid var(--border-color);
     padding: 0.75rem 1rem;
+    background-color: #fff; /* Pastikan background putih */
     transition: border-color 0.2s, box-shadow 0.2s;
 }
 .form-control:focus, .form-select:focus {
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+    /* Bayangan fokus yang lebih menonjol */
+    box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.15);
     outline: none;
 }
+.form-control::placeholder {
+    color: #adb5bd;
+}
 
-/* == Ringkasan Pesanan (Pengganti .preview-box) == */
+/* == Ringkasan Pesanan == */
 .order-summary {
     background-color: var(--light-gray);
-    border: 1px solid var(--border-color);
     border-radius: var(--border-radius-md);
     padding: 1.25rem;
     margin-top: 1.5rem;
+    border: 1px solid #e9ecef;
 }
 .summary-title {
     font-size: 1.1rem;
@@ -91,9 +127,7 @@
     margin-bottom: 0.75rem;
     font-size: 0.95rem;
 }
-.summary-key {
-    color: var(--slate-gray);
-}
+.summary-key { color: var(--slate-gray); }
 .summary-value {
     color: var(--dark-blue);
     font-weight: 500;
@@ -101,26 +135,30 @@
 }
 .summary-item.total .summary-value {
     font-size: 1.25rem;
+    font-weight: 700; /* Lebih tebal */
     color: var(--primary-dark);
 }
 .summary-divider {
-    border-color: var(--border-color);
+    border-color: #e9ecef;
     margin: 1rem 0;
 }
 
-/* == Tombol Utama di Konten == */
+/* == Tombol Utama dengan Gradien & Efek Hover == */
 main .btn-primary {
-    background: linear-gradient(90deg, #007BFF, #00A3FF);
+    background-size: 200% auto;
+    background-image: linear-gradient(90deg, #0d6efd 0%, #00c6ff 50%, #0d6efd 100%);
     border: none;
     border-radius: 0.5rem;
     padding: 0.85rem 1.5rem;
     font-weight: 600;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: all 0.4s ease; /* Transisi untuk semua properti */
 }
 main .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+    background-position: right center; /* Menggeser gradien */
+    transform: translateY(-3px);
+    box-shadow: 0 8px 15px rgba(0, 123, 255, 0.25);
 }
+
 
 /* == Kartu Status & Hasil == */
 .card-status { border-left: 5px solid var(--primary-color); }
@@ -139,7 +177,12 @@ main .btn-primary:hover {
 .detail-item {
     background-color: var(--light-gray);
     border-radius: 0.5rem;
-    padding: 0.5rem 0.75rem;
+    padding: 0.6rem 0.85rem;
+    border: 1px solid #e9ecef;
+    transition: background-color 0.2s;
+}
+.detail-item:hover {
+    background-color: #eef1f4;
 }
 .detail-item .k {
     display: block;
@@ -152,9 +195,7 @@ main .btn-primary:hover {
     color: var(--dark-blue);
     word-break: break-all;
 }
-.detail-item.uuid {
-    grid-column: 1 / -1; /* Span full width */
-}
+.detail-item.uuid { grid-column: 1 / -1; }
 
 /* == Blok Konfigurasi == */
 .cfg-block {
@@ -162,6 +203,7 @@ main .btn-primary:hover {
     border-radius: var(--border-radius-md);
     padding: 0.5rem 0.75rem;
     color: #abb2bf;
+    border: 1px solid #3a3f4b;
 }
 .cfg-title {
     font-size: 0.75rem;
@@ -176,7 +218,7 @@ main .btn-primary:hover {
     gap: 0.5rem;
 }
 .cfg-code {
-    font-family: 'Courier New', Courier, monospace;
+    font-family: 'SF Mono', 'Courier New', Courier, monospace;
     font-size: 0.85rem;
     white-space: nowrap;
     overflow: hidden;
@@ -189,19 +231,18 @@ main .btn-primary:hover {
     flex-shrink: 0;
     border: 1px solid #4b5263;
     color: #abb2bf;
+    transition: all 0.2s;
 }
 .cfg-copy:hover {
     background-color: #3a3f4b;
     color: #fff;
+    transform: scale(1.1);
 }
 
 /* == Overlay Loading == */
 .loading-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%;
     background-color: #fff;
     display: flex;
     justify-content: center;
@@ -211,7 +252,7 @@ main .btn-primary:hover {
     transition: opacity 0.6s ease;
 }
 .loading-spinner {
-    border: 4px solid var(--light-gray);
+    border: 4px solid var(--primary-light);
     border-top: 4px solid var(--primary-color);
     border-radius: 50%;
     width: 40px;
