@@ -1,0 +1,49 @@
+/* Khusus halaman Buy Kuota */
+
+.card-form {
+  border: 1px solid var(--gray-200);
+  border-radius: 16px;
+  box-shadow: 0 6px 24px rgba(0,0,0,.04);
+}
+
+.order-form .form-step-number{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:26px;height:26px;border-radius:50%;
+  background:var(--primary-100,#eef3ff);color:var(--primary-600,#2c6ef2);
+  font-weight:700;
+}
+
+.product-card{
+  border:1px solid var(--gray-200);
+  border-radius:14px;
+  padding:14px;
+  display:flex;gap:12px;align-items:flex-start;
+  transition: border-color .2s, box-shadow .2s;
+  cursor:pointer;background:#fff;
+}
+.product-card:hover{ border-color: var(--primary-300,#b9ccff); box-shadow: 0 6px 20px rgba(44,110,242,.08); }
+.product-card input[type="radio"]{ margin-top:6px; }
+.product-title{ font-weight:700;color:var(--gray-900); }
+.product-sub{ font-size:.9rem;color:var(--gray-600); }
+.product-price{ font-weight:800;color:var(--primary-600,#2c6ef2); }
+
+.otp-area .form-control{ letter-spacing: .12em; font-weight:600; }
+#sessionInfo { color: var(--gray-700); }
+
+.order-summary{
+  border:1px dashed var(--gray-300);border-radius:12px;padding:16px;margin-top:8px;background:#fafafa;
+}
+.order-summary .summary-title{ font-weight:700;margin-bottom:8px;color:var(--gray-900); }
+.order-summary .summary-item{ display:flex;justify-content:space-between;gap:8px;margin:6px 0; }
+.order-summary .summary-item .summary-key{ color:var(--gray-600); }
+.order-summary .summary-divider{ margin:10px 0; }
+.order-summary .total .summary-value{ font-size:1.1rem; }
+
+.card-status, .card-result{
+  border:1px solid var(--gray-200);border-radius:16px;box-shadow:0 6px 24px rgba(0,0,0,.04);
+}
+
+.qris-panel{
+  border:1px dashed var(--gray-300);border-radius:12px;padding:16px;text-align:center;background:#fff;
+}
+.qris-panel canvas{ width:100%; height:auto; max-width:320px; }
