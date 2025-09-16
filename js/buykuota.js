@@ -1,8 +1,10 @@
-/* js/buykuota.js (updated)
-   - Menampilkan field terpilih provider
-   - Deeplink DANA + QRIS modal + countdown
-   - Download bukti: {OrderId}.txt (teks rapi)
-   - Auto resume dari ?orderId= saat kembali dari Duitku
+/* js/buykuota.js
+   Frontend untuk pembelian kuota XL:
+   - GET  :  {API_BASE}/xl/config
+   - POST :  {API_BASE}/xl/ensure-session   { msisdn }
+   - POST :  {API_BASE}/xl/submit-otp       { msisdn, auth_id, otp }
+   - POST :  {API_BASE}/pay/create          { type:'XL', msisdn, packId, promoCode? }
+   - GET  :  {API_BASE}/pay/status?orderId=...
 */
 
 /* ====================== Utils ====================== */
@@ -65,9 +67,13 @@ const els = {
   statusText:      $('#statusText'),
   payLink:         $('#payLink'),
   resultInfo:      $('#resultInfo'),
-  btnDownloadBukti:$('#btnDownloadBukti'),
-  btnOpenDeeplink: $('#btnOpenDeeplink'),
-  btnShowQRIS:     $('#btnShowQRIS')
+  btnDownload:     $('#btnDownload'),
+
+  // QRIS modal
+  qrisModal:       $('#qrisModal'),
+  qrisImage:       $('#qrisImage'),
+  qrisCountdown:   $('#qrisCountdown'),
+  btnCopyQrString: $('#btnCopyQrString')
 };
 
 /* ============== State ============== */
@@ -78,7 +84,11 @@ const state = {
   access_token: null,
   orderId: null,
   pollTimer: null,
-  lastProviderNorm: null // simpan hasil normalize utk download bukti
+
+  // QRIS
+  qrisTimer: null,
+  qrisRemaining: 0,
+  qrisString: ''
 };
 
 function saveLocalSession(msisdn, token){
@@ -254,6 +264,136 @@ function stopPollingStatus(){
   if (state.pollTimer){ clearInterval(state.pollTimer); state.pollTimer = null; }
 }
 
+/* ====== QRIS helpers ====== */
+function startQrisCountdown(seconds){
+  stopQrisCountdown();
+  state.qrisRemaining = Math.max(0, parseInt(seconds||0,10) || 0);
+  updateQrisCountdown();
+  state.qrisTimer = setInterval(()=>{
+    state.qrisRemaining = Math.max(0, state.qrisRemaining - 1);
+    updateQrisCountdown();
+    if (state.qrisRemaining <= 0) stopQrisCountdown();
+  }, 1000);
+}
+function stopQrisCountdown(){
+  if (state.qrisTimer){ clearInterval(state.qrisTimer); state.qrisTimer = null; }
+}
+function updateQrisCountdown(){
+  if (!els.qrisCountdown) return;
+  const s = state.qrisRemaining;
+  if (!s) { els.qrisCountdown.innerText = ''; return; }
+  const m = Math.floor(s/60), d = s%60;
+  els.qrisCountdown.innerText = `Waktu tersisa: ${m}m ${d}s`;
+}
+function openQrisModal(qrString, remaining){
+  state.qrisString = qrString || '';
+  if (els.qrisImage){
+    // Pakai layanan QR gratis untuk render (tanpa dependency)
+    const url = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' + encodeURIComponent(qrString || '');
+    els.qrisImage.src = url;
+  }
+  startQrisCountdown(remaining || 0);
+
+  if (els.btnCopyQrString){
+    els.btnCopyQrString.onclick = async ()=>{
+      try{ await navigator.clipboard.writeText(state.qrisString || ''); toast('Data QR disalin.', 'success'); }
+      catch{ toast('Gagal menyalin data QR.', 'danger'); }
+    };
+  }
+
+  const modal = new bootstrap.Modal(els.qrisModal);
+  modal.show();
+}
+
+/* ====== Download Bukti (TXT) ====== */
+function downloadProof(orderId, data){
+  const lines = [];
+  lines.push("=== Bukti Pembelian Kuota XL ===");
+  lines.push(`Nomor Invoice : ${orderId}`);
+  if (data.trx_id) lines.push(`Transaksi ID  : ${data.trx_id}`);
+  if (data.status) lines.push(`Status        : ${data.status}`);
+
+  // cari payment_method
+  let method = data.payment_method || '';
+  if (!method && data.deeplink_data && data.deeplink_data.payment_method){
+    method = data.deeplink_data.payment_method;
+  }
+  if (data.is_qris) method = 'QRIS';
+  if (method) lines.push(`Metode Bayar  : ${method}`);
+
+  const msg = data.message || (data.have_deeplink && method==='DANA'
+              ? 'Silakan klik tombol BAYAR di aplikasi DANA.'
+              : (data.is_qris ? 'Silakan scan/upload QR di e-wallet/m-banking Anda.' : 'Transaksi berhasil dieksekusi.'));
+
+  if (msg) lines.push(`Pesan         : ${msg}`);
+
+  if (data.is_qris && data.qris_data){
+    lines.push("");
+    lines.push("=== Instruksi QRIS ===");
+    if (data.qris_data.remaining_time){
+      const menit = Math.floor(data.qris_data.remaining_time / 60);
+      const detik = data.qris_data.remaining_time % 60;
+      lines.push(`Waktu Tersisa : ${menit} menit ${detik} detik`);
+    }
+    if (data.qris_data.qr_code){
+      lines.push("QR Code:");
+      lines.push(data.qris_data.qr_code);
+    }
+  }
+
+  const text = lines.join("\n");
+  const blob = new Blob([text], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${orderId}.txt`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+/* ====== Render hasil provider (ringkas) ====== */
+function renderProviderBox(data){
+  // derive fields
+  const trx = data.trx_id || '-';
+  const st  = data.status || '-';
+  let method = data.payment_method || (data.deeplink_data && data.deeplink_data.payment_method) || (data.is_qris ? 'QRIS' : (data.have_deeplink ? 'DANA' : 'PULSA/BALANCE'));
+  if (!method && data.is_qris) method = 'QRIS';
+
+  const msg = data.message || (data.have_deeplink && method==='DANA'
+              ? 'Pastikan kamu punya aplikasi DANA lalu klik tombol BAYAR.'
+              : (data.is_qris ? 'Silakan scan/upload QR di e-wallet/m-banking Anda.' : 'Transaksi berhasil diproses.'));
+
+  // badges
+  const stBadge = (st || '').toUpperCase() === 'SUCCESS' ? 'bg-success' : 'bg-secondary';
+
+  let extra = '';
+  // tombol DANA deeplink
+  if (data.have_deeplink && data.deeplink_data && data.deeplink_data.deeplink_url){
+    extra += `
+      <a class="btn btn-primary w-100 mt-2" href="${escapeHtml(data.deeplink_data.deeplink_url)}" target="_blank" rel="noopener">
+        <i class="bi bi-lightning-charge"></i> Buka DANA &amp; Bayar
+      </a>`;
+  }
+  // tombol QRIS
+  if (data.is_qris && data.qris_data && data.qris_data.qr_code){
+    extra += `
+      <button id="btnShowQris" class="btn btn-outline-primary w-100 mt-2">
+        <i class="bi bi-qr-code"></i> Tampilkan QRIS
+      </button>`;
+  }
+
+  return `
+    <div class="border rounded p-3" style="background:#0f172a0a;">
+      <div class="mb-2"><span class="badge ${stBadge}">${escapeHtml(st || '-')}</span></div>
+      <div class="mb-1"><b>Transaksi ID</b><br><code>${escapeHtml(trx)}</code></div>
+      <div class="mb-1"><b>Metode Bayar</b><br>${escapeHtml(method || '-')}</div>
+      <div class="mb-2"><b>Pesan</b><br>${escapeHtml(msg || '-')}</div>
+      ${extra}
+    </div>
+  `;
+}
+
+/* ====== Cek status ====== */
 async function checkStatus(){
   if (!state.orderId) return;
   try{
@@ -270,11 +410,33 @@ async function checkStatus(){
       hide(els.waitingBox);
       show(els.resultBox);
 
+      // Tampilkan box hasil provider (ringkas)
       if (els.resultInfo){
-        if (js.providerResult){
-          // render + simpan normalized utk download bukti
-          const html = renderProviderResult(js.providerResult);
-          setHtml(els.resultInfo, html);
+        const pr = js.providerResult || null;
+        if (pr){
+          // render ringkas
+          setHtml(els.resultInfo, renderProviderBox(pr));
+
+          // aktifkan tombol QRIS modal jika ada
+          if (pr.is_qris && pr.qris_data && pr.qris_data.qr_code){
+            const btnQ = document.getElementById('btnShowQris');
+            if (btnQ) btnQ.onclick = ()=> openQrisModal(pr.qris_data.qr_code, pr.qris_data.remaining_time);
+          }
+
+          // munculkan tombol download
+          if (els.btnDownload){
+            els.btnDownload.style.display = 'block';
+            els.btnDownload.onclick = () => downloadProof(state.orderId, {
+              trx_id: pr.trx_id,
+              status: pr.status,
+              payment_method: (pr.payment_method || (pr.deeplink_data && pr.deeplink_data.payment_method) || (pr.is_qris ? 'QRIS' : '')),
+              message: pr.message || (pr.is_qris ? 'Silakan scan/upload QR di e-wallet/m-banking Anda.' : (pr.have_deeplink ? 'Silakan bayar via DANA.' : 'Transaksi berhasil.')),
+              is_qris: pr.is_qris,
+              qris_data: pr.qris_data,
+              have_deeplink: pr.have_deeplink,
+              deeplink_data: pr.deeplink_data
+            });
+          }
         }else{
           setHtml(els.resultInfo, `<div class="alert alert-info mb-0">Pembayaran diterima. Pesanan sedang diproses. Silakan refresh beberapa saat.</div>`);
         }
@@ -283,182 +445,12 @@ async function checkStatus(){
     else if (st === 'FAILED'){
       stopPollingStatus();
       toast('Pembayaran gagal atau kedaluwarsa.', 'danger');
+    } else {
+      // tetap menunggu
     }
   }catch(e){
     console.debug('status error:', e.message);
   }
-}
-
-/* ====== NORMALISASI HASIL PROVIDER + RENDER TERARAH ====== */
-function normalizeProviderResult(res){
-  let obj = null;
-  try { obj = (typeof res === 'string') ? JSON.parse(res) : res; } catch { obj = res; }
-  if (!obj || typeof obj !== 'object') return { raw: res };
-
-  const data = obj.data || {};
-  const deeplink = data.deeplink_data || {};
-  const qris = data.qris_data || {};
-
-  const norm = {
-    message: obj.message || data.message || '',
-    trx_id:  data.trx_id || data.trxId || '',
-    status:  data.status || obj.status || '',
-    payment_method: (deeplink.payment_method || data.payment_method || '').toString() || 
-                    (obj.is_qris ? 'QRIS' : ''),
-    have_deeplink: !!obj.have_deeplink || !!data.have_deeplink || !!deeplink.deeplink_url,
-    deeplink_url:  deeplink.deeplink_url || '',
-    is_qris: !!obj.is_qris || !!data.is_qris || !!qris.qr_code,
-    qris: {
-      qr_code: qris.qr_code || '',
-      payment_expired_at: qris.payment_expired_at || 0,
-      remaining_time: qris.remaining_time || null
-    },
-    raw: obj
-  };
-  state.lastProviderNorm = norm;
-  return norm;
-}
-function fmtBadge(v){
-  const s = String(v||'').toUpperCase();
-  const cls = s==='SUCCESS' ? 'bg-success' : (s==='PENDING'?'bg-warning text-dark':(s==='FAILED'?'bg-danger':'bg-secondary'));
-  return `<span class="badge ${cls}">${s || '-'}</span>`;
-}
-function renderProviderResult(res){
-  const n = normalizeProviderResult(res);
-
-  // tombol deeplink / qris / download bukti
-  if (els.btnOpenDeeplink){
-    if (n.have_deeplink && n.deeplink_url){
-      els.btnOpenDeeplink.style.display = '';
-      els.btnOpenDeeplink.href = n.deeplink_url;
-    } else {
-      els.btnOpenDeeplink.style.display = 'none';
-    }
-  }
-  if (els.btnShowQRIS){
-    if (n.is_qris && n.qris.qr_code){
-      els.btnShowQRIS.style.display = '';
-      els.btnShowQRIS.onclick = ()=> showQrisModal(n.qris);
-    } else {
-      els.btnShowQRIS.style.display = 'none';
-    }
-  }
-  // siapkan tombol Download Bukti (teks)
-  prepareDownloadBukti();
-
-  const html = `
-    <div class="row g-3">
-      <div class="col-12"><div class="alert alert-info mb-2">${escapeHtml(n.message || 'Hasil eksekusi provider')}</div></div>
-      <div class="col-6">
-        <div class="small text-muted">Trx ID</div>
-        <div class="fw-semibold">${escapeHtml(n.trx_id || '-')}</div>
-      </div>
-      <div class="col-6">
-        <div class="small text-muted">Status</div>
-        <div>${fmtBadge(n.status)}</div>
-      </div>
-      <div class="col-6">
-        <div class="small text-muted">Metode</div>
-        <div class="fw-semibold">${escapeHtml(n.payment_method || (n.is_qris?'QRIS':'-'))}</div>
-      </div>
-      ${n.is_qris && n.qris.remaining_time != null ? `
-        <div class="col-6">
-          <div class="small text-muted">Sisa Waktu QR</div>
-          <div class="fw-semibold" id="qrisInlineTimer">-</div>
-        </div>` : ''
-      }
-    </div>
-  `;
-
-  if (n.is_qris && n.qris.remaining_time != null) {
-    // tunggu elemen ada
-    setTimeout(()=>{
-      const el = document.getElementById('qrisInlineTimer');
-      if (el) startInlineQrisCountdown(n.qris, el);
-    }, 50);
-  }
-
-  return html;
-}
-
-/* ====== QRIS Modal + countdown ====== */
-let qrisTimerId = null;
-function showQrisModal(q){
-  const img = document.getElementById('qrisImg');
-  const aDL = document.getElementById('btnDownloadQR');
-  const cd  = document.getElementById('qrisCountdown');
-  if (!img || !aDL || !cd) return;
-
-  const urlImg = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&margin=2&data=${encodeURIComponent(q.qr_code)}`;
-  img.src = urlImg;
-  aDL.href = urlImg;
-
-  if (qrisTimerId) clearInterval(qrisTimerId);
-  const target = q.payment_expired_at ? (q.payment_expired_at * 1000) : (Date.now() + (q.remaining_time||300)*1000);
-  const tick = ()=>{
-    const s = Math.max(0, Math.floor((target - Date.now())/1000));
-    const mm = String(Math.floor(s/60)).padStart(2,'0');
-    const ss = String(s%60).padStart(2,'0');
-    cd.textContent = `Sisa waktu: ${mm}:${ss}`;
-    if (s<=0){ clearInterval(qrisTimerId); }
-  };
-  tick();
-  qrisTimerId = setInterval(tick, 1000);
-
-  try {
-    const modal = new bootstrap.Modal(document.getElementById('qrisModal'));
-    modal.show();
-  } catch {}
-}
-function startInlineQrisCountdown(q, el){
-  if (!el) return;
-  const target = q.payment_expired_at ? (q.payment_expired_at * 1000) : (Date.now() + (q.remaining_time||300)*1000);
-  const update = ()=>{
-    const s = Math.max(0, Math.floor((target - Date.now())/1000));
-    const mm = String(Math.floor(s/60)).padStart(2,'0');
-    const ss = String(s%60).padStart(2,'0');
-    el.textContent = `${mm}:${ss}`;
-  };
-  update();
-  const id = setInterval(()=>{
-    update();
-    if (Date.now() >= target) clearInterval(id);
-  }, 1000);
-}
-
-/* ====== Download Bukti (TXT rapih) ====== */
-function buildReceiptText(){
-  const n = state.lastProviderNorm || {};
-  const orderId = state.orderId || '-';
-  const nomor = (els.msisdn?.value || '').replace(/\D/g,'') || '-';
-  const paket = state.selected ? (state.selected.label || state.selected.id) : '-';
-  const now = new Date();
-  const tanggal = now.toLocaleString('id-ID', { dateStyle:'full', timeStyle:'medium' });
-
-  return [
-    `=== BUKTI TRANSAKSI FADZDIGITAL ===`,
-    ``,
-    `Nomor Invoice : ${orderId}`,
-    `Tanggal       : ${tanggal}`,
-    ``,
-    `Nomor XL      : ${nomor}`,
-    `Paket         : ${paket}`,
-    ``,
-    `Status        : ${n.status || '-'}`,
-    `Metode Bayar  : ${n.payment_method || (n.is_qris?'QRIS':'-')}`,
-    `Trx Provider  : ${n.trx_id || '-'}`,
-    `Pesan         : ${n.message || '-'}`,
-    ``,
-    `Catatan: simpan bukti ini. Jika terjadi kendala, hubungi CS dengan menyertakan Nomor Invoice.`,
-    `====================================`
-  ].join('\n');
-}
-function prepareDownloadBukti(){
-  if (!els.btnDownloadBukti) return;
-  const fileName = `${state.orderId || 'invoice'}.txt`;
-  const blob = new Blob([buildReceiptText()], { type: 'text/plain;charset=utf-8' });
-  els.btnDownloadBukti.href = URL.createObjectURL(blob);
-  els.btnDownloadBukti.download = fileName;
 }
 
 /* ============== Event binding ============== */
@@ -476,22 +468,21 @@ function bindEvents(){
   });
 }
 
-/* ============== Auto resume dari ?orderId= ============== */
-function bootFromQuery(){
-  const sp = new URLSearchParams(location.search);
-  const oid = sp.get('orderId') || sp.get('orderid') || '';
-  if (!oid) return;
-  state.orderId = oid;
-  setText(els.orderIdText, oid);
-  show(els.waitingBox);
-  hide(els.resultBox);
-  startPollingStatus();
-}
-
 /* ============== Boot ============== */
 document.addEventListener('DOMContentLoaded', async ()=>{
   bindEvents();
   await loadConfig();
   recalcSummary();
-  bootFromQuery(); // penting untuk redirect dari Duitku
+
+  // Auto-load status dari query ?orderId=... (returnUrl Duitku)
+  const url = new URL(window.location.href);
+  const orderId = url.searchParams.get('orderId');
+  if (orderId) {
+    state.orderId = orderId;
+    if (els.waitingBox) show(els.waitingBox);
+    if (els.resultBox)  hide(els.resultBox);
+    setText(els.orderIdText, orderId);
+    setText(els.statusText, 'Menunggu…');
+    startPollingStatus();
+  }
 });
