@@ -1,4 +1,10 @@
-/* js/buykuota.js=...
+/* js/buykuota.js
+   Frontend untuk pembelian kuota XL:
+   - GET  :  {API_BASE}/xl/config
+   - POST :  {API_BASE}/xl/ensure-session   { msisdn }
+   - POST :  {API_BASE}/xl/submit-otp       { msisdn, auth_id, otp }
+   - POST :  {API_BASE}/pay/create          { type:'XL', msisdn, packId, promoCode? }
+   - GET  :  {API_BASE}/pay/status?orderId=...
 */
 
 /* ====================== Utils ====================== */
@@ -9,7 +15,6 @@ function show(el){ if (typeof el === 'string') el = $(el); if (el) el.style.disp
 function hide(el){ if (typeof el === 'string') el = $(el); if (el) el.style.display = 'none'; }
 function setText(id, v){ const el = (typeof id==='string') ? $(id) : id; if (el) el.textContent = v ?? ''; }
 function setHtml(id, v){ const el = (typeof id==='string') ? $(id) : id; if (el) el.innerHTML = v ?? ''; }
-function qs(key){ return new URLSearchParams(location.search).get(key); }
 
 function rupiah(n){
   const x = Number(n||0);
@@ -41,6 +46,12 @@ function toast(msg, type='danger'){
 
 function startLoading(){ const o = $('#loadingOverlay'); if (o){ o.style.display='flex'; o.style.opacity='1'; } }
 function stopLoading(){ const o = $('#loadingOverlay'); if (o){ o.style.opacity='0'; setTimeout(()=>o.style.display='none',300); } }
+
+/* Helper: ambil query param dari URL (untuk ?orderId=...) */
+function getQueryParam(k){
+  const u = new URL(window.location.href);
+  return u.searchParams.get(k);
+}
 
 /* ============== Elemen ============== */
 const els = {
@@ -77,7 +88,6 @@ const state = {
 function saveLocalSession(msisdn, token){
   if (!msisdn || !token) return;
   localStorage.setItem(`xl_at:${msisdn}`, token);
-  localStorage.setItem('xl_last_msisdn', msisdn);
 }
 function readLocalSession(msisdn){
   if (!msisdn) return null;
@@ -295,24 +305,6 @@ function renderProviderResult(pr){
   }
 }
 
-/* ============== Resume dari returnUrl Duitku ============== */
-function resumeFromUrl(){
-  const urlOrder = qs('orderId');
-  if (!urlOrder) return;
-  state.orderId = urlOrder;
-
-  hide(els.resultBox);
-  show(els.waitingBox);
-  setText(els.orderIdText, urlOrder);
-  setText(els.statusText, 'Menunggu…');
-
-  // Prefill msisdn terakhir jika ada
-  const last = localStorage.getItem('xl_last_msisdn') || '';
-  if (last && els.msisdn) els.msisdn.value = last;
-
-  startPollingStatus();
-}
-
 /* ============== Event binding ============== */
 function bindEvents(){
   els.packId?.addEventListener('change', recalcSummary);
@@ -330,14 +322,21 @@ function bindEvents(){
 
 /* ============== Boot ============== */
 document.addEventListener('DOMContentLoaded', async ()=>{
-  // Prefill msisdn terakhir
-  const last = localStorage.getItem('xl_last_msisdn') || '';
-  if (last && els.msisdn) els.msisdn.value = last;
-
   bindEvents();
   await loadConfig();
   recalcSummary();
 
-  // auto resume bila datang dari Duitku returnUrl
-  resumeFromUrl();
+  // Auto-continue jika balik dari Duitku dengan ?orderId=...
+  const orderIdFromUrl = getQueryParam('orderId');
+  if (orderIdFromUrl) {
+    state.orderId = orderIdFromUrl;
+    if (els.waitingBox) show(els.waitingBox);
+    if (els.resultBox)  hide(els.resultBox);
+    if (els.orderIdText) setText(els.orderIdText, orderIdFromUrl);
+    if (els.statusText) {
+      els.statusText.className = 'badge bg-warning text-dark';
+      setText(els.statusText, 'MENUNGGU…');
+    }
+    startPollingStatus();
+  }
 });
