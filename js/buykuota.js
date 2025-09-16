@@ -1,10 +1,4 @@
-/* js/buykuota.js
-   Frontend untuk pembelian kuota XL:
-   - GET  :  {API_BASE}/xl/config
-   - POST :  {API_BASE}/xl/ensure-session   { msisdn }
-   - POST :  {API_BASE}/xl/submit-otp       { msisdn, auth_id, otp }
-   - POST :  {API_BASE}/pay/create          { type:'XL', msisdn, packId, promoCode? }
-   - GET  :  {API_BASE}/pay/status?orderId=...
+/* js/buykuota.js=...
 */
 
 /* ====================== Utils ====================== */
@@ -15,6 +9,7 @@ function show(el){ if (typeof el === 'string') el = $(el); if (el) el.style.disp
 function hide(el){ if (typeof el === 'string') el = $(el); if (el) el.style.display = 'none'; }
 function setText(id, v){ const el = (typeof id==='string') ? $(id) : id; if (el) el.textContent = v ?? ''; }
 function setHtml(id, v){ const el = (typeof id==='string') ? $(id) : id; if (el) el.innerHTML = v ?? ''; }
+function qs(key){ return new URLSearchParams(location.search).get(key); }
 
 function rupiah(n){
   const x = Number(n||0);
@@ -82,6 +77,7 @@ const state = {
 function saveLocalSession(msisdn, token){
   if (!msisdn || !token) return;
   localStorage.setItem(`xl_at:${msisdn}`, token);
+  localStorage.setItem('xl_last_msisdn', msisdn);
 }
 function readLocalSession(msisdn){
   if (!msisdn) return null;
@@ -299,6 +295,24 @@ function renderProviderResult(pr){
   }
 }
 
+/* ============== Resume dari returnUrl Duitku ============== */
+function resumeFromUrl(){
+  const urlOrder = qs('orderId');
+  if (!urlOrder) return;
+  state.orderId = urlOrder;
+
+  hide(els.resultBox);
+  show(els.waitingBox);
+  setText(els.orderIdText, urlOrder);
+  setText(els.statusText, 'Menunggu…');
+
+  // Prefill msisdn terakhir jika ada
+  const last = localStorage.getItem('xl_last_msisdn') || '';
+  if (last && els.msisdn) els.msisdn.value = last;
+
+  startPollingStatus();
+}
+
 /* ============== Event binding ============== */
 function bindEvents(){
   els.packId?.addEventListener('change', recalcSummary);
@@ -316,7 +330,14 @@ function bindEvents(){
 
 /* ============== Boot ============== */
 document.addEventListener('DOMContentLoaded', async ()=>{
+  // Prefill msisdn terakhir
+  const last = localStorage.getItem('xl_last_msisdn') || '';
+  if (last && els.msisdn) els.msisdn.value = last;
+
   bindEvents();
   await loadConfig();
   recalcSummary();
+
+  // auto resume bila datang dari Duitku returnUrl
+  resumeFromUrl();
 });
