@@ -1,317 +1,322 @@
-/* global QRious */
-(() => {
-  const $ = (id) => document.getElementById(id);
-  const elProductList = $('productList');
-  const elMsisdn = $('msisdn');
-  const elCheckSession = $('checkSessionBtn');
-  const elOtpArea = $('otpArea');
-  const elOtpCode = $('otpCode');
-  const elSubmitOtp = $('submitOtpBtn');
-  const elResendOtp = $('resendOtpBtn');
-  const elSessionInfo = $('sessionInfo');
+/* js/buykuota.js
+   Frontend untuk pembelian kuota XL:
+   - GET  :  {API_BASE}/xl/config
+   - POST :  {API_BASE}/xl/ensure-session   { msisdn }
+   - POST :  {API_BASE}/xl/submit-otp       { msisdn, auth_id, otp }
+   - POST :  {API_BASE}/pay/create          { type:'XL', msisdn, packId, promoCode? }
+   - GET  :  {API_BASE}/pay/status?orderId=...
+*/
 
-  const elSummaryProduct = $('summaryProduct');
-  const elSummaryMsisdn = $('summaryMsisdn');
-  const elSummaryPrice = $('summaryPrice');
+/* ====================== Utils ====================== */
+const API_BASE = (window.API_BASE || '').replace(/\/+$/,'');
+const $ = (sel) => document.querySelector(sel);
 
-  const elPayBtn = $('payBtn');
-  const elErrBox = $('errBox');
+function show(el){ if (typeof el === 'string') el = $(el); if (el) el.style.display = ''; }
+function hide(el){ if (typeof el === 'string') el = $(el); if (el) el.style.display = 'none'; }
+function setText(id, v){ const el = (typeof id==='string') ? $(id) : id; if (el) el.textContent = v ?? ''; }
+function setHtml(id, v){ const el = (typeof id==='string') ? $(id) : id; if (el) el.innerHTML = v ?? ''; }
 
-  const waitingBox = $('waitingBox');
-  const orderIdText = $('orderIdText');
-  const statusText = $('statusText');
-  const payLink = $('payLink');
+function rupiah(n){
+  const x = Number(n||0);
+  return x.toLocaleString('id-ID', {style:'currency', currency:'IDR', maximumFractionDigits:0});
+}
 
-  const provBox = $('provBox');
-  const deeplinkWrap = $('deeplinkWrap');
-  const deeplinkBtn = $('deeplinkBtn');
-  const qrisWrap = $('qrisWrap');
-  const qrisCanvas = $('qrisCanvas');
-  const provExtra = $('provExtra');
-
-  // state
-  let CONFIG = null;
-  let SELECTED = null; // product object
-  let ACCESS_TOKEN = null;
-  let AUTH_ID = null;
-  let ORDER_ID = null;
-  let POLL = null;
-
-  // ---------- helpers ----------
-  function money(n){ 
-    n = Number(n||0);
-    return 'Rp ' + n.toLocaleString('id-ID');
+async function fetchJSON(url, opt={}){
+  const r = await fetch(url, {
+    headers: {'content-type':'application/json'},
+    ...opt
+  });
+  const txt = await r.text();
+  let js; try { js = JSON.parse(txt); } catch { js = {raw:txt}; }
+  if (!r.ok) {
+    const msg = (js && (js.message || js.error)) ? (js.message || js.error) : `HTTP ${r.status}`;
+    throw new Error(msg);
   }
-  function showErr(msg){
-    elErrBox.style.display='block';
-    elErrBox.className = 'alert alert-danger';
-    elErrBox.textContent = msg || 'Terjadi kesalahan.';
+  return js;
+}
+
+function toast(msg, type='danger'){
+  const box = $('#errorBox');
+  if (!box) return alert(msg);
+  box.className = `alert alert-${type}`;
+  box.style.display = 'block';
+  box.innerText = msg;
+  setTimeout(()=>{ box.style.display='none'; }, 4000);
+}
+
+function startLoading(){ const o = $('#loadingOverlay'); if (o){ o.style.display='flex'; o.style.opacity='1'; } }
+function stopLoading(){ const o = $('#loadingOverlay'); if (o){ o.style.opacity='0'; setTimeout(()=>o.style.display='none',300); } }
+
+/* ============== Elemen ============== */
+const els = {
+  packId:          $('#packId'),
+  msisdn:          $('#msisdn'),
+  promoCode:       $('#promoCode'),
+  btnSession:      $('#btnSession'),
+  otpWrap:         $('#otpWrap'),
+  otpInput:        $('#otpInput'),
+  btnVerifyOtp:    $('#btnVerifyOtp'),
+  btnPay:          $('#btnPay'),
+  detailsPreview:  $('#detailsPreview'),
+  pricePreview:    $('#pricePreview'),
+  packLabelPreview:$('#packLabelPreview'),
+  msisdnPreview:   $('#msisdnPreview'),
+  waitingBox:      $('#waitingBox'),
+  resultBox:       $('#resultBox'),
+  orderIdText:     $('#orderIdText'),
+  statusText:      $('#statusText'),
+  payLink:         $('#payLink'),
+  resultInfo:      $('#resultInfo')
+};
+
+/* ============== State ============== */
+const state = {
+  products: [],
+  selected: null,
+  auth_id: null,
+  access_token: null,
+  orderId: null,
+  pollTimer: null
+};
+
+function saveLocalSession(msisdn, token){
+  if (!msisdn || !token) return;
+  localStorage.setItem(`xl_at:${msisdn}`, token);
+}
+function readLocalSession(msisdn){
+  if (!msisdn) return null;
+  return localStorage.getItem(`xl_at:${msisdn}`);
+}
+
+/* ============== Load Config ============== */
+async function loadConfig(){
+  startLoading();
+  try{
+    const cfg = await fetchJSON(`${API_BASE}/xl/config`);
+    const list = Array.isArray(cfg.products) ? cfg.products : [];
+    state.products = list;
+
+    if (els.packId){
+      els.packId.innerHTML =
+        `<option value="" selected disabled>-- Pilih Paket --</option>` +
+        list.map(p => `<option value="${p.id}" data-price="${p.price||0}">${escapeHtml(p.label||p.id)} — ${rupiah(p.price||0)}</option>`).join('');
+    }
+  }catch(e){
+    toast(`Gagal load config: ${e.message}`);
+  }finally{
+    stopLoading();
   }
-  function clearErr(){
-    elErrBox.style.display='none';
-    elErrBox.textContent = '';
+}
+
+/* ============== Helper UI ============== */
+function escapeHtml(s){ return String(s||'').replace(/[&<>]/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;' }[m])); }
+
+function recalcSummary(){
+  const msisdn = (els.msisdn?.value||'').replace(/\D/g,'');
+  const packId = els.packId?.value || '';
+  const prod = state.products.find(p => p.id === packId) || null;
+  state.selected = prod || null;
+
+  if (els.packLabelPreview) setText(els.packLabelPreview, prod ? (prod.label || prod.id) : '-');
+  if (els.msisdnPreview)    setText(els.msisdnPreview,    msisdn || '-');
+
+  if (prod){
+    const detail = `${prod.label || prod.id} • Metode: ${prod.payment_method || '-'}`;
+    setText(els.detailsPreview, detail);
+    setText(els.pricePreview, `${rupiah(prod.price||0)} (sebelum promo)`);
+  }else{
+    setText(els.detailsPreview, '-');
+    setText(els.pricePreview, 'Rp 0');
   }
-  function setLoading(disabled){
-    [elCheckSession, elSubmitOtp, elResendOtp, elPayBtn].forEach(b=>{
-      if (b) b.disabled = !!disabled;
+
+  if (!state.auth_id) hide(els.otpWrap);
+}
+
+/* ============== Step 1: Cek sesi / Kirim OTP ============== */
+async function onEnsureSession(){
+  const msisdn = (els.msisdn?.value||'').replace(/\D/g,'');
+  if (!msisdn) return toast('Nomor HP harus diisi.', 'warning');
+
+  startLoading();
+  try{
+    const r = await fetchJSON(`${API_BASE}/xl/ensure-session`, {
+      method: 'POST',
+      body: JSON.stringify({ msisdn })
     });
-  }
 
-  // ---------- load config (produk dari env worker) ----------
-  async function loadConfig(){
-    const r = await fetch(`${window.API_BASE}/kuota/config`);
-    const js = await r.json();
-    CONFIG = js;
-    renderProducts(js.products || []);
-  }
-
-  function renderProducts(items){
-    elProductList.innerHTML = '';
-    if (!items.length){
-      elProductList.innerHTML = `<div class="col-12"><div class="alert alert-warning">Produk belum tersedia.</div></div>`;
+    if (r.access_token){
+      state.access_token = r.access_token;
+      saveLocalSession(msisdn, r.access_token);
+      state.auth_id = null;
+      hide(els.otpWrap);
+      toast('Sesi ditemukan. Siap lanjut ke pembayaran.', 'success');
       return;
     }
-    items.forEach((p, i) => {
-      const col = document.createElement('div');
-      col.className = 'col-12';
-      col.innerHTML = `
-        <label class="product-card">
-          <input type="radio" name="product" value="${p.id}" ${i===0?'checked':''}/>
-          <div class="flex-grow-1">
-            <div class="d-flex justify-content-between align-items-start">
-              <div>
-                <div class="product-title">${p.title}</div>
-                <div class="product-sub">${p.subtitle || ''}</div>
-              </div>
-              <div class="product-price">${money(p.sellPrice || 0)}</div>
-            </div>
-            <div class="small text-muted mt-1">Pembayaran provider: <b>${p.payment_method}</b></div>
-          </div>
-        </label>
-      `;
-      elProductList.appendChild(col);
+
+    if (r.session === 'OTP_SENT' && r.auth_id){
+      state.auth_id = r.auth_id;
+      state.access_token = null;
+      show(els.otpWrap);
+      toast('OTP terkirim. Cek SMS dan masukkan kodenya.', 'info');
+      return;
+    }
+
+    toast('Tidak ada respon sesi yang dikenali.', 'warning');
+  }catch(e){
+    toast(`Gagal cek sesi/kirim OTP: ${e.message}`);
+  }finally{
+    stopLoading();
+  }
+}
+
+/* ============== Step 2: Verifikasi OTP ============== */
+async function onVerifyOtp(){
+  const msisdn = (els.msisdn?.value||'').replace(/\D/g,'');
+  const otp = (els.otpInput?.value||'').trim();
+  if (!msisdn || !state.auth_id || !otp) return toast('MSISDN, auth_id, dan OTP wajib.', 'warning');
+
+  startLoading();
+  try{
+    const r = await fetchJSON(`${API_BASE}/xl/submit-otp`, {
+      method: 'POST',
+      body: JSON.stringify({ msisdn, auth_id: state.auth_id, otp })
     });
-    // set default selected
-    updateSelection();
-    elProductList.addEventListener('change', updateSelection, { once:true });
-    elProductList.addEventListener('change', updateSummary);
-  }
-
-  function updateSelection(){
-    const val = (document.querySelector('input[name="product"]:checked')||{}).value;
-    SELECTED = (CONFIG.products || []).find(x => String(x.id) === String(val)) || null;
-    updateSummary();
-  }
-
-  function updateSummary(){
-    elSummaryProduct.textContent = SELECTED ? `${SELECTED.title}` : '-';
-    elSummaryMsisdn.textContent = formatMsisdn(elMsisdn.value || '-');
-    elSummaryPrice.textContent = SELECTED ? money(SELECTED.sellPrice||0) : 'Rp 0';
-    elPayBtn.disabled = !(SELECTED && ACCESS_TOKEN && validMsisdn(elMsisdn.value));
-  }
-
-  function validMsisdn(s){
-    s = String(s||'').trim();
-    return /^0[0-9]{9,13}$/.test(s);
-  }
-  function formatMsisdn(s){ return String(s||'').replace(/\s+/g,''); }
-
-  // ---------- Step 1: Cek sesi / OTP ----------
-  elCheckSession.addEventListener('click', async (e) => {
-    e.preventDefault(); clearErr();
-    const msisdn = formatMsisdn(elMsisdn.value);
-    if (!validMsisdn(msisdn)) return showErr('Nomor XL tidak valid.');
-
-    setLoading(true);
-    try{
-      const r = await fetch(`${window.API_BASE}/kuota/otp/start`, {
-        method: 'POST',
-        headers: { 'Content-Type':'application/json' },
-        body: JSON.stringify({ msisdn })
-      });
-      const js = await r.json();
-
-      if (js.access_token){
-        ACCESS_TOKEN = js.access_token;
-        elSessionInfo.style.display='block';
-        elSessionInfo.innerHTML = `<span class="badge bg-success">Sesi ditemukan</span> &nbsp;<code class="text-muted">${ACCESS_TOKEN.split(':')[0]}:****</code>`;
-        elOtpArea.style.display='none';
-        updateSummary();
-        return;
-      }
-
-      if (js.needOtp){
-        AUTH_ID = js.auth_id;
-        elOtpArea.style.display='block';
-        elSessionInfo.style.display='block';
-        elSessionInfo.innerHTML = `<span class="badge bg-warning text-dark">OTP dibutuhkan</span> Kirim ke nomor <b>${formatMsisdn(msisdn)}</b>`;
-        updateSummary();
-        return;
-      }
-
-      showErr(js.message || 'Gagal memulai sesi/OTP.');
-    } catch(err){
-      showErr('Network error saat cek sesi/OTP.');
-    } finally{
-      setLoading(false);
-    }
-  });
-
-  elResendOtp.addEventListener('click', async () => {
-    // panggil start lagi untuk resend
-    const msisdn = formatMsisdn(elMsisdn.value);
-    if (!validMsisdn(msisdn)) return;
-    try{
-      await fetch(`${window.API_BASE}/kuota/otp/start`, {
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ msisdn, resend: true })
-      });
-      elOtpCode.value = '';
-      elOtpCode.focus();
-    }catch{}
-  });
-
-  elSubmitOtp.addEventListener('click', async (e) => {
-    e.preventDefault(); clearErr();
-    const msisdn = formatMsisdn(elMsisdn.value);
-    const code = String(elOtpCode.value||'').trim();
-    if (!AUTH_ID) return showErr('Auth ID tidak ditemukan. Klik Cek/OTP dulu.');
-    if (!/^[0-9]{4,8}$/.test(code)) return showErr('Kode OTP tidak valid.');
-
-    setLoading(true);
-    try{
-      const r = await fetch(`${window.API_BASE}/kuota/otp/verify`, {
-        method: 'POST',
-        headers: { 'Content-Type':'application/json' },
-        body: JSON.stringify({ msisdn, auth_id: AUTH_ID, kode_otp: code })
-      });
-      const js = await r.json();
-      if (js.access_token){
-        ACCESS_TOKEN = js.access_token;
-        elOtpArea.style.display='none';
-        elSessionInfo.style.display='block';
-        elSessionInfo.innerHTML = `<span class="badge bg-success">Login OTP sukses</span>`;
-        updateSummary();
-      }else{
-        showErr(js.message || 'OTP salah/expired.');
-      }
-    } catch(err){
-      showErr('Network error saat verifikasi OTP.');
-    } finally{
-      setLoading(false);
-    }
-  });
-
-  elMsisdn.addEventListener('input', updateSummary);
-
-  // ---------- Step 2: Buat invoice Duitku ----------
-  $('kuotaForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-  });
-
-  elPayBtn.addEventListener('click', async (e) => {
-    e.preventDefault(); clearErr();
-    if (!SELECTED) return showErr('Silakan pilih paket terlebih dahulu.');
-    if (!ACCESS_TOKEN) return showErr('Silakan login/OTP dahulu.');
-    const msisdn = formatMsisdn(elMsisdn.value);
-    if (!validMsisdn(msisdn)) return showErr('Nomor XL tidak valid.');
-
-    setLoading(true);
-    try{
-      const r = await fetch(`${window.API_BASE}/kuota/create`, {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({
-          productId: SELECTED.id,
-          msisdn,
-          access_token: ACCESS_TOKEN
-        })
-      });
-      const js = await r.json();
-      if (!r.ok){
-        showErr(js?.message || 'Gagal membuat invoice.');
-        return;
-      }
-      ORDER_ID = js.orderId;
-      waitingBox.style.display='block';
-      orderIdText.textContent = ORDER_ID;
-      statusText.className = 'badge bg-warning text-dark';
-      statusText.textContent = 'Menunggu…';
-      payLink.href = js.paymentUrl;
-      payLink.target = '_blank';
-      // mulai polling
-      startPolling();
-      // scroll ke panel
-      waitingBox.scrollIntoView({ behavior:'smooth', block:'center' });
-    }catch(err){
-      showErr('Network error saat membuat invoice.');
-    }finally{
-      setLoading(false);
-    }
-  });
-
-  // ---------- polling status ----------
-  function startPolling(){
-    stopPolling();
-    POLL = setInterval(checkStatus, 3000);
-  }
-  function stopPolling(){
-    if (POLL){ clearInterval(POLL); POLL = null; }
-  }
-  async function checkStatus(){
-    if (!ORDER_ID) return;
-    try{
-      const r = await fetch(`${window.API_BASE}/kuota/status?orderId=${encodeURIComponent(ORDER_ID)}`);
-      const js = await r.json();
-
-      if (js.status === 'PAID' || js.status === 'SUCCESS'){
-        statusText.className = 'badge bg-success';
-        statusText.textContent = 'Lunas';
-        // tampilkan instruksi provider (deeplink/QR)
-        renderProvider(js.provider || {});
-        stopPolling();
-      }else if (js.status === 'FAILED' || js.status === 'EXPIRED'){
-        statusText.className = 'badge bg-danger';
-        statusText.textContent = 'Gagal / Expired';
-        stopPolling();
-      }else{
-        statusText.className = 'badge bg-warning text-dark';
-        statusText.textContent = 'Menunggu…';
-      }
-    }catch{}
-  }
-
-  function renderProvider(p){
-    provBox.style.display='block';
-
-    // Deeplink
-    if (p.have_deeplink && p.deeplink_data && p.deeplink_data.deeplink_url){
-      deeplinkWrap.style.display='block';
-      deeplinkBtn.href = p.deeplink_data.deeplink_url;
+    if (r.access_token){
+      state.access_token = r.access_token;
+      saveLocalSession(msisdn, r.access_token);
+      state.auth_id = null;
+      hide(els.otpWrap);
+      toast('Berhasil verifikasi OTP. Sesi siap.', 'success');
     }else{
-      deeplinkWrap.style.display='none';
+      toast('OTP salah atau expired.', 'danger');
     }
+  }catch(e){
+    toast(`Gagal verifikasi OTP: ${e.message}`);
+  }finally{
+    stopLoading();
+  }
+}
 
-    // QRIS
-    if (p.is_qris && p.qris_data && p.qris_data.qr_code){
-      qrisWrap.style.display='block';
-      const qr = new QRious({
-        element: qrisCanvas,
-        value: p.qris_data.qr_code,
-        size: 320
-      });
-      // fallback size
-      setTimeout(()=>{ try{ qr.size = 320; }catch{} }, 0);
-    }else{
-      qrisWrap.style.display='none';
-    }
+/* ============== Step 3: Buat Invoice (Duitku) ============== */
+async function onCreateInvoice(){
+  const packId = els.packId?.value || '';
+  const msisdn = (els.msisdn?.value||'').replace(/\D/g,'');
+  const promo  = els.promoCode?.value || '';
+  if (!packId) return toast('Pilih paket dulu.', 'warning');
+  if (!msisdn) return toast('Nomor HP harus diisi.', 'warning');
 
-    // extra
-    const expAt = p.qris_data && p.qris_data.payment_expired_at ? new Date(p.qris_data.payment_expired_at*1000) : null;
-    provExtra.textContent = expAt ? `QR/Deeplink berlaku hingga ${expAt.toLocaleString('id-ID')}` : '';
-    provBox.scrollIntoView({ behavior:'smooth', block:'center' });
+  if (!state.access_token){
+    const local = readLocalSession(msisdn);
+    if (local) state.access_token = local;
   }
 
-  // init
-  loadConfig().catch(()=> showErr('Gagal memuat daftar produk.'));
-})();
+  startLoading();
+  try{
+    const body = { type:'XL', packId, msisdn };
+    if (promo) body.promoCode = promo;
+
+    const r = await fetchJSON(`${API_BASE}/pay/create`, {
+      method: 'POST',
+      body: JSON.stringify(body)
+    });
+
+    if (!r.orderId || !r.paymentUrl){
+      throw new Error('Gagal membuat invoice.');
+    }
+
+    state.orderId = r.orderId;
+
+    if (els.waitingBox) show(els.waitingBox);
+    if (els.resultBox)  hide(els.resultBox);
+    setText(els.orderIdText, r.orderId);
+    setText(els.statusText, 'Menunggu…');
+    if (els.payLink){ els.payLink.href = r.paymentUrl; els.payLink.target = '_blank'; }
+
+    try { window.open(r.paymentUrl, '_blank'); } catch {}
+
+    startPollingStatus();
+  }catch(e){
+    toast(`Gagal membuat invoice: ${e.message}`);
+  }finally{
+    stopLoading();
+  }
+}
+
+/* ============== Polling status ============== */
+function startPollingStatus(){
+  stopPollingStatus();
+  state.pollTimer = setInterval(checkStatus, 3500);
+  checkStatus();
+}
+function stopPollingStatus(){
+  if (state.pollTimer){ clearInterval(state.pollTimer); state.pollTimer = null; }
+}
+
+async function checkStatus(){
+  if (!state.orderId) return;
+  try{
+    const js = await fetchJSON(`${API_BASE}/pay/status?orderId=${encodeURIComponent(state.orderId)}`);
+    const st = (js.status || '').toUpperCase();
+
+    if (els.statusText){
+      els.statusText.className = 'badge ' + (st==='PAID' ? 'bg-success' : (st==='FAILED' ? 'bg-danger' : 'bg-warning text-dark'));
+      setText(els.statusText, st || '-');
+    }
+
+    if (st === 'PAID'){
+      stopPollingStatus();
+      hide(els.waitingBox);
+      show(els.resultBox);
+
+      if (els.resultInfo){
+        if (js.providerResult){
+          setHtml(els.resultInfo, renderProviderResult(js.providerResult));
+        }else{
+          setHtml(els.resultInfo, `<div class="alert alert-info mb-0">Pembayaran diterima. Pesanan sedang diproses. Silakan refresh beberapa saat.</div>`);
+        }
+      }
+    }
+    else if (st === 'FAILED'){
+      stopPollingStatus();
+      toast('Pembayaran gagal atau kedaluwarsa.', 'danger');
+    }
+  }catch(e){
+    console.debug('status error:', e.message);
+  }
+}
+
+function renderProviderResult(pr){
+  try{
+    const obj = (typeof pr === 'string') ? JSON.parse(pr) : pr;
+    const pretty = escapeHtml(JSON.stringify(obj, null, 2));
+    return `
+      <div class="mb-2 fw-bold">Hasil Provider:</div>
+      <pre class="small p-2 rounded" style="background:#0f172a; color:#e2e8f0; overflow:auto; max-height:260px;">${pretty}</pre>
+      <div class="text-muted small">Simpan bukti ini jika diperlukan.</div>
+    `;
+  }catch{
+    return `<pre class="small p-2 rounded" style="background:#0f172a; color:#e2e8f0; overflow:auto; max-height:260px;">${escapeHtml(String(pr||''))}</pre>`;
+  }
+}
+
+/* ============== Event binding ============== */
+function bindEvents(){
+  els.packId?.addEventListener('change', recalcSummary);
+  els.msisdn?.addEventListener('input', recalcSummary);
+  els.promoCode?.addEventListener('input', recalcSummary);
+
+  els.btnSession?.addEventListener('click', (e)=>{ e.preventDefault(); onEnsureSession(); });
+  els.btnVerifyOtp?.addEventListener('click', (e)=>{ e.preventDefault(); onVerifyOtp(); });
+  els.btnPay?.addEventListener('click', (e)=>{ e.preventDefault(); onCreateInvoice(); });
+
+  els.otpInput?.addEventListener('keypress', (e)=>{
+    if (e.key === 'Enter'){ e.preventDefault(); onVerifyOtp(); }
+  });
+}
+
+/* ============== Boot ============== */
+document.addEventListener('DOMContentLoaded', async ()=>{
+  bindEvents();
+  await loadConfig();
+  recalcSummary();
+});
