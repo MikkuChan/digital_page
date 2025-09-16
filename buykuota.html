@@ -32,7 +32,7 @@
     <div class="loading-spinner"></div>
   </div>
 
-  <!-- Navbar -->
+  <!-- Navbar (pakai global css) -->
   <nav class="navbar navbar-expand-lg fixed-top">
     <div class="container">
       <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
@@ -196,11 +196,10 @@
 
                 <div id="resultInfo"></div>
 
-                <div class="mt-3 d-flex gap-2">
-                  <a id="btnDownloadBukti" class="btn btn-outline-secondary btn-sm">Download Bukti</a>
-                  <a id="btnOpenDeeplink" class="btn btn-primary btn-sm" target="_blank" style="display:none;">Buka DANA</a>
-                  <button id="btnShowQRIS" class="btn btn-success btn-sm" style="display:none;">Tampilkan QRIS</button>
-                </div>
+                <!-- Tombol download bukti -->
+                <button id="btnDownload" class="btn btn-outline-secondary w-100 mt-3" style="display:none;">
+                  <i class="bi bi-download me-1"></i> Download Bukti
+                </button>
               </div>
             </div>
           </div>
@@ -209,7 +208,7 @@
     </section>
   </main>
 
-  <!-- Footer -->
+  <!-- Footer (pakai global css) -->
   <footer class="py-4" style="background: var(--gray-900); color: var(--gray-100);">
     <div class="container text-center">
       <div class="mb-2">
@@ -230,23 +229,22 @@
   </footer>
 
   <!-- Modal QRIS -->
-  <div class="modal fade" id="qrisModal" tabindex="-1" aria-hidden="true">
+  <div class="modal fade" id="qrisModal" tabindex="-1" aria-labelledby="qrisModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content" style="border-radius:16px;">
+      <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Bayar via QRIS</h5>
+          <h5 class="modal-title" id="qrisModalLabel">QRIS Pembayaran</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
         </div>
         <div class="modal-body text-center">
-          <div id="qrisCountdown" class="badge bg-warning text-dark mb-3">Sisa waktu: -</div>
-          <img id="qrisImg" alt="QRIS" style="max-width:100%;height:auto;border-radius:12px;border:1px solid #e5e7eb;" />
-          <div class="small text-muted mt-3">
-            Scan / upload QR ini di E-Wallet / mBanking kamu. QR akan kadaluarsa saat waktu habis.
+          <div id="qrisCountdown" class="mb-2 text-muted small"></div>
+          <img id="qrisImage" alt="QRIS" style="max-width:100%;height:auto;border:1px solid #e5e7eb;border-radius:12px;padding:8px;" />
+          <div class="mt-2">
+            <button id="btnCopyQrString" class="btn btn-outline-secondary btn-sm">
+              <i class="bi bi-clipboard"></i> Salin Data QR
+            </button>
           </div>
-        </div>
-        <div class="modal-footer justify-content-between">
-          <a id="btnDownloadQR" class="btn btn-outline-secondary" download="qris.png">Download QR</a>
-          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Tutup</button>
+          <div class="form-text mt-2">Scan / upload QR di e-wallet atau m-banking Anda.</div>
         </div>
       </div>
     </div>
