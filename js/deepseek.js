@@ -1,5 +1,5 @@
-// --- Konfigurasi Endpoint Proxy Worker (ganti dengan Worker-mu jika perlu)
-const API_DEEPSEEK = "https://api.fadzdigital.dpdns.org/deepseek";
+// --- Konfigurasi Endpoint
+const API_DEEPSEEK = "https://api.ryzumi.vip/api/ai/deepseek";
 
 // --- Unique ID Generator
 function randomSessionId() {
