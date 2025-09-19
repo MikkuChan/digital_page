@@ -1,5 +1,5 @@
-// --- Konfigurasi Endpoint Proxy Worker (ganti jika endpoint Worker-mu beda)
-const API_CHATGPT = "https://api.fadzdigital.store/chatgpt";
+// --- Konfigurasi Endpoint
+const API_CHATGPT = "https://api.ryzumi.vip/api/ai/chatgpt";
 
 // --- Unique ID Generator
 function randomSessionId() {
