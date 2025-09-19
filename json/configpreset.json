@@ -191,6 +191,45 @@
         "server": { "type": "ubah", "value": "104.17.3.81" },
         "servername": { "type": "tetap", "value": "" },
         "host": { "type": "tetap", "value": "" }
+      },
+      {
+        "label": "Conference WC",
+        "value": "conference_wc",
+        "server": { "type": "ubah", "value": "support.zoom.us" },
+        "servername": { "type": "menambah", "value": "support.zoom.us" },
+        "host": { "type": "menambah", "value": "support.zoom.us" }
+      },
+       {
+        "label": "Biz Starter (WC-1)",
+        "value": "biz_wc1",
+        "server": {
+          "type": "ubah",
+          "value": "ava.game.naver.com"
+        },
+        "servername": {
+          "type": "menambah",
+          "value": "ava.game.naver.com"
+        },
+        "host": {
+          "type": "menambah",
+          "value": "ava.game.naver.com"
+        }
+      },
+      {
+        "label": "Biz Starter (WC-2)",
+        "value": "biz_wc2",
+        "server": {
+          "type": "ubah",
+          "value": "support.zoom.us"
+        },
+        "servername": {
+          "type": "menambah",
+          "value": "support.zoom.us"
+        },
+        "host": {
+          "type": "menambah",
+          "value": "support.zoom.us"
+        }
       }
     ]
   },
