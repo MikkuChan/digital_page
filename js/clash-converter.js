@@ -461,13 +461,39 @@ function buildYaml(proxies, useAnchor = true, onlyProxies = false, templateType 
     return window.jsyaml.dump(configObj, { noRefs: !useAnchor });
   }
 
-  // >>>> Template fadzWRT Provider
-  if (templateType === "fadzwrt-provider") {
-    const obj = JSON.parse(JSON.stringify(fadzProviderTemplate));
-    if (proxies && proxies.length) obj.proxies = proxies;
-    return window.jsyaml.dump(obj, { noRefs: !useAnchor });
+  // >>>> Template builder biz starter/lite
+if (templateType === "fadzwrt-provider") {
+  const obj = JSON.parse(JSON.stringify(fadzProviderTemplate));
+
+  // 1) Tempel proxies manual (kalau ada)
+  if (proxies && proxies.length) obj.proxies = proxies;
+
+  // 2) Ambil nama-nama proxy yg dipaste
+  const names = (proxies || []).map(p => p.name).filter(Boolean);
+
+  // Helper dedup
+  const uniq = (arr) => [...new Set(arr.filter(Boolean))];
+
+  // 3) Inject ke tiap group
+  const auto = (obj["proxy-groups"] || []).find(g => g.name === "🚀 fadzWRT • Auto");
+  if (auto) {
+    // url-test boleh punya 'use' dan 'proxies' sekaligus
+    auto.proxies = uniq([...(auto.proxies || []), ...names]);
   }
-  // <<<<
+
+  const manual = (obj["proxy-groups"] || []).find(g => g.name === "🎛 fadzWRT • Manual");
+  if (manual) {
+    manual.proxies = uniq([...(manual.proxies || []), ...names, "🚀 fadzWRT • Auto", "DIRECT"]);
+  }
+
+  const proxySel = (obj["proxy-groups"] || []).find(g => g.name === "🌍 fadzWRT • Proxy");
+  if (proxySel) {
+    proxySel.proxies = uniq([...(proxySel.proxies || []), "🚀 fadzWRT • Auto", "🎛 fadzWRT • Manual", ...names]);
+  }
+
+  return window.jsyaml.dump(obj, { noRefs: !useAnchor });
+}
+// <<<<
 
   // Default minimalis
   const configObj = {
