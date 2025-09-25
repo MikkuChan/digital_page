@@ -342,12 +342,107 @@ const fakeIpTemplate = {
       "localhost.ptlogin2.qq.com","localhost.sec.qq.com","+.srv.nintendo.net","+.stun.playstation.net",
       "xbox.*.microsoft.com","xnotify.xboxlive.com","+.battlenet.com.cn","+.wotgame.cn","+.wggames.cn",
       "+.wowsgame.cn","+.wargaming.net","proxy.golang.org","stun.*.*","stun.*.*.*","+.stun.*.*","+.stun.*.*.*",
-      "+.stun.*.*.*.*","heartbeat.belkin.com","*.linksys.com","*.linksyssmartwifi.com","*.router.asus.com",
+      "+.stun.*.*.*","heartbeat.belkin.com","*.linksys.com","*.linksyssmartwifi.com","*.router.asus.com",
       "mesu.apple.com","swscan.apple.com","swquery.apple.com","swdownload.apple.com","swcdn.apple.com",
       "swdist.apple.com","lens.l.google.com","stun.l.google.com","+.nflxvideo.net","*.square-enix.com",
       "*.finalfantasyxiv.com","*.ffxiv.com","*.mcdn.bilivideo.cn","+.media.dssott.com"
     ]
   }
+};
+
+// ----------- TEMPLATE BIZ STARTER/TAYO/LITE (REDIR-HOST) -----------
+const fadzProviderTemplate = {
+  port: 7890,
+  "socks-port": 7891,
+  "redir-port": 7892,
+  mode: "rule",
+  "allow-lan": true,
+  "external-controller": "0.0.0.0:9090",
+  secret: "",
+  "bind-address": "*",
+  "external-ui": "/usr/share/openclash/ui",
+  "external-ui-name": "metacubexd",
+  "log-level": "info",
+  ipv6: false,
+  "unified-delay": true,
+
+  dns: {
+    enable: true,
+    listen: "0.0.0.0:7874",
+    ipv6: false,
+    "enhanced-mode": "redir-host",
+    "proxy-server-nameserver": [
+      "112.215.198.254",
+      "112.215.198.248",
+      "https://1.1.1.1/dns-query",
+      "https://dns.google/dns-query"
+    ],
+    nameserver: [
+      "112.215.198.254",
+      "112.215.198.248",
+      "tls://1.1.1.1",
+      "tls://dns.google",
+      "https://dns.adguard.com/dns-query"
+    ],
+    fallback: [
+      "https://1.0.0.1/dns-query",
+      "https://9.9.9.9/dns-query"
+    ]
+  },
+
+  proxies: [],
+
+  "proxy-providers": {
+    "fadzWRT-Subs": {
+      type: "http",
+      url: "<<<MASUKKAN_URL_SUBSCRIPTION_JIKA_ADA>>>",
+      interval: 3600,
+      path: "./proxy_provider/fadzWRT-subscription.yaml",
+      "health-check": {
+        enable: true,
+        url: "http://www.gstatic.com/generate_204",
+        interval: 600
+      },
+      override: {
+        "skip-cert-verify": true,
+        udp: true
+      }
+    }
+  },
+
+  "proxy-groups": [
+    {
+      name: "🚀 fadzWRT • Auto",
+      type: "url-test",
+      use: ["fadzWRT-Subs"],
+      url: "http://www.gstatic.com/generate_204",
+      interval: 180,
+      tolerance: 50
+    },
+    {
+      name: "🎛 fadzWRT • Manual",
+      type: "select",
+      use: ["fadzWRT-Subs"],
+      proxies: ["🚀 fadzWRT • Auto", "DIRECT"]
+    },
+    {
+      name: "🌍 fadzWRT • Proxy",
+      type: "select",
+      proxies: ["🚀 fadzWRT • Auto", "🎛 fadzWRT • Manual"]
+    }
+  ],
+
+  rules: [
+    "DOMAIN-SUFFIX,local,DIRECT",
+    "IP-CIDR,127.0.0.0/8,DIRECT,no-resolve",
+    "IP-CIDR,10.0.0.0/8,DIRECT,no-resolve",
+    "IP-CIDR,172.16.0.0/12,DIRECT,no-resolve",
+    "IP-CIDR,192.168.0.0/16,DIRECT,no-resolve",
+    "IP-CIDR,100.64.0.0/10,DIRECT,no-resolve",
+    "IP-CIDR,224.0.0.0/4,DIRECT,no-resolve",
+    "GEOIP,CN,DIRECT",
+    "MATCH,🌍 fadzWRT • Proxy"
+  ]
 };
 
 // ----------- YAML BUILDER -----------
@@ -365,6 +460,15 @@ function buildYaml(proxies, useAnchor = true, onlyProxies = false, templateType 
     };
     return window.jsyaml.dump(configObj, { noRefs: !useAnchor });
   }
+
+  // >>>> Template fadzWRT Provider
+  if (templateType === "fadzwrt-provider") {
+    const obj = JSON.parse(JSON.stringify(fadzProviderTemplate));
+    if (proxies && proxies.length) obj.proxies = proxies;
+    return window.jsyaml.dump(obj, { noRefs: !useAnchor });
+  }
+  // <<<<
+
   // Default minimalis
   const configObj = {
     ...baseTemplate,
@@ -453,6 +557,7 @@ convertForm.addEventListener('submit', function(e) {
       let tempLabel = "Default";
       if (templateType === "redirhost") tempLabel = "Redir-host + Rules";
       if (templateType === "fakeip") tempLabel = "Fake-IP + Rules";
+      if (templateType === "fadzwrt-provider") tempLabel = "fadzWRT • Redir-Host (Provider)"; // <-- baru
       badge.textContent = (justProxies ? "proxies: saja" : tempLabel) + (justProxies ? "" : (useAnchor ? " / Anchor" : " / No Anchor"));
       badge.className = "badge ms-2 " + (
         justProxies ? "bg-warning text-dark" : useAnchor ? "bg-success" : "bg-danger"
