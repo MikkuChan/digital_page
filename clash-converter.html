@@ -102,6 +102,8 @@
                   <option value="default" selected>Default</option>
                   <option value="redirhost">Redir-Host + Rules</option>
                   <option value="fakeip">Fake-IP + Rules</option>
+                  <!-- Tambahan baru: biz starter/tayo/lite -->
+                  <option value="fadzwrt-provider">Biz Starter/Lite</option>
                 </select>
               </div>
 
@@ -179,7 +181,7 @@
                 </div>
               </div>
             </div>
-          </div>
+          </div> <!-- /.clash-converter-card -->
         </div>
       </div>
     </section>
@@ -204,20 +206,24 @@
     </div>
   </footer>
 
+  <!-- JS deps -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
+
+  <!-- App JS -->
   <script src="js/main.js"></script>
   <script src="js/clash-converter.js"></script>
+
   <script>
-    // Overlay loading saat halaman dibuka
-window.addEventListener('load', function () {
-  setTimeout(function () {
-    document.getElementById('loadingOverlay').style.opacity = '0';
+  // Overlay loading saat halaman dibuka
+  window.addEventListener('load', function () {
     setTimeout(function () {
-      document.getElementById('loadingOverlay').style.display = 'none';
-    }, 600); // Waktu transisi hilang overlay
-  }, 400); // Lama tampil overlay loading
-});
+      document.getElementById('loadingOverlay').style.opacity = '0';
+      setTimeout(function () {
+        document.getElementById('loadingOverlay').style.display = 'none';
+      }, 600); // Waktu transisi hilang overlay
+    }, 400); // Lama tampil overlay loading
+  });
   </script>
 </body>
 </html>
