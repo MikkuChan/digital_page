@@ -220,15 +220,15 @@
         "value": "biz_wc2",
         "server": {
           "type": "ubah",
-          "value": "support.zoom.us"
+          "value": "104.18.213.235"
         },
         "servername": {
           "type": "menambah",
-          "value": "support.zoom.us"
+          "value": "ava.game.naver.com"
         },
         "host": {
           "type": "menambah",
-          "value": "support.zoom.us"
+          "value": "ava.game.naver.com"
         }
       }
     ]
