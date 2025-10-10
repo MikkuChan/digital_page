@@ -395,7 +395,7 @@ const fadzProviderTemplate = {
   "proxy-providers": {
     "fadzWRT-Subs": {
       type: "http",
-      url: "<<<MASUKKAN_URL_SUBSCRIPTION_JIKA_ADA>>>",
+      url: "https://url-subs.akunjikapunya.com",
       interval: 3600,
       path: "./proxy_provider/fadzWRT-subscription.yaml",
       "health-check": {
