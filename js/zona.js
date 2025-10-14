@@ -179,6 +179,10 @@ async function loadAll() {
   renderTable(rows);
 }
 
+if (window.AOS && typeof AOS.init === 'function') {
+  AOS.init({ once: true, duration: 600, easing: 'ease-out' });
+}
+
 // ---- Events ----
 document.addEventListener("DOMContentLoaded", () => {
   // Init load
