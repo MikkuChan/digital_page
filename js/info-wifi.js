@@ -1,97 +1,77 @@
-// ====== KONFIG WIFI (EDIT DI SINI) ======
+// ====== KONFIG WIFI (EDIT DI SINI SAJA) ======
 const WIFI_24 = { ssid: "warkop",    pass: "0199e474-92d5-7eeb-e945-698bc762fde5", security: "WPA" };
 const WIFI_5G = { ssid: "warkop_5G", pass: "0199e474-92d5-7eeb-e945-698bc762fde5", security: "WPA" };
 
-// ====== HELPERS ======
+// ====== UTIL ======
 const $  = (s, el=document) => el.querySelector(s);
 const $$ = (s, el=document) => Array.from(el.querySelectorAll(s));
-
-function wifiQRString({ssid, pass, security="WPA", hidden=false}){
-  // Format standar: WIFI:T:WPA;S:MySSID;P:mypassword;H:false;;
-  const esc = (v)=> String(v).replace(/([\\;,:"])/g,"\\$1");
-  return `WIFI:T:${security};S:${esc(ssid)};P:${esc(pass)};H:${hidden?'true':'false'};;`;
-}
-
-function drawQR(canvasId, text){
-  if (!window.QRCode) return; // lib belum kebaca
-  const canvas = document.getElementById(canvasId);
-  if (!canvas) return;
-  QRCode.toCanvas(canvas, text, {
-    margin: 1,
-    width: 220,
-    errorCorrectionLevel: "M"
-  }, (err)=>{ if (err) console.error(err); });
-}
+const esc = v => String(v).replace(/([\\;,:"])/g,"\\$1");
+const wifiString = ({ssid, pass, security="WPA", hidden=false}) =>
+  `WIFI:T:${security};S:${esc(ssid)};P:${esc(pass)};H:${hidden?'true':'false'};;`;
 
 function copyText(text){
-  navigator.clipboard.writeText(text).then(()=>{
-    const toastEl = $("#copyToast");
-    if (toastEl) new bootstrap.Toast(toastEl, { delay: 1200 }).show();
-  });
+  navigator.clipboard.writeText(text).catch(()=>{});
+}
+
+function drawQR(canvasId, imgId, text){
+  const canvas = document.getElementById(canvasId);
+  const img = document.getElementById(imgId);
+  // Jika library qrcode tersedia, pakai canvas; kalau tidak, fallback img API
+  if (window.QRCode && canvas){
+    QRCode.toCanvas(canvas, text, { margin:1, width:220, errorCorrectionLevel:"M" }, ()=>{});
+  } else if (img){
+    const url = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(text)}`;
+    img.src = url;
+    img.classList.remove("d-none");
+    if (canvas) canvas.classList.add("d-none");
+  }
 }
 
 function toggleEye(btn){
-  const targetId = btn.getAttribute("data-target");
-  const input = document.getElementById(targetId);
+  const id = btn.getAttribute("data-target");
+  const input = document.getElementById(id);
   if (!input) return;
-  const isPwd = input.getAttribute("type")==="password";
-  input.setAttribute("type", isPwd ? "text" : "password");
+  const isPwd = input.type === "password";
+  input.type = isPwd ? "text" : "password";
   btn.innerHTML = `<i class="bi ${isPwd ? 'bi-eye-slash' : 'bi-eye'}"></i>`;
 }
 
-// ====== INIT ======
+// ====== INIT (scoped ke #wifiPage supaya aman) ======
 document.addEventListener("DOMContentLoaded", ()=>{
-  // Isi SSID & Password ke UI
-  $("#ssid24").textContent = WIFI_24.ssid;
-  $("#pass24").value       = WIFI_24.pass;
-  $("#ssid5").textContent  = WIFI_5G.ssid;
-  $("#pass5").value        = WIFI_5G.pass;
+  const root = document.getElementById("wifiPage");
+  if (!root) return; // halaman lain, skip
 
-  // Generate QR
-  drawQR("qr24", wifiQRString(WIFI_24));
-  drawQR("qr5",  wifiQRString(WIFI_5G));
+  // isi data
+  $("#ssid24", root).textContent = WIFI_24.ssid;
+  $("#pass24", root).value       = WIFI_24.pass;
+  $("#ssid5",  root).textContent = WIFI_5G.ssid;
+  $("#pass5",  root).value       = WIFI_5G.pass;
 
-  // Toggle eye
-  $$(".toggle-eye").forEach(btn => btn.addEventListener("click", ()=>toggleEye(btn)));
+  // QR
+  drawQR("qr24", "qr24img", wifiString(WIFI_24));
+  drawQR("qr5",  "qr5img",  wifiString(WIFI_5G));
 
-  // Copy per input
-  $$(".copy-btn").forEach(btn => {
+  // eye/copy
+  $$(".wifi-toggle", root).forEach(btn => btn.addEventListener("click", ()=>toggleEye(btn)));
+  $$(".wifi-copy", root).forEach(btn => {
     btn.addEventListener("click", ()=>{
-      const src = btn.getAttribute("data-copy");
-      const el = document.getElementById(src);
+      const id = btn.getAttribute("data-src");
+      const el = document.getElementById(id);
       if (el) copyText(el.value);
     });
   });
-  $$(".copy-ssid").forEach(btn=>{
+  $$(".wifi-copy-text", root).forEach(btn=>{
     btn.addEventListener("click", ()=>{
-      const id = btn.getAttribute("data-src");
+      const id = btn.getAttribute("data-text-src");
       const el = document.getElementById(id);
       if (el) copyText(el.textContent);
     });
   });
-  $$(".copy-pass").forEach(btn=>{
-    btn.addEventListener("click", ()=>{
-      const id = btn.getAttribute("data-src");
-      const el = document.getElementById(id);
-      if (el) copyText(el.value);
-    });
-  });
-
-  // Copy semua
-  $("#copyAll").addEventListener("click", ()=>{
-    const lines = [
-      `Wi-Fi 2.4G: ${WIFI_24.ssid} | Pass: ${WIFI_24.pass}`,
-      `Wi-Fi 5G  : ${WIFI_5G.ssid} | Pass: ${WIFI_5G.pass}`
-    ].join("\n");
-    copyText(lines);
-  });
-
-  // Print kartu
-  $("#printCards").addEventListener("click", ()=> window.print());
 
   // QRIS actions
-  const qrisImg = $("#qrisImg");
-  const dl = $("#downloadQris");
+  const qrisImg = $("#qrisImg", root);
+  const dl = $("#downloadQris", root);
   if (qrisImg && dl) dl.href = qrisImg.getAttribute("src");
-  $("#printQris").addEventListener("click", ()=> window.print());
+  const printBtn = $("#printQris", root);
+  if (printBtn) printBtn.addEventListener("click", ()=> window.print());
 });
