@@ -1,11 +1,18 @@
-// js/zona.js — versi "lengkap seluruh kab/kota" (auto fetch)
+/**
+ * js/zona.js — versi lengkap (auto-fetch seluruh provinsi & kab/kota)
+ * - Sumber data utama: API wilayah Indonesia (JSON statis)
+ * - Fallback: /data/provinces.json & /data/regencies/<id>.json (jika kamu host lokal)
+ * - Last-resort: seed minimal agar halaman tetap hidup meski offline total
+ */
+
 const WILDCARD_BARAT = "ava.game.naver.com";
 const IP_TIMUR = ["104.18.213.235", "104.18.214.235"];
 
-// Sumber data wilayah (statis, CORS-ready, cepat)
-const API_BASE = "https://www.emsifa.com/api-wilayah-indonesia/api"; // provinsi, kab/kota, dst. :contentReference[oaicite:0]{index=0}
+// Sumber data (utama & fallback)
+const API_MAIN = "https://www.emsifa.com/api-wilayah-indonesia/api";
+const API_LOCAL = "/data"; // siapkan jika mau offline penuh: /data/provinces.json & /data/regencies/<id>.json
 
-// Mapping ZONA per provinsi (nama persis sesuai API)
+// Mapping ZONA per provinsi (38 provinsi) — ubah di sini jika ada pengecualian
 const PROVINCE_ZONE = {
   // BARAT
   "Aceh": "barat",
@@ -49,32 +56,23 @@ const PROVINCE_ZONE = {
   "Papua Selatan": "timur"
 };
 
-// Helpers
+// ---- Helpers DOM
 const $ = (s, el=document) => el.querySelector(s);
 const $$ = (s, el=document) => Array.from(el.querySelectorAll(s));
 
-const STATE = {
-  rows: [],     // [{prov, zone, cities:[...], bug}]
-  filtered: []
-};
+const STATE = { rows: [], filtered: [] };
 
-function zoneBug(zone) {
-  if (zone === "barat") return WILDCARD_BARAT;
-  return IP_TIMUR.join(", ");
-}
-
+function zoneBug(zone) { return zone === "barat" ? WILDCARD_BARAT : IP_TIMUR.join(", "); }
 function zoneBadge(zone) {
-  return zone === "barat"
-    ? `<span class="badge-zone badge-barat">Barat</span>`
-    : `<span class="badge-zone badge-timur">Timur</span>`;
+  return zone === "barat" ? `<span class="badge-zone badge-barat">Barat</span>` : `<span class="badge-zone badge-timur">Timur</span>`;
 }
-
 function bugDisplay(zone) {
   return zone === "barat"
     ? `<span class="copy-badge">${WILDCARD_BARAT}</span>`
     : `<span class="copy-badge">${IP_TIMUR[0]}</span> <span class="copy-badge">•</span> <span class="copy-badge">${IP_TIMUR[1]}</span>`;
 }
 
+// ---- Render
 function renderTable(data) {
   const tbody = $("#zonaTableBody");
   const empty = $("#emptyState");
@@ -83,10 +81,7 @@ function renderTable(data) {
   data.forEach(item => {
     const tr = document.createElement("tr");
     tr.setAttribute("data-zone", item.zone);
-
-    const cityChips = item.cities
-      .map(c => `<span class="city-chip"><i class="bi bi-geo-alt"></i>${c.name}</span>`)
-      .join(" ");
+    const cityChips = item.cities.map(c => `<span class="city-chip"><i class="bi bi-geo-alt"></i>${c.name}</span>`).join(" ");
 
     tr.innerHTML = `
       <td class="fw-semibold">${item.prov}</td>
@@ -119,74 +114,100 @@ function renderTable(data) {
 }
 
 function applyFilter() {
-  const query = $("#searchInput").value.trim().toLowerCase();
+  const q = $("#searchInput").value.trim().toLowerCase();
   const active = $(".btn-tab.active")?.getAttribute("data-filter") || "all";
 
   STATE.filtered = STATE.rows.filter(row => {
     const zoneOk = active === "all" ? true : row.zone === active;
     if (!zoneOk) return false;
-
-    if (!query) return true;
-
-    const provOk  = row.prov.toLowerCase().includes(query);
-    const kotaOk  = row.cities.some(c => c.name.toLowerCase().includes(query));
-    return provOk || kotaOk;
+    if (!q) return true;
+    return row.prov.toLowerCase().includes(q) || row.cities.some(c => c.name.toLowerCase().includes(q));
   });
 
   renderTable(STATE.filtered);
 }
-
 function setActiveTab(btn) {
   $$(".btn-tab").forEach(b => b.classList.remove("active"));
   btn.classList.add("active");
   applyFilter();
 }
 
-// --- Loader: ambil semua provinsi lalu semua kab/kota ---
+// ---- Data Loader (dengan fallback)
+async function fetchJSON(url) {
+  const r = await fetch(url, { cache: "no-cache" });
+  if (!r.ok) throw new Error(`HTTP ${r.status} on ${url}`);
+  return r.json();
+}
+
+async function loadProvinces() {
+  // coba sumber utama
+  try { return await fetchJSON(`${API_MAIN}/provinces.json`); }
+  catch { /* fallback lokal */ }
+  try { return await fetchJSON(`${API_LOCAL}/provinces.json`); }
+  catch {
+    // seed minimal (last resort) — biar halaman gak blank
+    return [
+      { id: "11", name: "Aceh" },
+      { id: "31", name: "DKI Jakarta" },
+      { id: "32", name: "Jawa Barat" },
+      { id: "33", name: "Jawa Tengah" },
+      { id: "35", name: "Jawa Timur" },
+      { id: "51", name: "Bali" },
+    ];
+  }
+}
+
+async function loadRegencies(provId) {
+  // utama
+  try { return await fetchJSON(`${API_MAIN}/regencies/${provId}.json`); }
+  catch { /* fallback lokal */ }
+  try { return await fetchJSON(`${API_LOCAL}/regencies/${provId}.json`); }
+  catch {
+    // minimal fallback per beberapa provinsi umum
+    const seed = {
+      "11": [ {id:"1101", name:"Kota Banda Aceh"}, {id:"1102", name:"Kota Lhokseumawe"} ],
+      "31": [ {id:"3171", name:"Jakarta Pusat"}, {id:"3172", name:"Jakarta Selatan"}, {id:"3173", name:"Jakarta Barat"}, {id:"3174", name:"Jakarta Timur"}, {id:"3175", name:"Jakarta Utara"} ],
+      "32": [ {id:"3273", name:"Kota Bekasi"}, {id:"3279", name:"Kota Depok"}, {id:"3277", name:"Kota Cimahi"}, {id:"3275", name:"Kota Bogor"} ],
+      "33": [ {id:"3374", name:"Kota Semarang"}, {id:"3372", name:"Kota Surakarta"}, {id:"3301", name:"Kab. Cilacap"} ],
+      "35": [ {id:"3578", name:"Kota Surabaya"}, {id:"3573", name:"Kota Malang"}, {id:"3515", name:"Kab. Sidoarjo"} ],
+      "51": [ {id:"5171", name:"Kota Denpasar"}, {id:"5103", name:"Kab. Badung"} ],
+    };
+    return seed[provId] || [];
+  }
+}
+
 async function loadAll() {
-  // Skeleton loading
   $("#zonaTableBody").innerHTML = `
     <tr><td colspan="5" class="text-center py-5 text-muted">
       <div class="spinner-border me-2" role="status" aria-hidden="true"></div>
-      Memuat data provinsi & kota/kab seluruh Indonesia…
+      Memuat data provinsi & kab/kota seluruh Indonesia…
     </td></tr>
   `;
 
-  const provs = await fetch(`${API_BASE}/provinces.json`).then(r => r.json()); // [{id, name}] :contentReference[oaicite:1]{index=1}
-
-  // Fetch paralel kab/kota per provinsi
-  const rows = await Promise.all(provs.map(async (p) => {
-    const zone = PROVINCE_ZONE[p.name] || "timur"; // default timur jika belum terpetakan
-    const cities = await fetch(`${API_BASE}/regencies/${p.id}.json`).then(r => r.json()); // [{id, province_id, name}] :contentReference[oaicite:2]{index=2}
-    // Sort alfabetis biar rapi
+  const provs = await loadProvinces(); // [{id,name}]
+  const rows = await Promise.all(provs.map(async p => {
+    const zone = PROVINCE_ZONE[p.name] || "timur";
+    const cities = await loadRegencies(p.id); // [{id,name}]
     cities.sort((a,b) => a.name.localeCompare(b.name, "id"));
-    return {
-      prov: p.name,
-      zone,
-      bug: zoneBug(zone),
-      cities: cities.map(c => ({ id: c.id, name: c.name }))
-    };
+    return { prov: p.name, zone, bug: zoneBug(zone), cities: cities.map(c => ({id:c.id, name:c.name})) };
   }));
 
-  // Urutkan provinsi: barat dulu lalu timur, lalu alfabet
-  rows.sort((a,b) => {
-    if (a.zone !== b.zone) return a.zone === "barat" ? -1 : 1;
-    return a.prov.localeCompare(b.prov, "id");
-  });
+  // urutkan: barat dulu, baru timur; lalu alfabet
+  rows.sort((a,b) => (a.zone === b.zone ? a.prov.localeCompare(b.prov, "id") : (a.zone === "barat" ? -1 : 1)));
 
   STATE.rows = rows;
   STATE.filtered = rows;
   renderTable(rows);
 }
 
-// ---- Events ----
+// ---- Events
 document.addEventListener("DOMContentLoaded", () => {
   // Init load
   loadAll().catch(err => {
     console.error(err);
     $("#zonaTableBody").innerHTML = `
       <tr><td colspan="5" class="text-center py-5 text-danger">
-        Gagal memuat data wilayah. Coba refresh (Ctrl/Cmd+R).
+        Gagal memuat data wilayah. Coba refresh (Ctrl/Cmd+R) atau siapkan data lokal di <code>/data</code>.
       </td></tr>
     `;
   });
@@ -198,18 +219,9 @@ document.addEventListener("DOMContentLoaded", () => {
   $$(".btn-tab").forEach(btn => btn.addEventListener("click", () => setActiveTab(btn)));
 
   // Reset
-  $("#btnReset").addEventListener("click", () => {
-    $("#searchInput").value = "";
-    setActiveTab($('[data-filter="all"]'));
-  });
+  $("#btnReset").addEventListener("click", () => { $("#searchInput").value=""; setActiveTab($('[data-filter="all"]')); });
   const btnResetEmpty = $("#btnResetEmpty");
-  if (btnResetEmpty) {
-    btnResetEmpty.addEventListener("click", () => {
-      $("#searchInput").value = "";
-      setActiveTab($('[data-filter="all"]'));
-      window.scrollTo({ top: document.querySelector('.zona-toolbar')?.offsetTop || 0, behavior: 'smooth' });
-    });
-  }
+  if (btnResetEmpty) btnResetEmpty.addEventListener("click", () => { $("#searchInput").value=""; setActiveTab($('[data-filter="all"]')); });
 
   // Delegation: copy & ping
   document.body.addEventListener("click", (e) => {
@@ -217,14 +229,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (copyBtn) {
       const val = copyBtn.getAttribute("data-copy");
       navigator.clipboard.writeText(val).then(() => {
-        // pakai toast kalau ada (zona.html revamp include toast)
         const toastEl = $("#copyToast");
         if (toastEl) new bootstrap.Toast(toastEl, { delay: 1200 }).show();
-        else {
-          const orig = copyBtn.innerHTML;
-          copyBtn.innerHTML = `<i class="bi bi-check2-circle"></i> Tersalin!`;
-          setTimeout(() => (copyBtn.innerHTML = orig), 1200);
-        }
       });
     }
 
@@ -232,9 +238,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (pingBtn) {
       const zone = pingBtn.getAttribute("data-zone");
       if (zone === "barat") {
-        alert(`Tips Ping (Zona Barat):\n1) Buka Command Prompt/Terminal\n2) Jalankan: ping ${WILDCARD_BARAT}\n3) Pilih latensi paling kecil (ms).`);
+        alert(`Tips Ping (Zona Barat):\n1) Buka Terminal/Command Prompt\n2) Jalankan: ping ${WILDCARD_BARAT}\n3) Pilih latensi paling kecil (ms).`);
       } else {
-        alert(`Tips Ping (Zona Timur):\n1) Buka Command Prompt/Terminal\n2) Jalankan:\n   ping ${IP_TIMUR[0]}\n   ping ${IP_TIMUR[1]}\n3) Pilih latensi paling kecil (ms).`);
+        alert(`Tips Ping (Zona Timur):\n1) Buka Terminal/Command Prompt\n2) Jalankan:\n   ping ${IP_TIMUR[0]}\n   ping ${IP_TIMUR[1]}\n3) Pilih latensi paling kecil (ms).`);
       }
     }
   });
