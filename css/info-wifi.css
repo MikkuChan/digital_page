@@ -1,0 +1,58 @@
+:root {
+  --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body { font-family: var(--font-primary); background:#f6f8fb; min-height:100vh; }
+
+/* hero */
+.wifi-hero { background: linear-gradient(180deg,#f9fafb 60%,rgba(224,242,254,.6) 100%); }
+.badge-tools {
+  background: linear-gradient(100deg,#2563eb 60%,#10b981 120%);
+  color:#fff; border-radius:999px; font-weight:700; display:inline-flex; align-items:center; gap:.5rem;
+  box-shadow:0 6px 22px rgba(59,130,246,.14);
+}
+.hero-decor { position:absolute; border-radius:999px; filter:blur(42px); opacity:.25; pointer-events:none; }
+.hero-decor-1 { width:260px;height:260px;background:#60a5fa; top:-60px; left:-60px;}
+.hero-decor-2 { width:300px;height:300px;background:#34d399; bottom:-90px; right:-80px;}
+
+/* toolbar */
+.wifi-toolbar { position:sticky; top:70px; background:rgba(255,255,255,.84); backdrop-filter:saturate(180%) blur(8px); border-bottom:1px solid rgba(2,6,23,.06); z-index:100; }
+.btn-soft { border-radius:999px; padding:.5rem .9rem; background:rgba(108,117,125,.07); border:1px solid rgba(108,117,125,.2); font-weight:600; }
+
+/* grid */
+.wifi-grid {
+  display:grid;
+  grid-template-columns: repeat(3,minmax(0,1fr));
+  gap:16px;
+}
+@media (max-width:1200px){ .wifi-grid{ grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@media (max-width:640px){ .wifi-grid{ grid-template-columns: 1fr; } }
+
+/* cards */
+.wifi-card, .qris-card {
+  background:#fff; border:1px solid #e6e9ef; border-radius:16px; padding:16px;
+  display:flex; flex-direction:column; gap:12px; min-height:220px;
+  transition: box-shadow .18s ease, transform .18s ease;
+}
+.wifi-card:hover, .qris-card:hover { box-shadow:0 16px 36px rgba(2,6,23,.08); transform: translateY(-2px); }
+
+.card-head { display:flex; align-items:start; justify-content:space-between; gap:12px; }
+.wifi-band { font-size:.84rem; font-weight:800; letter-spacing:.04em; color:#64748b; text-transform:uppercase; }
+.ssid { font-weight:900; letter-spacing:.01em; color:#111827; margin:0; }
+
+.qr-wrap { display:grid; place-items:center; padding:8px; border:1px dashed #e6e9ef; border-radius:12px; background:#fafbff; }
+.qris-image { display:grid; place-items:center; border:1px dashed #e6e9ef; border-radius:12px; background:#fff; padding:10px; }
+.qris-image img { width:100%; max-width:320px; height:auto; border-radius:10px; }
+
+.field .input-group .form-control-lg { font-family:'JetBrains Mono','Courier New',monospace; }
+.btn-row { display:flex; gap:8px; margin-top:8px; }
+.toggle-eye i { pointer-events:none; }
+
+/* print */
+@media print {
+  body { background:#fff; }
+  nav, .wifi-toolbar, footer, .note { display:none !important; }
+  .wifi-grid { grid-template-columns: repeat(2,1fr) !important; gap:14px; }
+  .wifi-card, .qris-card { border:1px solid #000; }
+}
