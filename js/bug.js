@@ -96,7 +96,6 @@ const $ = (s, el=document) => el.querySelector(s);
 const $$ = (s, el=document) => Array.from(el.querySelectorAll(s));
 
 function toYAML(node){
-  // generate YAML exactly like requested
   const lines = [
     `- name: ${node.name}`,
     `  server: ${node.server}`,
@@ -114,58 +113,47 @@ function toYAML(node){
   ];
   return lines.join("\n");
 }
-
-function listToYAML(list){
-  return list.map(toYAML).join("\n\n");
-}
-
-function zoneBadges(zones){
+const listToYAML = list => list.map(toYAML).join("\n\n");
+const zoneBadges = zones => {
   const hasBarat = zones.includes("barat");
   const hasTimur = zones.includes("timur");
   let html = "";
   if (hasBarat) html += `<span class="badge-zone badge-barat">Barat</span>`;
   if (hasTimur) html += ` <span class="badge-zone badge-timur">Timur</span>`;
   return html;
-}
+};
 
 function createCard(node){
-  const col = document.createElement("div");
-  col.className = "col-12 col-md-6 col-lg-4";
-  col.innerHTML = `
-    <div class="bug-card h-100 d-flex flex-column">
-      <div class="d-flex align-items-start justify-content-between">
-        <div>
-          <div class="bug-title">${node.name}</div>
-          <div class="mt-1">${zoneBadges(node.zones)}</div>
-        </div>
-        <span class="badge rounded-pill text-bg-light border fw-semibold">${node.group}</span>
+  const card = document.createElement("article");
+  card.className = "bug-card";
+  card.innerHTML = `
+    <div class="d-flex align-items-start justify-content-between">
+      <div>
+        <div class="bug-title">${node.name}</div>
+        <div class="mt-1">${zoneBadges(node.zones)}</div>
       </div>
+      <span class="badge rounded-pill text-bg-light border fw-semibold">${node.group}</span>
+    </div>
 
-      <div class="meta-list mt-3">
-        <div class="meta-item"><i class="bi bi-hdd-network"></i> Server: <code>${node.server}</code></div>
-        <div class="meta-item"><i class="bi bi-shield-lock"></i> SNI: <code>${node.sni}</code></div>
-        <div class="meta-item"><i class="bi bi-diagram-3"></i> Host: <code>${node.host}</code></div>
-        <div class="meta-item"><i class="bi bi-slash-square"></i> Path: <code>${node.path}</code></div>
-      </div>
+    <div class="meta-list">
+      <div class="meta-item"><i class="bi bi-hdd-network"></i> Server: <code>${node.server}</code></div>
+      <div class="meta-item"><i class="bi bi-shield-lock"></i> SNI: <code>${node.sni}</code></div>
+      <div class="meta-item"><i class="bi bi-diagram-3"></i> Host: <code>${node.host}</code></div>
+      <div class="meta-item"><i class="bi bi-slash-square"></i> Path: <code>${node.path}</code></div>
+    </div>
 
-      <div class="mt-3 d-flex flex-wrap gap-2">
-        <button class="btn btn-sm btn-outline-primary copy-yaml"><i class="bi bi-clipboard-check me-1"></i>Copy YAML</button>
-        <button class="btn btn-sm btn-outline-secondary copy-server"><i class="bi bi-clipboard me-1"></i>Server</button>
-        <button class="btn btn-sm btn-outline-secondary copy-sni"><i class="bi bi-clipboard me-1"></i>SNI</button>
-      </div>
+    <div class="mt-1 d-flex flex-wrap gap-2">
+      <button class="btn btn-sm btn-outline-primary copy-yaml"><i class="bi bi-clipboard-check me-1"></i>Copy YAML</button>
+      <button class="btn btn-sm btn-outline-secondary copy-server"><i class="bi bi-clipboard me-1"></i>Server</button>
+      <button class="btn btn-sm btn-outline-secondary copy-sni"><i class="bi bi-clipboard me-1"></i>SNI</button>
     </div>
   `;
 
-  // wire buttons
-  const btnYaml = $(".copy-yaml", col);
-  const btnServer = $(".copy-server", col);
-  const btnSni = $(".copy-sni", col);
+  $(".copy-yaml", card).addEventListener("click", () => copyText(toYAML(node)));
+  $(".copy-server", card).addEventListener("click", () => copyText(node.server));
+  $(".copy-sni", card).addEventListener("click", () => copyText(node.sni));
 
-  btnYaml.addEventListener("click", () => copyText(toYAML(node)));
-  btnServer.addEventListener("click", () => copyText(node.server));
-  btnSni.addEventListener("click", () => copyText(node.sni));
-
-  return col;
+  return card;
 }
 
 function copyText(text){
@@ -182,10 +170,7 @@ function renderList(list){
   const wrap = $("#bugList");
   const empty = $("#emptyState");
   wrap.innerHTML = "";
-  if (!list.length) {
-    empty.classList.remove("d-none");
-    return;
-  }
+  if (!list.length) { empty.classList.remove("d-none"); return; }
   empty.classList.add("d-none");
   list.forEach(item => wrap.appendChild(createCard(item)));
 }
@@ -195,13 +180,11 @@ function applyFilter(){
   const tab = $(".btn-tab.active")?.getAttribute("data-filter") || "all";
 
   let filtered = BUGS.filter(b => {
-    // tab
-    if (tab === "BIZ" && b.group !== "BIZ") return false;
+    if (tab === "BIZ"   && b.group !== "BIZ") return false;
     if (tab === "XCVIP" && b.group !== "XCVIP") return false;
     if (tab === "barat" && !b.zones.includes("barat")) return false;
     if (tab === "timur" && !b.zones.includes("timur")) return false;
 
-    // search
     const hay = `${b.name} ${b.group} ${b.server} ${b.sni} ${b.host} ${b.zones.join(" ")}`.toLowerCase();
     return hay.includes(q);
   });
@@ -216,29 +199,23 @@ function setActiveTab(btn){
   applyFilter();
 }
 
-// ====== BOOT ======
 document.addEventListener("DOMContentLoaded", () => {
-  // initial render
   renderList(BUGS);
 
-  // search
   $("#searchInput").addEventListener("input", applyFilter);
-
-  // tabs
   $$(".btn-tab").forEach(btn => btn.addEventListener("click", () => setActiveTab(btn)));
 
-  // reset
   $("#btnReset").addEventListener("click", () => {
     $("#searchInput").value = "";
     setActiveTab($('[data-filter="all"]'));
   });
+
   const btnResetEmpty = $("#btnResetEmpty");
   if (btnResetEmpty) btnResetEmpty.addEventListener("click", () => {
     $("#searchInput").value = "";
     setActiveTab($('[data-filter="all"]'));
   });
 
-  // copy all (filtered) as YAML
   $("#btnCopyAll").addEventListener("click", () => {
     const text = listToYAML(STATE.filtered.length ? STATE.filtered : BUGS);
     copyText(text);
