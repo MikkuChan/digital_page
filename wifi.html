@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="id" class="light-mode">
+<head>
+  <meta charset="UTF-8" />
+  <title>Informasi Wi-Fi – fadzdigital</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Halaman informasi Wi-Fi: SSID, password, QR Wi-Fi, dan QRIS pembayaran." />
+  <link rel="icon" href="https://raw.githubusercontent.com/fadzdigital/image/main/favicon.ico" />
+  <base href="/" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+
+  <!-- Bootstrap & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+
+  <!-- Global & Page CSS -->
+  <link href="/css/style.css" rel="stylesheet" />
+  <link href="/css/info-wifi.css" rel="stylesheet" />
+</head>
+<body>
+  <!-- Loading overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+  </div>
+
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg fixed-top">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="/index.html">
+        <img src="https://raw.githubusercontent.com/fadzdigital/image/main/fadzdigital.png" alt="fadzdigital Logo" style="height:38px;width:auto;object-fit:contain"/>
+        <span class="text-gradient" style="font-size:2rem;font-weight:700;">fadzdigital</span>
+      </a>
+      <button class="navbar-toggler border-0 p-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav mx-auto">
+          <li class="nav-item"><a class="nav-link" href="/index.html">Beranda</a></li>
+          <li class="nav-item"><a class="nav-link" href="/index.html#features">Fitur</a></li>
+          <li class="nav-item"><a class="nav-link" href="/ordervpn.html">Order VPN</a></li>
+          <li class="nav-item"><a class="nav-link" href="/tutorial.html">Tutorial</a></li>
+          <li class="nav-item"><a class="nav-link active" href="/tools.html">Tools</a></li>
+          <li class="nav-item"><a class="nav-link" href="/index.html#contact">Kontak</a></li>
+        </ul>
+        <div class="d-flex align-items-center gap-3">
+          <a href="https://wa.me/6285727035336" class="btn btn-success d-none d-lg-inline-flex">WhatsApp</a>
+          <a href="https://t.me/fadzdigital" class="btn btn-primary">Telegram</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- TOOLBAR -->
+  <div class="wifi-toolbar shadow-sm">
+    <div class="container py-2 d-flex flex-wrap align-items-center gap-2">
+      <div class="me-auto small text-muted d-none d-md-block">
+        <i class="bi bi-wifi"></i> Informasi jaringan Wi-Fi untuk tamu.
+      </div>
+      <button class="btn btn-soft" id="copyAll"><i class="bi bi-clipboard-check"></i> Copy Semua</button>
+      <button class="btn btn-soft" id="printCards"><i class="bi bi-printer"></i> Print Kartu</button>
+      <a class="btn btn-outline-primary" href="/zona.html"><i class="bi bi-diagram-3"></i> Lihat Zona</a>
+      <a class="btn btn-primary" href="/bug.html"><i class="bi bi-bug"></i> Bug</a>
+    </div>
+  </div>
+
+  <main style="margin-top:90px;min-height:100vh;">
+    <!-- HERO -->
+    <section class="wifi-hero text-center font-display py-5 position-relative overflow-hidden">
+      <div class="hero-decor hero-decor-1"></div>
+      <div class="hero-decor hero-decor-2"></div>
+      <div class="container">
+        <span class="badge-tools mb-4 px-4 py-2 fs-6 d-inline-flex align-items-center shadow-sm">
+          <i class="bi bi-wifi me-2"></i>Informasi Wi-Fi
+        </span>
+        <h1 class="display-5 fw-bold mb-3" style="letter-spacing:-1px;color:#1f2937;">
+          SSID & Password <span class="text-gradient">Wi-Fi</span>
+        </h1>
+        <p class="lead mx-auto mb-0" style="max-width:780px;color:#4b5563;">
+          Scan QR untuk terhubung lebih cepat. Card siap print untuk ditempel di meja / dinding.
+        </p>
+      </div>
+    </section>
+
+    <!-- GRID -->
+    <section class="container py-4">
+      <div class="wifi-grid" id="wifiGrid">
+        <!-- kartu 2.4G -->
+        <article class="wifi-card" id="card24">
+          <div class="card-head">
+            <div>
+              <div class="wifi-band">2.4G Wi-Fi</div>
+              <h3 class="ssid" id="ssid24">—</h3>
+            </div>
+            <span class="badge rounded-pill text-bg-light border fw-semibold">WPA/WPA2-PSK</span>
+          </div>
+
+          <div class="qr-wrap">
+            <canvas id="qr24" width="220" height="220" aria-label="QR Wi-Fi 2.4G"></canvas>
+          </div>
+
+          <div class="field">
+            <label class="form-label">Password</label>
+            <div class="input-group">
+              <input type="password" class="form-control form-control-lg" id="pass24" readonly />
+              <button class="btn btn-outline-secondary toggle-eye" data-target="pass24" type="button">
+                <i class="bi bi-eye"></i>
+              </button>
+              <button class="btn btn-outline-primary copy-btn" data-copy="pass24" type="button">
+                <i class="bi bi-clipboard"></i>
+              </button>
+            </div>
+            <div class="btn-row">
+              <button class="btn btn-light btn-sm copy-ssid" data-src="ssid24"><i class="bi bi-clipboard"></i> SSID</button>
+              <button class="btn btn-light btn-sm copy-pass" data-src="pass24"><i class="bi bi-clipboard"></i> Password</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- kartu 5G -->
+        <article class="wifi-card" id="card5g">
+          <div class="card-head">
+            <div>
+              <div class="wifi-band">5G Wi-Fi</div>
+              <h3 class="ssid" id="ssid5">—</h3>
+            </div>
+            <span class="badge rounded-pill text-bg-light border fw-semibold">WPA/WPA2-PSK</span>
+          </div>
+
+          <div class="qr-wrap">
+            <canvas id="qr5" width="220" height="220" aria-label="QR Wi-Fi 5G"></canvas>
+          </div>
+
+          <div class="field">
+            <label class="form-label">Password</label>
+            <div class="input-group">
+              <input type="password" class="form-control form-control-lg" id="pass5" readonly />
+              <button class="btn btn-outline-secondary toggle-eye" data-target="pass5" type="button">
+                <i class="bi bi-eye"></i>
+              </button>
+              <button class="btn btn-outline-primary copy-btn" data-copy="pass5" type="button">
+                <i class="bi bi-clipboard"></i>
+              </button>
+            </div>
+            <div class="btn-row">
+              <button class="btn btn-light btn-sm copy-ssid" data-src="ssid5"><i class="bi bi-clipboard"></i> SSID</button>
+              <button class="btn btn-light btn-sm copy-pass" data-src="pass5"><i class="bi bi-clipboard"></i> Password</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- QRIS -->
+        <article class="qris-card">
+          <div class="card-head">
+            <div>
+              <div class="wifi-band">Dukung Kami</div>
+              <h3 class="ssid">QRIS Pembayaran</h3>
+            </div>
+            <span class="badge rounded-pill text-bg-warning border fw-semibold">QRIS</span>
+          </div>
+
+          <div class="qris-image">
+            <img src="/assets/qris/fadz.jpg" alt="QRIS fadzdigital" id="qrisImg">
+          </div>
+          <div class="d-flex gap-2 mt-2">
+            <a class="btn btn-outline-primary" id="downloadQris" download="QRIS-fadzdigital.jpg"><i class="bi bi-download"></i> Download</a>
+            <button class="btn btn-outline-secondary" id="printQris"><i class="bi bi-printer"></i> Print</button>
+          </div>
+        </article>
+      </div>
+
+      <div class="note small mt-3">
+        <i class="bi bi-info-circle"></i>
+        Simpan password ini di tempat aman. Ganti berkala untuk keamanan jaringan.
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="py-4" style="background: var(--gray-900); color:var(--gray-100)">
+    <div class="container text-center">
+      <div class="mb-2"><span class="fw-bold font-display text-gradient" style="font-size:1.3rem;">fadzdigital</span></div>
+      <div class="mb-2 small">&copy; 2025 fadzdigital. All rights reserved.<br/>Made with 💙 in Indonesia</div>
+      <div>
+        <a href="/index.html" class="text-primary small text-decoration-none mx-2">Beranda</a>
+        <a href="/ordervpn.html" class="text-primary small text-decoration-none mx-2">Order VPN</a>
+        <a href="/tutorial.html" class="text-primary small text-decoration-none mx-2">Tutorial</a>
+        <a href="/tools.html" class="text-primary small text-decoration-none mx-2">Tools</a>
+        <a href="/index.html#contact" class="text-primary small text-decoration-none mx-2">Kontak</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- TOAST -->
+  <div class="position-fixed top-0 end-0 p-3" style="z-index:1080;">
+    <div id="copyToast" class="toast align-items-center text-bg-dark border-0" role="status" aria-live="polite" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body"><i class="bi bi-check2-circle me-1"></i>Tersalin.</div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JS deps -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- QR generator (kecil & cepat) -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+
+  <!-- App JS -->
+  <script src="/js/main.js"></script>
+  <script src="/js/info-wifi.js"></script>
+
+  <script>
+    // Loading overlay
+    window.addEventListener('load', function () {
+      setTimeout(function () {
+        const el = document.getElementById('loadingOverlay');
+        if (!el) return;
+        el.style.opacity = '0';
+        setTimeout(function () { el.style.display = 'none'; }, 600);
+      }, 400);
+    });
+  </script>
+</body>
+</html>
