@@ -22,12 +22,9 @@
   <link href="/css/bug.css" rel="stylesheet"/>
 </head>
 <body>
-  <!-- Loading overlay -->
-  <div class="loading-overlay" id="loadingOverlay">
-    <div class="loading-spinner"></div>
-  </div>
+  <div class="loading-overlay" id="loadingOverlay"><div class="loading-spinner"></div></div>
 
-  <!-- NAVBAR (konsisten) -->
+  <!-- NAVBAR -->
   <nav class="navbar navbar-expand-lg fixed-top">
     <div class="container">
       <a class="navbar-brand d-flex align-items-center gap-2" href="/index.html">
@@ -69,7 +66,6 @@
         <p class="lead mx-auto mb-3" style="max-width:860px;color:#4b5563;">
           Pilih bug sesuai <a href="/zona.html" class="fw-bold text-decoration-none">Zona</a>-mu. Klik untuk menyalin YAML siap tempel ke Clash/Meta.
         </p>
-        <div class="small text-muted">Password, path, dan header sudah disetel otomatis.</div>
       </div>
     </section>
 
@@ -92,11 +88,9 @@
       </div>
     </div>
 
-    <!-- LIST BUG -->
+    <!-- LIST BUG → GRID -->
     <section class="container py-4">
-      <div id="bugList" class="row g-3">
-        <!-- kartu bug dirender via js -->
-      </div>
+      <div id="bugList" class="bug-grid"><!-- cards injected by JS --></div>
 
       <div class="empty-state text-center p-5 d-none" id="emptyState">
         <div class="empty-emoji">🔎</div>
@@ -140,12 +134,10 @@
   <script src="/js/bug.js"></script>
 
   <script>
-    // Loading overlay
     window.addEventListener('load', function () {
       setTimeout(function () {
         const el = document.getElementById('loadingOverlay');
-        if (!el) return;
-        el.style.opacity = '0';
+        if (!el) return; el.style.opacity = '0';
         setTimeout(function () { el.style.display = 'none'; }, 600);
       }, 400);
     });
