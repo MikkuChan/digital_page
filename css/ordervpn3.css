@@ -16,17 +16,52 @@
 .loading-spinner{border:4px solid #e6f0ff;border-top:4px solid var(--primary-color);border-radius:50%;width:44px;height:44px;animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* Filter */
-.catalog-filter{border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm)}
-.catalog-filter .btn{border-radius:10px}
-.catalog-filter .btn.active{box-shadow:inset 0 0 0 2px var(--primary-color)}
+/* ========== Filter Bar Polished ========== */
+.filter-bar{
+  border:1px solid var(--border);
+  border-radius:18px;
+  box-shadow:0 10px 25px -15px rgba(2,6,23,.18);
+  position:relative;
+  overflow:hidden;
+}
+.filter-bar::before{
+  content:"";
+  position:absolute; inset:0 0 auto 0; height:4px;
+  background:linear-gradient(90deg,#0ea5e9,#22c55e,#f59e0b);
+}
+/* Segmented */
+.segmented{display:flex; gap:8px; background:#f8fafc; padding:6px; border-radius:12px; border:1px solid var(--border)}
+.seg-btn{
+  appearance:none; border:0; background:transparent; color:#2563eb;
+  font-weight:700; padding:.45rem .9rem; border-radius:10px; transition:.2s;
+}
+.seg-btn:hover{background:#eef2ff}
+.seg-btn.active{background:#1d4ed8; color:#fff; box-shadow:0 6px 16px -6px rgba(29,78,216,.45)}
+/* Search & Sort */
+.search-ctrl .input-group-text,
+.sort-ctrl .input-group-text{background:#fff; border-color:var(--border)}
+.search-ctrl .form-control,
+.sort-ctrl .form-select{border-color:var(--border); border-left:0}
+.search-ctrl .form-control:focus,
+.sort-ctrl .form-select:focus{box-shadow:0 0 0 4px rgba(13,110,253,.12)}
+/* Promo pill */
+.promo-pill{
+  display:inline-flex; align-items:center; gap:.4rem;
+  font-weight:700; font-size:.8rem;
+  padding:.35rem .6rem; border-radius:999px;
+  border:1px solid var(--border); background:#fff; color:#475569;
+}
+.promo-pill[data-status="on"]{background:#ecfdf5;color:#047857;border-color:#a7f3d0}
+.promo-pill[data-status="off"]{background:#fff7ed;color:#9a3412;border-color:#fed7aa}
+/* Responsive */
+@media (max-width: 991.98px){.filter-bar .card-body{gap:10px}.search-ctrl{min-width:260px}}
+@media (max-width: 575.98px){.segmented{padding:4px}.seg-btn{padding:.35rem .7rem}.search-ctrl{flex:1 1 100%}}
 
-/* Grid */
+/* ========== Grid & Cards ========== */
 .catalog-grid{display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:18px}
 @media(min-width:576px){.catalog-grid{grid-template-columns:repeat(2,1fr)}}
 @media(min-width:992px){.catalog-grid{grid-template-columns:repeat(3,1fr)}}
 
-/* Card Produk */
 .card-prod{position:relative;border:1px solid var(--border);border-radius:18px;overflow:hidden;background:#fff;box-shadow:var(--shadow-sm);animation:fadeInUp .45s ease}
 .card-prod:hover{transform:translateY(-4px);box-shadow:var(--shadow-md);transition:.25s}
 .card-prod .thumb{width:100%;aspect-ratio:16/9;object-fit:cover;background:#eef4ff}
@@ -41,28 +76,6 @@
 .card-prod .btn-buy{border:none;border-radius:12px;padding:.6rem 1rem;font-weight:700;background:linear-gradient(90deg,#0d6efd,#00b4ff);color:#fff;box-shadow:0 10px 18px -10px rgba(13,110,253,.5)}
 .card-prod .btn-buy:hover{transform:translateY(-2px);box-shadow:0 18px 26px -12px rgba(13,110,253,.55)}
 
-/* Soft badge */
-.badge-soft{background:#f6f9ff;border:1px solid var(--border);color:#334155}
-
 /* Skeleton */
 .skeleton{height:320px;border-radius:18px;background:linear-gradient(90deg,#eef2f7 25%,#f5f7fb 37%,#eef2f7 63%);background-size:400% 100%;animation:shimmer 1.2s infinite}
 @keyframes shimmer{0%{background-position:100% 0}100%{background-position:-100% 0}}
-
-/* Perks */
-.perks-row .perk{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--border);border-radius:14px;padding:14px;background:#fff;box-shadow:var(--shadow-sm)}
-.perks-row .perk i{font-size:1.6rem;color:#0ea5e9}
-.perks-row .perk h3{font-size:1rem;margin:0 0 2px}
-.perks-row .perk p{color:#64748b;margin:0}
-
-/* How it works */
-.howit{border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow-sm)}
-.howit .step{text-align:center}
-.howit .bubble{display:inline-grid;place-items:center;width:36px;height:36px;border-radius:999px;background:linear-gradient(90deg,#0d6efd,#00b4ff);color:#fff;font-weight:800;margin-bottom:6px}
-
-/* Pay strip */
-.pay-strip{border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow-sm)}
-.paylogo{height:30px;opacity:.85;filter:saturate(0.9);transition:.2s}
-.paylogo:hover{opacity:1;filter:none}
-
-/* CTA */
-.cta{border:1px solid var(--border);border-radius:16px;background:linear-gradient(90deg,#f8fbff,#f1f9ff);box-shadow:var(--shadow-sm)}
