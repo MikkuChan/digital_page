@@ -1,426 +1,200 @@
-/* =========================================================
-   ordervpn2.js — FE dengan logika Chained Dropdown (FIXED v2)
-   ========================================================= */
+/* Katalog OrderVPN — polished UI/UX (search, sort, skeleton, persist payment) */
 
 const API_BASE = (window.API_BASE || '').replace(/\/+$/, '') || `${location.origin}`;
+const LS_LAST_PAYMENT = 'fdz_last_payment';
+const LS_LAST_ORDER   = 'fdz_last_order';
 const POLL_INTERVAL_MS = 5000;
 const POLL_TIMEOUT_MS  = 10 * 60 * 1000;
 
-// ---------- GET ELEMENTS ----------
-const formEl      = document.getElementById('orderForm');
-const usernameEl  = document.getElementById('username');
-const emailEl     = document.getElementById('email');
-const protocolEl  = document.getElementById('protocol');
-const variantSel  = document.getElementById('variant');
-const regionSel   = document.getElementById('region');
-const serverSel   = document.getElementById('serverId');
-const promoEl     = document.getElementById('promoCode');
+let CFG=null, paymentWindow=null, pollTimer=null;
+let curVariant='HP', curRegion='SG', qSearch='', qSort='price-asc';
 
-// Preview
-const usernameFinalPreview = document.getElementById('usernameFinalPreview');
-const pricePreview   = document.getElementById('pricePreview');
-const detailsPreview = document.getElementById('detailsPreview');
+// ====== persist helpers
+const saveLastPayment=(o)=>{try{localStorage.setItem(LS_LAST_PAYMENT,JSON.stringify({...o,ts:Date.now()}))}catch{}};
+const getLastPayment=()=>{try{return JSON.parse(localStorage.getItem(LS_LAST_PAYMENT)||'null')}catch{return null}};
+const clearLastPayment=()=>{try{localStorage.removeItem(LS_LAST_PAYMENT)}catch{}};
 
-// Status & Hasil
-const submitBtn    = document.getElementById('submitBtn');
-const waitingBox   = document.getElementById('waitingBox');
-const orderIdText  = document.getElementById('orderIdText');
-const statusText   = document.getElementById('statusText');
-const payLink      = document.getElementById('payLink');
-const resultBox    = document.getElementById('resultBox');
-const configTextEl = document.getElementById('configText');
-const errorBox     = document.getElementById('errorBox');
+// ====== refs
+const grid=document.getElementById('catalogGrid');
+const skeleton=document.getElementById('skeletonGrid');
+const waitingBox=document.getElementById('waitingBox');
+const orderIdText=document.getElementById('orderIdText');
+const statusText=document.getElementById('statusText');
+const payLink=document.getElementById('payLink');
+const promoInfo=document.getElementById('promoInfo');
+const searchBox=document.getElementById('searchBox');
+const sortSel=document.getElementById('sortSel');
 
-// Detail Akun
-const accUsername  = document.getElementById('accUsername');
-const accUUID      = document.getElementById('accUUID');
-const accDomain    = document.getElementById('accDomain');
-const accQuota     = document.getElementById('accQuota');
-const accCreated   = document.getElementById('accCreated');
-const accExpired   = document.getElementById('accExpired');
-const blkWsTls     = document.getElementById('blk-ws-tls');
-const blkWsNtls    = document.getElementById('blk-ws-ntls');
-const blkGrpc      = document.getElementById('blk-grpc');
-const accWsTls     = document.getElementById('accWsTls');
-const accWsNtls    = document.getElementById('accWsNtls');
-const accGrpc      = document.getElementById('accGrpc');
-const copyAllBtn   = document.getElementById('copyAllBtn');
-const downloadBtn  = document.getElementById('downloadConfigBtn');
+// modal
+let coModal;
+const co_variant=document.getElementById('co_variant');
+const co_region=document.getElementById('co_region');
+const co_serverId=document.getElementById('co_serverId');
+const co_protocol=document.getElementById('co_protocol');
+const co_username=document.getElementById('co_username');
+const co_email=document.getElementById('co_email');
+const btnCheckout=document.getElementById('btnCheckout');
 
-// ---------- STATE ----------
-let CFG = null; // Hasil dari GET /config
-let pollTimer = null;
+// ====== helpers
+const rupiah=(n)=>(Number(n)||0).toLocaleString('id-ID');
+const sanitizeBase=(s)=>String(s||'').toLowerCase().replace(/[^a-z0-9\-]/g,'').slice(0,20);
+const withSuffix=(base)=>{const d=new Date();const suf=String(d.getSeconds()).padStart(2,'0')+String(Math.floor(d.getMilliseconds()/10)).padStart(2,'0');return `${sanitizeBase(base)}-${suf}`.slice(0,24)};
+const imgFor=(variant,region)=>{
+  const map={HP:{SG:'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1600&auto=format&fit=crop',ID:'https://images.unsplash.com/photo-1518779578993-ec3579fee39f?q=80&w=1600&auto=format&fit=crop'},
+             STB:{SG:'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=1600&auto=format&fit=crop',ID:'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?q=80&w=1600&auto=format&fit=crop'}};
+  return (map[variant]&&map[variant][region])||'https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1600&auto=format&fit=crop';
+};
+const setActive=(els,val,key)=>els.forEach(b=>b.classList.toggle('active', (key==='variant'?b.dataset.filterVariant:b.dataset.filterRegion)===val));
 
-// ---------- UI UTILS ----------
-const show = (el) => { if (el) el.style.display = ''; };
-const hide = (el) => { if (el) el.style.display = 'none'; };
-const setText = (el, t) => { if (el) el.textContent = t ?? ''; };
-const htmlEscape = (s) => String(s || '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+// ====== data
+async function loadConfig(){
+  const r=await fetch(`${API_BASE}/config`,{headers:{accept:'application/json'}});
+  if(!r.ok) throw new Error(`Gagal /config (HTTP ${r.status}).`);
+  const j=await r.json(); CFG=j;
+  promoInfo.textContent=j?.promo?.status==='online'?`Online • -Rp ${rupiah(j.promo.discount||0)}`:'Tidak aktif';
+}
+const products=(v,r)=>{
+  const defQ=v==='HP'?300:600;
+  return (CFG?.variants?.[v]?.[r]||[]).map(s=>({
+    id:s.id, label:s.label, price:Number(s.price)||0, quota:s.quotaGB ?? defQ, days:s.expDays ?? 30,
+    variant:v, region:r, img:imgFor(v,r)
+  }));
+};
 
-function showError(msg) {
-    if (!errorBox) return;
-    errorBox.innerHTML = `<div class="alert alert-danger">${htmlEscape(msg)}</div>`;
-    show(errorBox);
-    setLoading(false);
+// ====== render
+const card=(p)=>{
+  const best = (p.price<=10000) ? '<div class="badge-ribbon">Best Value</div>' : '';
+  return `
+  <article class="card-prod">
+    ${best}
+    <img class="thumb" loading="lazy" src="${p.img}" alt="${p.label}">
+    <div class="body">
+      <h3 class="title">${p.region} ${p.variant} ${p.label}</h3>
+      <div class="meta">Kuota ~${p.quota}GB • ${p.days} hari</div>
+      <div class="feat">
+        <span class="chip">${p.variant}</span>
+        <span class="chip"><i class="bi bi-geo-alt"></i> ${p.region}</span>
+        <span class="chip"><i class="bi bi-shield-check"></i> Otomatis</span>
+      </div>
+      <div class="cta">
+        <div class="price">Rp ${rupiah(p.price)} <span class="text-muted" style="font-size:.8rem">/30 hari</span></div>
+        <button class="btn-buy" data-buy data-variant="${p.variant}" data-region="${p.region}" data-serverid="${p.id}">
+          <i class="bi bi-cart3 me-1"></i> Beli
+        </button>
+      </div>
+    </div>
+  </article>`;
+};
+
+function applySearchSort(items){
+  let out=[...items];
+  const q=qSearch.trim().toLowerCase();
+  if(q) out=out.filter(p=>(`${p.label} ${p.region} ${p.variant}`).toLowerCase().includes(q));
+  switch(qSort){
+    case 'price-desc': out.sort((a,b)=>b.price-a.price); break;
+    case 'quota-desc': out.sort((a,b)=>b.quota-a.quota); break;
+    case 'quota-asc':  out.sort((a,b)=>a.quota-b.quota); break;
+    case 'label-asc':  out.sort((a,b)=>String(a.label).localeCompare(b.label)); break;
+    default:           out.sort((a,b)=>a.price-b.price);
+  }
+  return out;
 }
 
-function clearError() {
-    if (errorBox) {
-        errorBox.innerHTML = '';
-        hide(errorBox);
-    }
+function render(){
+  const items=applySearchSort(products(curVariant,curRegion));
+  if(!items.length){
+    grid.innerHTML=`<div class="alert alert-warning">Tidak ada item untuk filter ini. Ubah filter atau cek konfigurasi PRICE_${curRegion}_${curVariant}.</div>`;
+  }else{
+    grid.innerHTML=items.map(card).join('');
+  }
 }
 
-function setLoading(isLoading) {
-    if (!submitBtn) return;
-    submitBtn.disabled = isLoading;
-    submitBtn.innerHTML = isLoading
-        ? `<span class="spinner-border spinner-border-sm me-2"></span> Memproses...`
-        : `<i class="bi bi-cart-check me-2"></i>Checkout & Bayar`;
+// ====== checkout
+async function createInvoice(payload){
+  const r=await fetch(`${API_BASE}/pay/create`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(payload)});
+  const j=await r.json().catch(()=>null);
+  if(!r.ok||!j) throw new Error(j?.message||`Gagal membuat invoice (HTTP ${r.status})`);
+  return j;
+}
+async function pollStatus(orderId){
+  const start=Date.now(); clearInterval(pollTimer);
+  const tick=async()=>{
+    if(Date.now()-start>POLL_TIMEOUT_MS){ statusText.textContent='Timeout. Silakan buka halaman pembayaran lagi.'; statusText.className='badge bg-secondary'; return clearInterval(pollTimer); }
+    try{
+      const r=await fetch(`${API_BASE}/pay/status?orderId=${encodeURIComponent(orderId)}`,{headers:{accept:'application/json'}});
+      const d=await r.json();
+      if(!r.ok){ statusText.textContent='Order tidak ditemukan / error.'; statusText.className='badge bg-danger'; return clearInterval(pollTimer); }
+      if(d.paymentUrl){ payLink.href=d.paymentUrl; const cur=getLastPayment(); if(cur && cur.orderId===(d.orderId||orderId)) saveLastPayment({...cur,paymentUrl:d.paymentUrl}); }
+      const s=String(d.status||'').toUpperCase();
+      if(s==='PAID'){ statusText.textContent='Pembayaran diterima ✔'; statusText.className='badge bg-success'; clearLastPayment(); return clearInterval(pollTimer); }
+      if(s==='FAILED'){ statusText.textContent='Pembayaran gagal ✖'; statusText.className='badge bg-danger'; clearLastPayment(); return clearInterval(pollTimer); }
+      statusText.textContent='Menunggu pembayaran...'; statusText.className='badge bg-warning text-dark';
+    }catch{}
+  };
+  await tick(); pollTimer=setInterval(tick,POLL_INTERVAL_MS);
+}
+function openModal(title,v,r,sid){
+  document.getElementById('checkoutTitle').textContent=title;
+  co_variant.value=v; co_region.value=r; co_serverId.value=sid;
+  co_protocol.value='vmess'; co_username.value=''; co_email.value='';
+  if(!coModal) coModal=new bootstrap.Modal(document.getElementById('checkoutModal'));
+  coModal.show();
+}
+async function doCheckout(){
+  const variant=co_variant.value.trim(), region=co_region.value.trim(), serverId=co_serverId.value.trim();
+  const protocol=co_protocol.value, username=sanitizeBase(co_username.value||'user'), email=(co_email.value||'').trim();
+  if(!username) return alert('Username wajib diisi.');
+  if(email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return alert('Email tidak valid.');
+  const usernameFinal=withSuffix(username);
+  try{
+    btnCheckout.disabled=true; btnCheckout.innerHTML='<span class="spinner-border spinner-border-sm me-2"></span>Memproses...';
+    const res=await createInvoice({variant,region,serverId,protocol,username,usernameFinal,email,promoCode:''});
+    const {orderId,paymentUrl,reference}=res; if(!orderId||!paymentUrl) throw new Error('Respon API tidak valid.');
+    try{ localStorage.setItem(LS_LAST_ORDER,orderId) }catch{}
+    saveLastPayment({orderId,paymentUrl,reference});
+    orderIdText.textContent=orderId; statusText.textContent='Menunggu pembayaran...'; statusText.className='badge bg-warning text-dark';
+    payLink.href=paymentUrl; waitingBox.style.display='';
+    coModal.hide();
+    if(!paymentWindow||paymentWindow.closed){ paymentWindow=window.open(paymentUrl,'_blank','noopener'); } else { paymentWindow.focus(); }
+    pollStatus(orderId);
+  }catch(e){ alert(e.message||'Gagal membuat invoice'); }
+  finally{ btnCheckout.disabled=false; btnCheckout.innerHTML='<i class="bi bi-shield-check me-1"></i> Lanjutkan Pembayaran'; }
 }
 
-// ---------- HELPERS ----------
-const randomSuffix3 = () => Math.floor(100 + Math.random() * 900).toString();
-const baseSanitize = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9\-]/g, '').slice(0, 20);
-const buildUsernameFinal = (base) => `${baseSanitize(base)}-${randomSuffix3()}`.slice(0, 24);
-const rupiah = (n) => (n || 0).toLocaleString('id-ID');
+// ====== init
+document.addEventListener('DOMContentLoaded', async ()=>{
+  // restore payment
+  const last=getLastPayment();
+  if(last&&last.orderId){
+    orderIdText.textContent=last.orderId; statusText.textContent='Menunggu pembayaran...';
+    statusText.className='badge bg-warning text-dark'; if(last.paymentUrl) payLink.href=last.paymentUrl;
+    waitingBox.style.display=''; pollStatus(last.orderId);
+  }
 
-// ---------- [LOGIKA BARU] CHAINED DROPDOWN LOGIC ----------
+  // load config + pick first available
+  try{ await loadConfig(); }catch(e){ skeleton.style.display='none'; grid.innerHTML=`<div class="alert alert-danger">${e.message}</div>`; return; }
+  const variants=['HP','STB'], regions=['SG','ID'];
+  let found=false; for(const v of variants){ for(const r of regions){ if((CFG?.variants?.[v]?.[r]||[]).length){ curVariant=v;curRegion=r; found=true; break; } } if(found) break; }
+  skeleton.style.display='none'; render();
 
-async function initializeForm() {
-    try {
-        const response = await fetch(`${API_BASE}/config`);
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        CFG = await response.json();
-        
-        // Langkah 1: Isi Varian, nonaktifkan sisanya
-        variantSel.disabled = false;
-        regionSel.disabled = true;
-        serverSel.disabled = true;
-        
-        regionSel.innerHTML = '<option>Pilih Varian Dahulu</option>';
-        serverSel.innerHTML = '<option>Pilih Region Dahulu</option>';
-        
-        updatePreview();
-    } catch (error) {
-        console.error("Gagal memuat konfigurasi dari API:", error);
-        showError("Gagal memuat daftar server. Silakan muat ulang halaman.");
-    }
-}
+  // filter handlers
+  const bv=[...document.querySelectorAll('[data-filter-variant]')];
+  const br=[...document.querySelectorAll('[data-filter-region]')];
+  setActive(bv,curVariant,'variant'); setActive(br,curRegion,'region');
+  bv.forEach(b=>b.addEventListener('click',()=>{curVariant=b.dataset.filterVariant; setActive(bv,curVariant,'variant'); render()}));
+  br.forEach(b=>b.addEventListener('click',()=>{curRegion=b.dataset.filterRegion; setActive(br,curRegion,'region'); render()}));
 
-function onVariantChange() {
-    const selectedVariant = variantSel.value;
+  // search + sort
+  searchBox.addEventListener('input',()=>{ qSearch=searchBox.value; render(); });
+  sortSel.addEventListener('change',()=>{ qSort=sortSel.value; render(); });
 
-    if (!selectedVariant) {
-        regionSel.innerHTML = '<option>Pilih Varian Dahulu</option>';
-        serverSel.innerHTML = '<option>Pilih Region Dahulu</option>';
-        regionSel.disabled = true;
-        serverSel.disabled = true;
-        updatePreview();
-        return;
-    }
-    
-    // Isi Region berdasarkan Varian yang dipilih
-    const regions = CFG.variants?.[selectedVariant] || {};
-    const availableRegions = [];
-    if (regions.ID && regions.ID.length > 0) availableRegions.push({ value: 'ID', text: 'Indonesia' });
-    if (regions.SG && regions.SG.length > 0) availableRegions.push({ value: 'SG', text: 'Singapore' });
-    
-    regionSel.innerHTML = ''; // Kosongkan region
-    if (availableRegions.length > 0) {
-        regionSel.innerHTML = '<option value="">-- Pilih Region --</option>';
-        availableRegions.forEach(reg => {
-            const option = document.createElement('option');
-            option.value = reg.value;
-            option.textContent = reg.text;
-            regionSel.appendChild(option);
-        });
-        regionSel.disabled = false;
-    } else {
-        regionSel.innerHTML = '<option>Varian ini tidak tersedia</option>';
-        regionSel.disabled = true;
-    }
-    
-    // Reset server dropdown
-    serverSel.innerHTML = '<option>Pilih Region Dahulu</option>';
-    serverSel.disabled = true;
-    
-    updatePreview();
-}
+  // delegate buy
+  document.addEventListener('click',e=>{
+    const btn=e.target.closest('[data-buy]'); if(!btn) return;
+    const v=btn.dataset.variant, r=btn.dataset.region, sid=btn.dataset.serverid;
+    const title=btn.closest('.card-prod')?.querySelector('.title')?.textContent?.trim() || 'Beli Paket';
+    openModal(title,v,r,sid);
+  });
 
-function onRegionChange() {
-    const selectedVariant = variantSel.value;
-    const selectedRegion = regionSel.value;
-    
-    if (!selectedRegion) {
-        serverSel.innerHTML = '<option>Pilih Region Dahulu</option>';
-        serverSel.disabled = true;
-        updatePreview();
-        return;
-    }
-    
-    // Isi Server berdasarkan Varian dan Region
-    const servers = CFG.variants?.[selectedVariant]?.[selectedRegion] || [];
-    serverSel.innerHTML = '';
-    
-    if (servers.length > 0) {
-        servers.forEach(server => {
-            const option = document.createElement('option');
-            option.value = server.id;
-            option.textContent = `${server.label} — Rp ${rupiah(server.price)}`;
-            option.dataset.price = server.price;
-            option.dataset.label = server.label;
-            serverSel.appendChild(option);
-        });
-        serverSel.disabled = false;
-        // [FIX] Langsung panggil updatePreview setelah server diisi
-        updatePreview(); 
-    } else {
-        serverSel.innerHTML = '<option>Tidak ada server</option>';
-        serverSel.disabled = true;
-        updatePreview();
-    }
-}
-
-function updatePreview() {
-    // 1. Update Username Final
-    setText(usernameFinalPreview, buildUsernameFinal(usernameEl.value || 'user'));
-
-    // 2. Kalkulasi Harga
-    const selectedOption = serverSel.options[serverSel.selectedIndex];
-    if (serverSel.disabled || !selectedOption || !selectedOption.dataset.price) {
-        setText(pricePreview, `Rp 0 / 30 hari`);
-        setText(detailsPreview, "Lengkapi pilihan di atas");
-        return;
-    }
-    
-    const basePrice = parseInt(selectedOption.dataset.price, 10);
-    let finalPrice = basePrice;
-
-    // Terapkan diskon jika promo valid
-    const promoCode = promoEl.value.trim().toLowerCase();
-    if (promoCode && CFG.promo?.status === 'online') {
-        const validCodes = CFG.promo.codes.map(c => c.toLowerCase());
-        if (validCodes.includes(promoCode)) {
-            finalPrice = Math.max(0, basePrice - (CFG.promo.discount || 0));
-        }
-    }
-    
-    // 3. Update Tampilan Harga dan Detail
-    setText(pricePreview, `Rp ${rupiah(finalPrice)} / 30 hari`);
-    const regionLabel = regionSel.options[regionSel.selectedIndex]?.text || '';
-    const variantLabel = variantSel.options[variantSel.selectedIndex]?.text || '';
-    setText(detailsPreview, `${variantLabel} • ${regionLabel} • ${selectedOption.dataset.label}`);
-}
-
-// ----------------------------------------------------
-// FUNGSI-FUNGSI LAIN (Submit, Poll, Tampilkan Hasil)
-// ----------------------------------------------------
-async function handleSubmit(event) {
-    event.preventDefault();
-    clearError();
-    hide(resultBox);
-    hide(waitingBox);
-
-    const username = baseSanitize(usernameEl.value || '');
-    if (!username) return showError('Username wajib diisi.');
-    
-    const email = (emailEl.value || '').trim();
-    if (email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return showError('Format email tidak valid.');
-
-    if (!serverSel.value || serverSel.disabled || serverSel.options[serverSel.selectedIndex]?.disabled) {
-        return showError('Varian, Region, dan Server harus dipilih.');
-    }
-
-    const payload = {
-        variant: variantSel.value,
-        region: regionSel.value,
-        serverId: serverSel.value,
-        promoCode: promoEl.value.trim(),
-        protocol: protocolEl.value,
-        username,
-        usernameFinal: usernameFinalPreview.textContent,
-        email
-    };
-
-    setLoading(true);
-    try {
-        const response = await fetch(`${API_BASE}/pay/create`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-
-        const data = await response.json();
-        setLoading(false);
-
-        if (!response.ok) {
-            return showError(data?.message || 'Gagal membuat invoice.');
-        }
-
-        const { orderId, paymentUrl } = data;
-        localStorage.setItem('fdz_last_order', orderId);
-        setText(orderIdText, orderId);
-        setText(statusText, 'Menunggu pembayaran...');
-        payLink.href = paymentUrl;
-        show(waitingBox);
-        window.open(paymentUrl, '_blank', 'noopener');
-        pollStatus(orderId);
-    } catch (error) {
-        setLoading(false);
-        showError('Gagal terhubung ke API. Periksa koneksi Anda.');
-        console.error("Submit error:", error);
-    }
-}
-
-async function pollStatus(orderId) {
-    const startTime = Date.now();
-    stopPoll();
-
-    const tick = async () => {
-        if (Date.now() - startTime > POLL_TIMEOUT_MS) {
-            setText(statusText, 'Timeout. Silakan buka halaman pembayaran lagi.');
-            stopPoll();
-            return;
-        }
-
-        try {
-            const response = await fetch(`${API_BASE}/pay/status?orderId=${encodeURIComponent(orderId)}`);
-            const data = await response.json();
-            
-            if (!response.ok) {
-                setText(statusText, 'Order tidak ditemukan / error.');
-                stopPoll();
-                return;
-            }
-
-            const status = (data.status || '').toUpperCase();
-            if (status === 'PAID') {
-                setText(statusText, 'Pembayaran diterima ✔');
-                showResultConfig(data);
-                stopPoll();
-            } else if (status === 'FAILED') {
-                setText(statusText, 'Pembayaran gagal ✖');
-                stopPoll();
-            } else {
-                setText(statusText, 'Menunggu pembayaran...');
-            }
-        } catch (error) {
-            console.warn("Polling error (akan dicoba lagi):", error);
-        }
-    };
-
-    await tick();
-    pollTimer = setInterval(tick, POLL_INTERVAL_MS);
-}
-
-function stopPoll() {
-    if (pollTimer) {
-        clearInterval(pollTimer);
-        pollTimer = null;
-    }
-}
-
-function showResultConfig(data) {
-    hide(waitingBox);
-    show(resultBox);
-    const account = data.accountFields;
-    const rawConfig = (data.accountConfig || '').trim();
-
-    if (account && account.username) {
-        hide(configTextEl);
-        setText(accUsername, account.username);
-        setText(accUUID, account.uuid);
-        setText(accDomain, account.domain);
-        setText(accQuota, `${account.quota_gb || '?'} GB`);
-        setText(accCreated, account.created);
-        setText(accExpired, account.expired);
-        account.ws_tls ? (setText(accWsTls, account.ws_tls), show(blkWsTls)) : hide(blkWsTls);
-        account.ws_ntls ? (setText(accWsNtls, account.ws_ntls), show(blkWsNtls)) : hide(blkWsNtls);
-        account.grpc ? (setText(accGrpc, account.grpc), show(blkGrpc)) : hide(blkGrpc);
-        setupActions(data);
-    } else {
-        show(configTextEl);
-        configTextEl.value = rawConfig || 'Akun berhasil dibuat. Jika detail tidak muncul, hubungi admin.';
-        setupActions(data);
-    }
-}
-
-function buildTextDump(data) {
-    if (data.accountFields && data.accountFields.username) {
-        const p = data.accountFields;
-        const lines = [
-            '=== FADZDIGITAL VPN ACCOUNT ===',
-            `Username : ${p.username || ''}`,
-            `UUID     : ${p.uuid || ''}`,
-            `Domain   : ${p.domain || ''}`,
-            `Quota    : ${p.quota_gb || '?'} GB`,
-            `Created  : ${p.created || ''}`,
-            `Expired  : ${p.expired || ''}`,
-            '',
-            p.ws_tls ? `[WS TLS]\n${p.ws_tls}\n` : '',
-            p.ws_ntls ? `[WS Non-TLS]\n${p.ws_ntls}\n` : '',
-            p.grpc ? `[gRPC]\n${p.grpc}\n` : '',
-            'Simpan file ini untuk impor konfigurasi.'
-        ];
-        return lines.filter(Boolean).join('\n');
-    }
-    return data.accountConfig || '';
-}
-
-function setupActions(data) {
-    const textContent = buildTextDump(data);
-    
-    copyAllBtn.onclick = async () => {
-        await navigator.clipboard.writeText(textContent);
-        const originalText = copyAllBtn.innerHTML;
-        copyAllBtn.innerHTML = `<i class="bi bi-clipboard-check"></i> Disalin!`;
-        setTimeout(() => copyAllBtn.innerHTML = originalText, 1500);
-    };
-
-    downloadBtn.onclick = () => {
-        const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `${data.orderId || 'vpn-account'}.txt`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-    };
-}
-
-// ---------- Event Listeners ----------
-document.addEventListener('DOMContentLoaded', () => {
-    initializeForm();
-    const lastOrder = localStorage.getItem('fdz_last_order');
-    if (lastOrder) {
-        setText(orderIdText, lastOrder);
-        setText(statusText, 'Memeriksa status terakhir...');
-        show(waitingBox);
-        pollStatus(lastOrder);
-    }
-});
-
-formEl.addEventListener('submit', handleSubmit);
-
-variantSel.addEventListener('change', onVariantChange);
-regionSel.addEventListener('change', onRegionChange);
-serverSel.addEventListener('change', updatePreview);
-promoEl.addEventListener('input', updatePreview);
-usernameEl.addEventListener('input', updatePreview);
-
-document.addEventListener('click', async (e) => {
-    const copyBtn = e.target.closest('.cfg-copy');
-    if (copyBtn) {
-        const targetId = copyBtn.dataset.target;
-        const targetEl = document.getElementById(targetId);
-        if (targetEl) {
-            await navigator.clipboard.writeText(targetEl.textContent);
-            const originalText = copyBtn.innerHTML;
-            copyBtn.innerHTML = `<i class="bi bi-clipboard-check"></i> Disalin!`;
-            setTimeout(() => copyBtn.innerHTML = originalText, 1500);
-        }
-    }
+  btnCheckout.addEventListener('click', doCheckout);
 });
