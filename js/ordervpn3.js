@@ -1,16 +1,14 @@
 /* Katalog OrderVPN — polished UI/UX (search, sort, skeleton, persist payment) */
 
-const API_BASE = (window.API_BASE || '').replace(/\/+$/, '') || `${location.origin}`;
-const LS_LAST_PAYMENT = 'fdz_last_payment';
-const LS_LAST_ORDER   = 'fdz_last_order';
-const POLL_INTERVAL_MS = 5000;
-const POLL_TIMEOUT_MS  = 10 * 60 * 1000;
+const API_BASE=(window.API_BASE||'').replace(/\/+$/,'')||`${location.origin}`;
+const LS_LAST_PAYMENT='fdz_last_payment', LS_LAST_ORDER='fdz_last_order';
+const POLL_INTERVAL_MS=5000, POLL_TIMEOUT_MS=10*60*1000;
 
 let CFG=null, paymentWindow=null, pollTimer=null;
 let curVariant='HP', curRegion='SG', qSearch='', qSort='price-asc';
 
 // ====== persist helpers
-const saveLastPayment=(o)=>{try{localStorage.setItem(LS_LAST_PAYMENT,JSON.stringify({...o,ts:Date.now()}))}catch{}};
+const saveLastPayment=o=>{try{localStorage.setItem(LS_LAST_PAYMENT,JSON.stringify({...o,ts:Date.now()}))}catch{}};
 const getLastPayment=()=>{try{return JSON.parse(localStorage.getItem(LS_LAST_PAYMENT)||'null')}catch{return null}};
 const clearLastPayment=()=>{try{localStorage.removeItem(LS_LAST_PAYMENT)}catch{}};
 
@@ -36,15 +34,11 @@ const co_email=document.getElementById('co_email');
 const btnCheckout=document.getElementById('btnCheckout');
 
 // ====== helpers
-const rupiah=(n)=>(Number(n)||0).toLocaleString('id-ID');
-const sanitizeBase=(s)=>String(s||'').toLowerCase().replace(/[^a-z0-9\-]/g,'').slice(0,20);
-const withSuffix=(base)=>{const d=new Date();const suf=String(d.getSeconds()).padStart(2,'0')+String(Math.floor(d.getMilliseconds()/10)).padStart(2,'0');return `${sanitizeBase(base)}-${suf}`.slice(0,24)};
-const imgFor=(variant,region)=>{
-  const map={HP:{SG:'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1600&auto=format&fit=crop',ID:'https://images.unsplash.com/photo-1518779578993-ec3579fee39f?q=80&w=1600&auto=format&fit=crop'},
-             STB:{SG:'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=1600&auto=format&fit=crop',ID:'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?q=80&w=1600&auto=format&fit=crop'}};
-  return (map[variant]&&map[variant][region])||'https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1600&auto=format&fit=crop';
-};
-const setActive=(els,val,key)=>els.forEach(b=>b.classList.toggle('active', (key==='variant'?b.dataset.filterVariant:b.dataset.filterRegion)===val));
+const rupiah=n=>(Number(n)||0).toLocaleString('id-ID');
+const sanitizeBase=s=>String(s||'').toLowerCase().replace(/[^a-z0-9\-]/g,'').slice(0,20);
+const withSuffix=base=>{const d=new Date();const suf=String(d.getSeconds()).padStart(2,'0')+String(Math.floor(d.getMilliseconds()/10)).padStart(2,'0');return `${sanitizeBase(base)}-${suf}`.slice(0,24)};
+const imgFor=(v,r)=>{const m={HP:{SG:'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1600&auto=format&fit=crop',ID:'https://images.unsplash.com/photo-1518779578993-ec3579fee39f?q=80&w=1600&auto=format&fit=crop'},STB:{SG:'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=1600&auto=format&fit=crop',ID:'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?q=80&w=1600&auto=format&fit=crop'}};return (m[v]&&m[v][r])||'https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1600&auto=format&fit=crop'};
+const setActive=(els,val,key)=>els.forEach(b=>b.classList.toggle('active',(key==='variant'?b.dataset.filterVariant:b.dataset.filterRegion)===val));
 
 // ====== data
 async function loadConfig(){
@@ -56,39 +50,36 @@ async function loadConfig(){
 const products=(v,r)=>{
   const defQ=v==='HP'?300:600;
   return (CFG?.variants?.[v]?.[r]||[]).map(s=>({
-    id:s.id, label:s.label, price:Number(s.price)||0, quota:s.quotaGB ?? defQ, days:s.expDays ?? 30,
-    variant:v, region:r, img:imgFor(v,r)
+    id:s.id,label:s.label,price:Number(s.price)||0,quota:s.quotaGB??defQ,days:s.expDays??30,
+    variant:v,region:r,img:imgFor(v,r)
   }));
 };
 
 // ====== render
-const card=(p)=>{
-  const best = (p.price<=10000) ? '<div class="badge-ribbon">Best Value</div>' : '';
-  return `
-  <article class="card-prod">
-    ${best}
-    <img class="thumb" loading="lazy" src="${p.img}" alt="${p.label}">
-    <div class="body">
-      <h3 class="title">${p.region} ${p.variant} ${p.label}</h3>
-      <div class="meta">Kuota ~${p.quota}GB • ${p.days} hari</div>
-      <div class="feat">
-        <span class="chip">${p.variant}</span>
-        <span class="chip"><i class="bi bi-geo-alt"></i> ${p.region}</span>
-        <span class="chip"><i class="bi bi-shield-check"></i> Otomatis</span>
-      </div>
-      <div class="cta">
-        <div class="price">Rp ${rupiah(p.price)} <span class="text-muted" style="font-size:.8rem">/30 hari</span></div>
-        <button class="btn-buy" data-buy data-variant="${p.variant}" data-region="${p.region}" data-serverid="${p.id}">
-          <i class="bi bi-cart3 me-1"></i> Beli
-        </button>
-      </div>
+const card=p=>`
+<article class="card-prod">
+  ${(p.price<=10000)?'<div class="badge-ribbon">Best Value</div>':''}
+  <img class="thumb" loading="lazy" src="${p.img}" alt="${p.label}">
+  <div class="body">
+    <h3 class="title">${p.region} ${p.variant} ${p.label}</h3>
+    <div class="meta">Kuota ~${p.quota}GB • ${p.days} hari</div>
+    <div class="feat">
+      <span class="chip">${p.variant}</span>
+      <span class="chip"><i class="bi bi-geo-alt"></i> ${p.region}</span>
+      <span class="chip"><i class="bi bi-shield-check"></i> Otomatis</span>
     </div>
-  </article>`;
-};
+    <div class="cta">
+      <div class="price">Rp ${rupiah(p.price)} <span class="text-muted" style="font-size:.8rem">/30 hari</span></div>
+      <button class="btn-buy" data-buy data-variant="${p.variant}" data-region="${p.region}" data-serverid="${p.id}">
+        <i class="bi bi-cart3 me-1"></i> Beli
+      </button>
+    </div>
+  </div>
+</article>`;
 
 function applySearchSort(items){
   let out=[...items];
-  const q=qSearch.trim().toLowerCase();
+  const q=(qSearch||'').trim().toLowerCase();
   if(q) out=out.filter(p=>(`${p.label} ${p.region} ${p.variant}`).toLowerCase().includes(q));
   switch(qSort){
     case 'price-desc': out.sort((a,b)=>b.price-a.price); break;
@@ -99,14 +90,10 @@ function applySearchSort(items){
   }
   return out;
 }
-
 function render(){
   const items=applySearchSort(products(curVariant,curRegion));
-  if(!items.length){
-    grid.innerHTML=`<div class="alert alert-warning">Tidak ada item untuk filter ini. Ubah filter atau cek konfigurasi PRICE_${curRegion}_${curVariant}.</div>`;
-  }else{
-    grid.innerHTML=items.map(card).join('');
-  }
+  grid.innerHTML = items.length ? items.map(card).join('') :
+    `<div class="alert alert-warning">Tidak ada item untuk filter ini. Ubah filter atau cek konfigurasi PRICE_${curRegion}_${curVariant}.</div>`;
 }
 
 // ====== checkout
@@ -124,7 +111,7 @@ async function pollStatus(orderId){
       const r=await fetch(`${API_BASE}/pay/status?orderId=${encodeURIComponent(orderId)}`,{headers:{accept:'application/json'}});
       const d=await r.json();
       if(!r.ok){ statusText.textContent='Order tidak ditemukan / error.'; statusText.className='badge bg-danger'; return clearInterval(pollTimer); }
-      if(d.paymentUrl){ payLink.href=d.paymentUrl; const cur=getLastPayment(); if(cur && cur.orderId===(d.orderId||orderId)) saveLastPayment({...cur,paymentUrl:d.paymentUrl}); }
+      if(d.paymentUrl){ payLink.href=d.paymentUrl; const cur=getLastPayment(); if(cur&&cur.orderId===(d.orderId||orderId)) saveLastPayment({...cur,paymentUrl:d.paymentUrl}); }
       const s=String(d.status||'').toUpperCase();
       if(s==='PAID'){ statusText.textContent='Pembayaran diterima ✔'; statusText.className='badge bg-success'; clearLastPayment(); return clearInterval(pollTimer); }
       if(s==='FAILED'){ statusText.textContent='Pembayaran gagal ✖'; statusText.className='badge bg-danger'; clearLastPayment(); return clearInterval(pollTimer); }
@@ -150,7 +137,7 @@ async function doCheckout(){
     btnCheckout.disabled=true; btnCheckout.innerHTML='<span class="spinner-border spinner-border-sm me-2"></span>Memproses...';
     const res=await createInvoice({variant,region,serverId,protocol,username,usernameFinal,email,promoCode:''});
     const {orderId,paymentUrl,reference}=res; if(!orderId||!paymentUrl) throw new Error('Respon API tidak valid.');
-    try{ localStorage.setItem(LS_LAST_ORDER,orderId) }catch{}
+    try{localStorage.setItem(LS_LAST_ORDER,orderId)}catch{}
     saveLastPayment({orderId,paymentUrl,reference});
     orderIdText.textContent=orderId; statusText.textContent='Menunggu pembayaran...'; statusText.className='badge bg-warning text-dark';
     payLink.href=paymentUrl; waitingBox.style.display='';
@@ -173,8 +160,7 @@ document.addEventListener('DOMContentLoaded', async ()=>{
 
   // load config + pick first available
   try{ await loadConfig(); }catch(e){ skeleton.style.display='none'; grid.innerHTML=`<div class="alert alert-danger">${e.message}</div>`; return; }
-  const variants=['HP','STB'], regions=['SG','ID'];
-  let found=false; for(const v of variants){ for(const r of regions){ if((CFG?.variants?.[v]?.[r]||[]).length){ curVariant=v;curRegion=r; found=true; break; } } if(found) break; }
+  for(const v of ['HP','STB']){ for(const r of ['SG','ID']){ if((CFG?.variants?.v?.r||CFG?.variants?.[v]?.[r]||[]).length){ curVariant=v; curRegion=r; break; } } if((CFG?.variants?.[curVariant]?.[curRegion]||[]).length) break; }
   skeleton.style.display='none'; render();
 
   // filter handlers
