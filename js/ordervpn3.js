@@ -37,7 +37,7 @@ const btnCheckout=document.getElementById('btnCheckout');
 const rupiah=n=>(Number(n)||0).toLocaleString('id-ID');
 const sanitizeBase=s=>String(s||'').toLowerCase().replace(/[^a-z0-9\-]/g,'').slice(0,20);
 const withSuffix=base=>{const d=new Date();const suf=String(d.getSeconds()).padStart(2,'0')+String(Math.floor(d.getMilliseconds()/10)).padStart(2,'0');return `${sanitizeBase(base)}-${suf}`.slice(0,24)};
-const imgFor=(v,r)=>{const m={HP:{SG:'https://raw.githubusercontent.com/MikkuChan/digital_page/main/assets/citlali/citlali01.jpg',ID:'https://raw.githubusercontent.com/MikkuChan/digital_page/main/assets/citlali/citlali02.jpg'},STB:{SG:'https://raw.githubusercontent.com/MikkuChan/digital_page/main/assets/citlali/citlali03.jpg',ID:'https://raw.githubusercontent.com/MikkuChan/digital_page/main/assets/citlali/citlali04.jpg'}};return (m[v]&&m[v][r])||'https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1600&auto=format&fit=crop'};
+const imgFor=(v,r)=>{const m={HP:{SG:'https://raw.githubusercontent.com/MikkuChan/digital_page/main/assets/citlali/citlali01.jpg',ID:'https://raw.githubusercontent.com/MikkuChan/digital_page/main/assets/citlali/citlali02.jpg'},STB:{SG:'https://raw.githubusercontent.com/MikkuChan/digital_page/main/assets/citlali/citlali06.jpg',ID:'https://raw.githubusercontent.com/MikkuChan/digital_page/main/assets/citlali/citlali05.jpg'}};return (m[v]&&m[v][r])||'https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1600&auto=format&fit=crop'};
 const setActive=(els,val,key)=>els.forEach(b=>b.classList.toggle('active',(key==='variant'?b.dataset.filterVariant:b.dataset.filterRegion)===val));
 
 // ====== data
