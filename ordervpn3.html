@@ -58,33 +58,35 @@
       </div>
     </section>
 
-    <!-- FILTER + GRID -->
+    <!-- FILTER BAR + GRID -->
     <section class="container py-4">
-      <div class="catalog-filter card mb-3">
+      <!-- Filter bar polished -->
+      <div class="catalog-filter card mb-3 filter-bar">
         <div class="card-body d-flex flex-wrap gap-3 align-items-center">
+          <!-- Varian -->
           <div class="d-flex align-items-center gap-2">
-            <span class="text-muted">Varian:</span>
-            <div class="btn-group" role="group">
-              <button class="btn btn-outline-primary active" data-filter-variant="HP">HP</button>
-              <button class="btn btn-outline-primary" data-filter-variant="STB">STB</button>
+            <span class="text-muted fw-medium">Varian:</span>
+            <div class="segmented" role="group" aria-label="Pilih Varian">
+              <button class="seg-btn active" data-filter-variant="HP">HP</button>
+              <button class="seg-btn" data-filter-variant="STB">STB</button>
             </div>
           </div>
-
+          <!-- Region -->
           <div class="d-flex align-items-center gap-2">
-            <span class="text-muted">Region:</span>
-            <div class="btn-group" role="group">
-              <button class="btn btn-outline-secondary active" data-filter-region="SG">Singapore</button>
-              <button class="btn btn-outline-secondary" data-filter-region="ID">Indonesia</button>
+            <span class="text-muted fw-medium">Region:</span>
+            <div class="segmented" role="group" aria-label="Pilih Region">
+              <button class="seg-btn active" data-filter-region="SG">Singapore</button>
+              <button class="seg-btn" data-filter-region="ID">Indonesia</button>
             </div>
           </div>
-
-          <div class="ms-auto d-flex flex-wrap gap-2">
-            <div class="input-group input-group-sm">
-              <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+          <!-- Kanan -->
+          <div class="ms-auto d-flex flex-wrap gap-2 align-items-center">
+            <div class="search-ctrl input-group input-group-sm">
+              <span class="input-group-text"><i class="bi bi-search"></i></span>
               <input id="searchBox" class="form-control" placeholder="Cari: label/server…" />
             </div>
-            <div class="input-group input-group-sm" style="width:210px">
-              <span class="input-group-text bg-white"><i class="bi bi-sort-down"></i></span>
+            <div class="sort-ctrl input-group input-group-sm">
+              <span class="input-group-text"><i class="bi bi-sort-down"></i></span>
               <select id="sortSel" class="form-select">
                 <option value="price-asc">Harga termurah</option>
                 <option value="price-desc">Harga termahal</option>
@@ -93,9 +95,10 @@
                 <option value="label-asc">Nama A→Z</option>
               </select>
             </div>
-            <span class="badge text-bg-light align-self-center">
-              <i class="bi bi-ticket-perforated"></i> <span id="promoInfo">Promo: -</span>
-            </span>
+            <div id="promoPill" class="promo-pill" data-status="off">
+              <i class="bi bi-ticket-perforated me-1"></i>
+              <span id="promoInfo">Tidak aktif</span>
+            </div>
           </div>
         </div>
       </div>
@@ -128,7 +131,7 @@
       </div>
     </section>
 
-    <!-- FAQ (diperbarui, termasuk cara order) -->
+    <!-- FAQ (termasuk cara order) -->
     <section class="container py-4">
       <div class="card">
         <div class="card-body">
@@ -143,13 +146,12 @@
               <div id="c0" class="accordion-collapse collapse show" data-bs-parent="#faqAcc">
                 <div class="accordion-body">
                   1) Pilih <b>Varian</b> & <b>Region</b> → klik <b>Beli</b> pada kartu server.<br/>
-                  2) Isi <b>protokol</b>, <b>username</b>, dan <b>email</b> (opsional) pada modal checkout.<br/>
+                  2) Isi <b>protokol</b>, <b>username</b>, dan <b>email</b> (opsional) di modal checkout.<br/>
                   3) Lanjutkan pembayaran via <b>Duitku</b> (QRIS, VA, e-wallet).<br/>
-                  4) Setelah <i>paid</i>, detail akun muncul otomatis dan bisa diunduh; juga dikirim ke email bila diisi.
+                  4) Setelah <i>paid</i>, detail akun muncul otomatis & bisa diunduh; juga dikirim ke email bila diisi.
                 </div>
               </div>
             </div>
-
             <div class="accordion-item">
               <h2 class="accordion-header" id="f1">
                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c1">
@@ -157,25 +159,19 @@
                 </button>
               </h2>
               <div id="c1" class="accordion-collapse collapse" data-bs-parent="#faqAcc">
-                <div class="accordion-body">
-                  Instan. Sistem memproses otomatis dan menampilkan detail akun di halaman ini.
-                </div>
+                <div class="accordion-body">Instan. Sistem memproses otomatis dan menampilkan detail akun di halaman ini.</div>
               </div>
             </div>
-
             <div class="accordion-item">
               <h2 class="accordion-header" id="f2">
                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c2">
-                  Protokol apa saja yang tersedia?
+                  Protokol yang tersedia?
                 </button>
               </h2>
               <div id="c2" class="accordion-collapse collapse" data-bs-parent="#faqAcc">
-                <div class="accordion-body">
-                  VMess, VLESS, dan Trojan—kompatibel dengan v2rayNG, NapsternetV, Nekobox, dll.
-                </div>
+                <div class="accordion-body">VMess, VLESS, dan Trojan—kompatibel dengan v2rayNG, NapsternetV, Nekobox, dll.</div>
               </div>
             </div>
-
             <div class="accordion-item">
               <h2 class="accordion-header" id="f3">
                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c3">
@@ -183,12 +179,9 @@
                 </button>
               </h2>
               <div id="c3" class="accordion-collapse collapse" data-bs-parent="#faqAcc">
-                <div class="accordion-body">
-                  Tenang—link pembayaran disimpan otomatis. Saat halaman dibuka lagi, sistem akan me-restore dan lanjut memantau statusnya.
-                </div>
+                <div class="accordion-body">Link pembayaran disimpan otomatis. Saat dibuka lagi, sistem restore & lanjut memantau status.</div>
               </div>
             </div>
-
             <div class="accordion-item">
               <h2 class="accordion-header" id="f4">
                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c4">
@@ -196,9 +189,7 @@
                 </button>
               </h2>
               <div id="c4" class="accordion-collapse collapse" data-bs-parent="#faqAcc">
-                <div class="accordion-body">
-                  Jika terjadi kesalahan sistem (akun tidak terbit > 15 menit) dan pembayaran sukses, hubungi admin—kami bantu sesuai kebijakan.
-                </div>
+                <div class="accordion-body">Jika terjadi kesalahan sistem (akun tidak terbit > 15 menit) dan pembayaran sukses, hubungi admin—kami bantu sesuai kebijakan.</div>
               </div>
             </div>
 
@@ -208,7 +199,7 @@
     </section>
   </main>
 
-  <!-- MODAL CHECKOUT (singkat) -->
+  <!-- MODAL CHECKOUT -->
   <div class="modal fade" id="checkoutModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
