@@ -1,11 +1,18 @@
-/* order-status.js */
+/* order-status.js — fetch status pakai orderId + uf + email, UI dipoles */
+
 const API_BASE = (window.API_BASE || '').replace(/\/+$/, '') || `${location.origin}`;
 const POLL_INTERVAL_MS = 5000;
 const POLL_TIMEOUT_MS  = 10 * 60 * 1000;
+const LS_LAST_PAYMENT  = 'fdz_last_payment';   // berisi {orderId, paymentUrl, reference, uf, email, ts}
+const LS_LAST_ORDER    = 'fdz_last_order';     // menyimpan last orderId saja (optional)
 
 const orderIdInput = document.getElementById('orderIdInput');
+const ufInput      = document.getElementById('ufInput');
+const emailInput   = document.getElementById('emailInput');
+
 const btnLookup    = document.getElementById('btnLookup');
 const btnOpenPay   = document.getElementById('btnOpenPayment');
+
 const statusBox    = document.getElementById('statusBox');
 const resultBox    = document.getElementById('resultBox');
 const errorBox     = document.getElementById('errorBox');
@@ -31,20 +38,23 @@ const downloadBtn  = document.getElementById('downloadConfigBtn');
 
 let pollTimer = null;
 
-const show = el => el && (el.style.display = '');
-const hide = el => el && (el.style.display = 'none');
-const setText = (el, t) => el && (el.textContent = t ?? '');
+const show   = (el) => el && (el.style.display = '');
+const hide   = (el) => el && (el.style.display = 'none');
+const setText= (el, t) => el && (el.textContent = t ?? '');
+const validEmail = (s) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(String(s||'').trim());
 
 function showError(msg) {
   errorBox.innerHTML = `<div class="alert alert-danger">${msg}</div>`;
   show(errorBox);
 }
-
 function clearError() {
   errorBox.innerHTML = '';
   hide(errorBox);
 }
 
+function getLastPayment(){
+  try { return JSON.parse(localStorage.getItem(LS_LAST_PAYMENT) || 'null'); } catch { return null; }
+}
 function setPaymentUrl(url){
   if (url) {
     btnOpenPay.href = url;
@@ -99,7 +109,7 @@ function buildTextDump(data) {
 function showAccount(data) {
   hide(statusBox);
   show(resultBox);
-  const p = data.accountFields;
+  const p = data.accountFields || {};
   setText(accUsername, p.username);
   setText(accUUID, p.uuid);
   setText(accDomain, p.domain);
@@ -114,14 +124,19 @@ function showAccount(data) {
   setupActions(data);
 }
 
-async function fetchStatus(orderId){
-  const r = await fetch(`${API_BASE}/pay/status?orderId=${encodeURIComponent(orderId)}`);
-  const data = await r.json();
-  if (!r.ok) throw new Error(data?.message || 'Order tidak ditemukan.');
+/** fetch status (AMAN): wajib orderId + uf + email */
+async function fetchStatus(orderId, uf, email){
+  const u = new URL(`${API_BASE}/pay/status`);
+  u.searchParams.set('orderId', orderId);
+  u.searchParams.set('uf', uf);
+  u.searchParams.set('email', email);
+  const r = await fetch(u.toString(), { headers: { accept: 'application/json' } });
+  const data = await r.json().catch(()=>null);
+  if (!r.ok || !data) throw new Error(data?.message || 'Order tidak ditemukan / parameter tidak cocok.');
   return data;
 }
 
-async function startPolling(orderId){
+async function startPolling(orderId, uf, email){
   clearError();
   hide(resultBox);
   show(statusBox);
@@ -138,8 +153,15 @@ async function startPolling(orderId){
       return;
     }
     try {
-      const data = await fetchStatus(orderId);
-      setPaymentUrl(data?.paymentUrl || localStorage.getItem('fdz_last_payurl') || '');
+      const data = await fetchStatus(orderId, uf, email);
+      // set payment URL jika tersedia (atau dari last payment)
+      if (data?.paymentUrl) {
+        setPaymentUrl(data.paymentUrl);
+      } else {
+        const last = getLastPayment();
+        setPaymentUrl(last?.orderId === orderId ? last.paymentUrl : '');
+      }
+
       const st = String(data.status || '').toUpperCase();
       if (st === 'PAID') {
         statusBadge.textContent = 'Dibayar ✔';
@@ -168,9 +190,10 @@ async function startPolling(orderId){
 }
 
 function stopPolling(){
-  if (pollTimer) clearInterval(pollTimer), (pollTimer = null);
+  if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
 }
 
+// copy buttons (WS/GRPC)
 document.addEventListener('click', async (e) => {
   const btn = e.target.closest('.cfg-copy');
   if (btn) {
@@ -185,26 +208,46 @@ document.addEventListener('click', async (e) => {
   }
 });
 
+// form submit
 document.getElementById('lookupForm').addEventListener('submit', (e)=>{
   e.preventDefault();
+  clearError();
+
   const oid = (orderIdInput.value || '').trim();
-  if (!oid) return;
-  localStorage.setItem('fdz_last_order', oid);
-  startPolling(oid);
+  const uf  = (ufInput.value || '').trim().toLowerCase();
+  const em  = (emailInput.value || '').trim();
+
+  if (!oid) return showError('Order ID wajib diisi.');
+  if (!uf)  return showError('Username Final (uf) wajib diisi.');
+  if (!em || !validEmail(em)) return showError('Email wajib diisi dan harus valid.');
+
+  try { localStorage.setItem(LS_LAST_ORDER, oid); } catch {}
+  startPolling(oid, uf, em);
 });
 
 // Auto-init dari query/localStorage
 (function init(){
-  const u = new URL(location.href);
-  const qid = u.searchParams.get('orderId');
-  const last = localStorage.getItem('fdz_last_order');
-  const oid = qid || last;
-  const payurl = localStorage.getItem('fdz_last_payurl');
-  if (payurl) setPaymentUrl(payurl);
-  if (oid) {
-    orderIdInput.value = oid;
+  const url = new URL(location.href);
+  const qid   = url.searchParams.get('orderId') || '';
+  const quf   = url.searchParams.get('uf') || '';
+  const qmail = url.searchParams.get('email') || '';
+  const last  = getLastPayment(); // {orderId,paymentUrl,uf,email}
+
+  // Prefill input dari query atau dari last payment
+  const orderIdPref = qid || (last?.orderId || localStorage.getItem(LS_LAST_ORDER) || '');
+  const ufPref      = quf || (last?.uf || '');
+  const emailPref   = qmail || (last?.email || '');
+
+  if (orderIdPref) orderIdInput.value = orderIdPref;
+  if (ufPref)      ufInput.value      = ufPref;
+  if (emailPref)   emailInput.value   = emailPref;
+
+  if (last?.paymentUrl && last?.orderId === orderIdPref) setPaymentUrl(last.paymentUrl);
+
+  // Auto start polling jika tiga parameter lengkap
+  if (orderIdPref && ufPref && emailPref) {
     hintEl.style.display = '';
-    hintEl.textContent = 'Order ID terdeteksi otomatis dari sesi sebelumnya / URL.';
-    startPolling(oid);
+    hintEl.textContent = 'Parameter terdeteksi otomatis dari sesi/URL. Memeriksa status…';
+    startPolling(orderIdPref, ufPref, emailPref);
   }
 })();
