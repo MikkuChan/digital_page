@@ -121,5 +121,16 @@
 /* error boxes */
 #errorBox .alert, #errorBoxRight .alert{ border-radius:.75rem; }
 
+.pm-badges{display:flex;flex-wrap:wrap;gap:.5rem}
+.pm{padding:.35rem .6rem;border-radius:999px;font-size:.8rem;font-weight:600;border:1px solid #e5e7eb;background:#fff}
+.pm-bank{border-color:#b6e0fe;background:#eaf6ff}
+.pm-ew{border-color:#ffd6a5;background:#fff7e6}
+.pm-qris{border-color:#ffc2c2;background:#fff0f0}
+.pm-retail{border-color:#cdeccf;background:#f1fff1}
+@media (max-width: 576px){
+  .pay-hint .btn{width:100%}
+}
+
+
 /* spinner tweak */
 .spinner-border{ width:1.8rem;height:1.8rem;border-width:.2rem; }
