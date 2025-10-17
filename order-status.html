@@ -59,7 +59,9 @@
           Masukkan <b>Order ID</b>, <b>Username Final (uf)</b>, dan <b>Email</b> yang kamu pakai saat order.
         </p>
         <div class="d-flex justify-content-center gap-2">
-          <a href="ordervpn.html" class="btn btn-outline-primary"><i class="bi bi-cart4 me-1"></i> Order Paket Baru</a>
+          <a href="ordervpn.html" class="btn btn-outline-primary">
+            <i class="bi bi-cart4 me-1"></i> Order Paket Baru
+          </a>
         </div>
       </div>
     </section>
@@ -135,13 +137,13 @@
                     <span class="pm pm-retail">Retail</span>
                   </div>
 
-                  <div class="ms-auto d-flex flex-wrap gap-2 pay-actions">
+                  <div class="ms-auto pay-actions">
                     <a id="btnOpenPaymentInline" class="btn btn-outline-primary disabled" target="_blank" rel="noopener">
                       <i class="bi bi-box-arrow-up-right me-1"></i> Buka Halaman Pembayaran
                     </a>
-                    <a href="ordervpn.html" class="btn btn-light">
-                      <i class="bi bi-arrow-left-circle me-1"></i> Kembali ke Katalog
-                    </a>
+                    <button id="btnAccountList" type="button" class="btn btn-light border">
+                      <i class="bi bi-people me-1"></i> Daftar Akun
+                    </button>
                   </div>
                 </div>
               </div>
@@ -324,6 +326,31 @@
     </div>
   </footer>
 
+  <!-- Modal: Daftar Akun Tersimpan -->
+  <div class="modal fade" id="accountsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Daftar Akun (Cache 30 hari)</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+        </div>
+        <div class="modal-body">
+          <div id="accountsEmpty" class="alert alert-info small" style="display:none;">
+            Belum ada akun tersimpan. Setelah pembayaran berhasil, akun akan otomatis tersimpan di sini.
+          </div>
+          <div id="accountsList" class="list-group"></div>
+        </div>
+        <div class="modal-footer">
+          <button id="btnClearExpired" type="button" class="btn btn-outline-danger btn-sm">
+            <i class="bi bi-trash3"></i> Hapus yang Kedaluwarsa
+          </button>
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Tutup</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPTS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="js/order-status.js"></script>
   <script>
