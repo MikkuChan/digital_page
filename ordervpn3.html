@@ -13,13 +13,14 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
   <link href="css/style.css" rel="stylesheet" />
   <link href="css/ordervpn3.css" rel="stylesheet" />
+  <!-- Pastikan ini mengarah ke domain Worker kamu (HTTPS absolute) -->
   <script>window.API_BASE="https://call.fadzdigital.store";</script>
 </head>
 <body>
   <!-- overlay -->
   <div class="loading-overlay" id="loadingOverlay"><div class="loading-spinner"></div></div>
 
-  <!-- NAVBAR (tidak diubah) -->
+  <!-- NAVBAR -->
   <nav class="navbar navbar-expand-lg fixed-top">
     <div class="container">
       <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
@@ -60,7 +61,7 @@
 
     <!-- FILTER BAR + GRID -->
     <section class="container py-4">
-      <!-- Filter bar polished -->
+      <!-- Filter bar -->
       <div class="catalog-filter card mb-3 filter-bar">
         <div class="card-body d-flex flex-wrap gap-3 align-items-center">
           <!-- Varian -->
@@ -131,7 +132,7 @@
       </div>
     </section>
 
-    <!-- FAQ (termasuk cara order) -->
+    <!-- FAQ -->
     <section class="container py-4">
       <div class="card">
         <div class="card-body">
@@ -146,9 +147,9 @@
               <div id="c0" class="accordion-collapse collapse show" data-bs-parent="#faqAcc">
                 <div class="accordion-body">
                   1) Pilih <b>Varian</b> & <b>Region</b> → klik <b>Beli</b> pada kartu server.<br/>
-                  2) Isi <b>protokol</b>, <b>username</b>, dan <b>email</b> (opsional) di modal checkout.<br/>
+                  2) Isi <b>protokol</b>, <b>username</b>, dan <b>email (wajib)</b> di modal checkout.<br/>
                   3) Lanjutkan pembayaran via <b>Duitku</b> (QRIS, VA, e-wallet).<br/>
-                  4) Setelah <i>paid</i>, detail akun muncul otomatis & bisa diunduh; juga dikirim ke email bila diisi.
+                  4) Setelah <i>paid</i>, detail akun muncul otomatis & juga dikirim ke email kamu.
                 </div>
               </div>
             </div>
@@ -208,7 +209,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <form class="vstack gap-2">
+          <form class="vstack gap-2" onsubmit="return false;">
             <input id="co_variant" class="d-none" />
             <input id="co_region" class="d-none" />
             <input id="co_serverId" class="d-none" />
@@ -226,11 +227,11 @@
                 <input id="co_username" class="form-control" placeholder="misal: userkeren" />
               </div>
               <div class="col-12">
-                <label class="form-label small text-muted">Email (opsional)</label>
-                <input id="co_email" type="email" class="form-control" placeholder="contoh@gmail.com" />
+                <label class="form-label small text-muted">Email <span class="text-danger">*</span></label>
+                <input id="co_email" type="email" class="form-control" placeholder="contoh@gmail.com" required />
               </div>
             </div>
-            <div class="small text-muted">Sistem menambah suffix agar unik.</div>
+            <div class="small text-muted">Sistem menambah suffix agar unik. Email dipakai untuk kirim detail akun & memverifikasi status order.</div>
           </form>
         </div>
         <div class="modal-footer">
@@ -243,7 +244,7 @@
     </div>
   </div>
 
-  <!-- FOOTER (tetap) -->
+  <!-- FOOTER -->
   <footer class="py-4" style="background:var(--gray-900);color:var(--gray-100);">
     <div class="container text-center">
       <div class="mb-2"><span class="fw-bold font-display text-gradient" style="font-size:1.3rem;">fadzdigital</span></div>
@@ -252,6 +253,7 @@
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- pastikan file JS yang terbaru (yang memanggil /pay/status dengan orderId+uf+email) -->
   <script src="js/ordervpn3.js"></script>
   <script>
     window.addEventListener('load',()=>{setTimeout(()=>{const el=document.getElementById('loadingOverlay');if(!el)return;el.style.opacity='0';setTimeout(()=>el.style.display='none',600)},400)});
