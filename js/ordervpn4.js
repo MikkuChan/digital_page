@@ -1,6 +1,4 @@
-/* =========================================================
-   ordervpn4.js — (Tidak Ada Perubahan)
-   ========================================================= */
+/* ordervpn.js */
 
 const API_BASE = (window.API_BASE || '').replace(/\/+$/, '') || `${location.origin}`;
 const POLL_INTERVAL_MS = 5000;
@@ -419,3 +417,4 @@ document.addEventListener('click', async (e) => {
         }
     }
 });
+
