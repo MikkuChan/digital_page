@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <title>Status Pesanan – fadzdigital</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Cek status pesanan VPN & lihat detail akun Anda." />
+  <meta name="description" content="Cek status pesanan VPN & ambil detail akun Anda." />
   <link rel="icon" href="https://raw.githubusercontent.com/fadzdigital/image/main/favicon.ico" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -14,17 +14,14 @@
   <link href="css/style.css" rel="stylesheet" />
   <link href="css/ordervpn.css" rel="stylesheet" />
   <link href="css/order-status.css" rel="stylesheet" />
-  <script>
-    window.API_BASE = "https://call.fadzdigital.store";
-  </script>
+  <script>window.API_BASE = "https://call.fadzdigital.store";</script>
 </head>
 
 <body>
-  <div class="loading-overlay" id="loadingOverlay">
-    <div class="loading-spinner"></div>
-  </div>
+  <!-- overlay -->
+  <div class="loading-overlay" id="loadingOverlay"><div class="loading-spinner"></div></div>
 
-  <!-- NAVBAR: sama seperti halaman Order VPN -->
+  <!-- NAVBAR (match halaman lain) -->
   <nav class="navbar navbar-expand-lg fixed-top">
     <div class="container">
       <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
@@ -53,25 +50,21 @@
   </nav>
 
   <main style="margin-top:90px;min-height:100vh;">
-    <!-- HERO: konsisten -->
+    <!-- HERO -->
     <section class="order-hero text-center font-display py-5 mb-0">
       <div class="container">
-        <span class="badge-hero mb-3">
-          <i class="bi bi-receipt-cutoff me-2"></i>Status Pesanan
-        </span>
-        <h1 class="display-4 fw-bold mb-3 text-dark-blue">
-          Lacak <span class="text-gradient">Pembayaran</span> & Ambil Akun
-        </h1>
-        <p class="lead text-secondary mx-auto mb-4" style="max-width:650px;">
-          Masukkan <b>Order ID</b>, <b>Username Final (uf)</b>, dan <b>Email</b> yang dipakai saat order.
+        <span class="badge-hero mb-3"><i class="bi bi-receipt-cutoff me-2"></i>Status Pesanan</span>
+        <h1 class="display-4 fw-bold mb-3 text-dark-blue">Lacak <span class="text-gradient">Pembayaran</span> & Ambil Akun</h1>
+        <p class="lead text-secondary mx-auto mb-4" style="max-width:700px">
+          Masukkan <b>Order ID</b>, <b>Username Final (uf)</b>, dan <b>Email</b> yang kamu pakai saat order.
         </p>
       </div>
     </section>
 
-    <!-- KONTEN: 2 kolom (kiri form, kanan status/result sticky) -->
+    <!-- CONTENT -->
     <section class="container py-5">
       <div class="row g-4 g-lg-5">
-        <!-- KIRI: FORM LOOKUP -->
+        <!-- LEFT: Lookup form + progress -->
         <div class="col-lg-7">
           <div class="card card-form">
             <div class="card-body p-4 p-lg-5">
@@ -88,12 +81,12 @@
                   </div>
                   <div class="col-md-6">
                     <label class="form-label small text-muted">Username Final (uf)</label>
-                    <input id="ufInput" class="form-control" placeholder="misal: userkeren-12" />
+                    <input id="ufInput" class="form-control" placeholder="misal: user-12" />
                   </div>
                   <div class="col-12">
                     <label class="form-label small text-muted">Email (Wajib)</label>
                     <input id="emailInput" type="email" class="form-control" placeholder="contoh@gmail.com" />
-                    <div class="form-text">Email ini harus sama dengan yang digunakan saat order.</div>
+                    <div class="form-text">Harus sama dengan email saat order (untuk keamanan & pengiriman akun).</div>
                   </div>
                 </div>
 
@@ -104,34 +97,108 @@
                 <div id="hint" class="small text-muted mt-3" style="display:none;"></div>
                 <div id="errorBox" class="mt-3" style="display:none;"></div>
               </form>
+
+              <!-- Progress tracker -->
+              <div class="status-steps mt-5">
+                <div class="step" data-step="1">
+                  <div class="dot"><i class="bi bi-bag"></i></div>
+                  <div class="label">Order Dibuat</div>
+                </div>
+                <div class="line"></div>
+                <div class="step" data-step="2">
+                  <div class="dot"><i class="bi bi-credit-card"></i></div>
+                  <div class="label">Menunggu Pembayaran</div>
+                </div>
+                <div class="line"></div>
+                <div class="step" data-step="3">
+                  <div class="dot"><i class="bi bi-patch-check"></i></div>
+                  <div class="label">Dibayar</div>
+                </div>
+                <div class="line"></div>
+                <div class="step" data-step="4">
+                  <div class="dot"><i class="bi bi-shield-lock"></i></div>
+                  <div class="label">Akun Siap</div>
+                </div>
+              </div>
+
+              <!-- Payment methods (visual hint) -->
+              <div class="pay-hint card mt-4">
+                <div class="card-body d-flex flex-wrap align-items-center gap-3">
+                  <span class="text-muted small">Metode yang didukung:</span>
+                  <div class="pm-badges">
+                    <span class="pm pm-qris">QRIS</span>
+                    <span class="pm pm-va">VA</span>
+                    <span class="pm pm-ew">E-Wallet</span>
+                  </div>
+                  <a id="btnOpenPaymentInline" class="btn btn-outline-primary ms-auto disabled" target="_blank" rel="noopener">
+                    <i class="bi bi-box-arrow-up-right me-1"></i> Buka Halaman Pembayaran
+                  </a>
+                </div>
+              </div>
+
+              <!-- Timeline kecil -->
+              <div class="timeline mt-4">
+                <div class="t-item">
+                  <div class="t-dot"></div>
+                  <div class="t-content">
+                    <div class="t-title">Mulai</div>
+                    <div class="t-desc">Masukkan data & klik “Cek & Mulai Pantau”.</div>
+                  </div>
+                </div>
+                <div class="t-item">
+                  <div class="t-dot"></div>
+                  <div class="t-content">
+                    <div class="t-title">Pembayaran</div>
+                    <div class="t-desc">Jika belum bayar, buka halaman pembayaran & selesaikan transaksi.</div>
+                  </div>
+                </div>
+                <div class="t-item">
+                  <div class="t-dot"></div>
+                  <div class="t-content">
+                    <div class="t-title">Aktivasi Akun</div>
+                    <div class="t-desc">Setelah paid, sistem menyiapkan akun otomatis (biasanya &lt; 1 menit).</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tips -->
+          <div class="card card-tips mt-4">
+            <div class="card-body p-4">
+              <div class="d-flex align-items-center gap-2 mb-2">
+                <i class="bi bi-lightbulb"></i>
+                <strong>Tips:</strong>
+              </div>
+              <ul class="mb-0 small text-muted">
+                <li>Kalau halaman tertutup, buka lagi & isi Order ID + uf + Email untuk restore.</li>
+                <li>Simak tombol <b>Buka Halaman Pembayaran</b> jika status masih “Menunggu”.</li>
+                <li>Setelah akun muncul, klik <b>Salin Semua</b> atau <b>Download .txt</b>.</li>
+              </ul>
             </div>
           </div>
         </div>
 
-        <!-- KANAN: STATUS / RESULT -->
+        <!-- RIGHT: Status / Result (sticky) -->
         <div class="col-lg-5">
           <div class="position-sticky" style="top: 100px;">
-            <!-- STATUS BOX -->
+            <!-- Status card -->
             <div class="card card-status" id="statusBox" style="display:none;">
               <div class="card-body p-4">
                 <div class="d-flex align-items-center gap-3 mb-3">
-                  <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                  </div>
+                  <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>
                   <h3 class="h5 fw-bold mb-0 text-dark-blue">Status Pesanan</h3>
                 </div>
-
                 <p class="text-muted mb-1">Order ID: <code id="orderIdText">-</code></p>
                 <p class="text-muted mb-3">Username Final: <code id="ufText">-</code></p>
                 <div class="mb-3">Status: <span id="statusBadge" class="badge bg-info badge-pulse">Memeriksa…</span></div>
-
                 <a id="btnOpenPayment" class="btn btn-outline-primary w-100 disabled" target="_blank" rel="noopener">
                   <i class="bi bi-box-arrow-up-right me-1"></i> Buka Halaman Pembayaran
                 </a>
               </div>
             </div>
 
-            <!-- RESULT BOX -->
+            <!-- Result card -->
             <div class="card card-result" id="resultBox" style="display:none;">
               <div class="card-body p-4">
                 <div class="d-flex align-items-center gap-3 mb-3">
@@ -158,7 +225,6 @@
                     <button class="btn btn-sm btn-light cfg-copy" data-target="accWsTls" title="Salin"><i class="bi bi-clipboard"></i></button>
                   </div>
                 </div>
-
                 <div id="blk-ws-ntls" class="cfg-block mb-2" style="display:none;">
                   <div class="cfg-title">WS Non-TLS</div>
                   <div class="cfg-row">
@@ -166,7 +232,6 @@
                     <button class="btn btn-sm btn-light cfg-copy" data-target="accWsNtls" title="Salin"><i class="bi bi-clipboard"></i></button>
                   </div>
                 </div>
-
                 <div id="blk-grpc" class="cfg-block mb-3" style="display:none;">
                   <div class="cfg-title">gRPC</div>
                   <div class="cfg-row">
@@ -193,15 +258,13 @@
     </section>
   </main>
 
-  <!-- FOOTER: sama -->
+  <!-- FOOTER -->
   <footer class="py-4" style="background: var(--gray-900); color: var(--gray-100);">
     <div class="container text-center">
       <div class="mb-2">
         <span class="fw-bold font-display text-gradient" style="font-size:1.3rem;">fadzdigital</span>
       </div>
-      <div class="mb-2 small">
-        &copy; 2025 fadzdigital. All rights reserved.<br />Made with 💙 in Indonesia
-      </div>
+      <div class="mb-2 small">&copy; 2025 fadzdigital. All rights reserved.<br/>Made with 💙 in Indonesia</div>
       <div>
         <a href="index.html" class="text-primary small text-decoration-none mx-2">Beranda</a>
         <a href="ordervpn.html" class="text-primary small text-decoration-none mx-2">Order VPN</a>
@@ -215,15 +278,7 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="js/order-status.js"></script>
   <script>
-    // Hilangkan overlay loading halus
-    window.addEventListener('load', () => {
-      setTimeout(() => {
-        const el = document.getElementById('loadingOverlay');
-        if (!el) return;
-        el.style.opacity = '0';
-        setTimeout(() => (el.style.display = 'none'), 600);
-      }, 400);
-    });
+    window.addEventListener('load',()=>{setTimeout(()=>{const el=document.getElementById('loadingOverlay');if(!el)return;el.style.opacity='0';setTimeout(()=>el.style.display='none',600)},400)});
   </script>
 </body>
 </html>
