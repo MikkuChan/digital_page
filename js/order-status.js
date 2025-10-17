@@ -3,6 +3,7 @@
 const API_BASE = (window.API_BASE || '').replace(/\/+$/, '') || `${location.origin}`;
 const POLL_INTERVAL_MS = 5000;
 const POLL_TIMEOUT_MS  = 10 * 60 * 1000;
+const CACHE_HOURS = 36; // lama cache akun di browser
 
 const LS_LAST_PAYMENT = 'fdz_last_payment'; // {orderId, uf, email, paymentUrl, ...}
 const LS_LAST_LOOKUP  = 'fdz_last_lookup';  // {orderId, uf, email}
@@ -49,6 +50,10 @@ const downloadBtn = $('#downloadConfigBtn');
 // steps UI
 const steps = $$('.status-steps .step');
 
+// tampilkan durasi cache di FAQ
+const cacheHoursEl = $('#cacheHours');
+if (cacheHoursEl) cacheHoursEl.textContent = CACHE_HOURS;
+
 let pollTimer = null;
 let pollStart = 0;
 
@@ -76,10 +81,10 @@ function writeLastAccount(o){ writeJSON(LS_LAST_ACCOUNT, { ...o, ts: now() }); }
 function clearLastAccount(){ removeLS(LS_LAST_ACCOUNT); }
 function isSameIdentity(a,b){ return !!a && !!b && a.orderId===b.orderId && a.uf===b.uf && a.email===b.email; }
 
-// hapus cache akun jika terlalu lama (>36 jam)
+// hapus cache akun jika terlalu lama (> CACHE_HOURS)
 (function pruneAccount(){
   const a = readLastAccount();
-  if (a && (now() - (a.ts||0) > 36*60*60*1000)) clearLastAccount();
+  if (a && (now() - (a.ts||0) > CACHE_HOURS*60*60*1000)) clearLastAccount();
 })();
 
 // ===== payment link
@@ -191,6 +196,7 @@ async function fetchStatus(orderId, uf, email){
 }
 
 // ===== polling
+let pollTimerRef = null;
 async function startPolling({ orderId, uf, email }){
   clearErr(errorBox); clearErr(errorBoxR);
   show(statusBox); hide(resultBox);
@@ -254,9 +260,9 @@ async function startPolling({ orderId, uf, email }){
   };
 
   await tick();
-  pollTimer = setInterval(tick, POLL_INTERVAL_MS);
+  pollTimerRef = setInterval(tick, POLL_INTERVAL_MS);
 }
-function stopPolling(){ if (pollTimer) { clearInterval(pollTimer); pollTimer = null; } }
+function stopPolling(){ if (pollTimerRef) { clearInterval(pollTimerRef); pollTimerRef = null; } }
 
 // ===== events
 lookupForm.addEventListener('submit',(e)=>{
@@ -286,7 +292,7 @@ document.addEventListener('click', async (e)=>{
   }
 });
 
-// ===== init (restore by URL → last_payment → last_lookup → last_account)
+// ===== init (URL → last_payment → last_lookup → last_account)
 (function init(){
   const u = new URL(location.href);
   let restore = {
@@ -323,7 +329,7 @@ document.addEventListener('click', async (e)=>{
     });
     hintEl.style.display = '';
     hintEl.textContent = 'Detail akun dipulihkan dari sesi sebelumnya.';
-    // tetap polling sebentar untuk berjaga-jaga
+    // tetap polling untuk berjaga-jaga
     startPolling(restore);
     return;
   }
