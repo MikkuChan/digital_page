@@ -1,210 +1,95 @@
-/* order-status.css — mempercantik halaman status pesanan
-   Catatan:
-   - Menggunakan variable warna dari style.css/ordervpn3.css kalau ada (fallback disediakan)
-*/
-
+/* Halaman STATUS — kecil2 pemanis, nyatu dengan ordervpn.css */
+/* pakai variabel yang sudah ada di style/ordervpn.css */
 :root {
-  --fdz-radius-xl: 16px;
-  --fdz-radius-lg: 12px;
-  --fdz-radius-md: 10px;
-  --fdz-shadow: 0 10px 30px rgba(2, 6, 23, 0.08); /* slate-950-ish */
-  --fdz-shadow-soft: 0 6px 18px rgba(2, 6, 23, 0.06);
-  --fdz-border: #e6e8ee;
-
-  /* fallback warna (kalau belum ada di style.css) */
-  --gray-50:  #f9fafb;
-  --gray-100: #f3f4f6;
-  --gray-200: #e5e7eb;
-  --gray-700: #374151;
-  --gray-900: #0f172a;
-  --primary-50: #eef2ff;
-  --primary-100:#e0e7ff;
-  --primary-500:#6366f1;
-  --primary-600:#4f46e5;
-  --success-50:#ecfdf5;
-  --success-600:#16a34a;
-  --warning-50:#fff7ed;
-  --warning-600:#ea580c;
-  --danger-50:#fef2f2;
-  --danger-600:#dc2626;
+  --badge-border: #e9ecef;
+  --fdz-border: #e9ecef;
+  --fdz-radius-lg: 1rem;   /* 16px */
+  --fdz-radius-md: .75rem; /* 12px */
+  --shadow-soft: 0 6px 20px rgba(0,0,0,.06);
 }
 
-/* Hero kecil di atas form */
-.page-hero .pill {
-  display: inline-flex;
-  align-items: center;
-  gap: .4rem;
-  background: linear-gradient(90deg, var(--primary-100), #fff);
-  color: #334155;
-  padding: .35rem .7rem;
-  border-radius: 999px;
-  font-weight: 600;
-  font-size: .8rem;
+/* Liftnya sama seperti kartu lain */
+.card-form, .card-status, .card-result {
   border: 1px solid var(--fdz-border);
-}
-
-/* Kartu form/status/result */
-.card-form,
-.card-status,
-.card-result {
-  border: 1px solid var(--fdz-border);
-  border-radius: var(--fdz-radius-xl);
-  box-shadow: var(--fdz-shadow-soft);
-  overflow: hidden;
-}
-
-.card-form .form-control,
-.card-form .form-select {
-  border-radius: 10px;
-}
-
-.card-status .card-body,
-.card-form .card-body,
-.card-result .card-body {
+  border-radius: var(--fdz-radius-lg);
   background: #fff;
+  box-shadow: var(--shadow-soft);
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+.card-form:hover { transform: translateY(-3px); }
+
+/* Badge hero biar konsisten */
+.badge-hero {
+  display:inline-flex;align-items:center;gap:.5rem;
+  background:#fff; color:var(--primary-dark);
+  padding:.5rem 1rem; border-radius:999px;
+  border:1px solid var(--badge-border);
 }
 
-/* Status badge animasi pulse (dipakai default di statusBox) */
-.badge-pulse {
-  position: relative;
-}
+/* Badge status dengan pulse halus */
+.badge-pulse { position: relative; }
 .badge-pulse::after {
-  content: "";
-  position: absolute;
-  inset: -6px;
-  border-radius: 999px;
-  border: 2px solid rgba(99,102,241,.25); /* primary-500 low */
-  animation: pulse 1.6s ease-out infinite;
+  content:"";
+  position:absolute; inset:-6px; border-radius:999px;
+  border:2px solid rgba(13,110,253,.2);
+  animation: st-pulse 1.7s ease-out infinite;
 }
-@keyframes pulse {
-  0%   { opacity: .75; transform: scale(1); }
-  70%  { opacity: 0;   transform: scale(1.4); }
-  100% { opacity: 0;   transform: scale(1.4); }
+@keyframes st-pulse {
+  0% { opacity:.7; transform:scale(1); }
+  70%{ opacity:0; transform:scale(1.4); }
+  100%{ opacity:0; transform:scale(1.4); }
 }
 
 /* Grid detail akun */
 .account-details-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: .75rem .75rem;
+  display:grid;
+  grid-template-columns: 1fr;
+  gap:.75rem;
 }
-@media (max-width: 540px) {
-  .account-details-grid { grid-template-columns: 1fr; }
+@media (min-width:576px){
+  .account-details-grid { grid-template-columns: repeat(2,1fr); }
 }
 .detail-item {
-  background: var(--gray-50);
-  border: 1px solid var(--fdz-border);
-  border-radius: var(--fdz-radius-lg);
-  padding: .8rem .9rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: .75rem;
+  background: #f8f9fa;
+  border:1px solid var(--fdz-border);
+  border-radius:.65rem;
+  padding:.65rem .9rem;
 }
 .detail-item .k {
-  font-size: .82rem;
-  color: #64748b; /* slate-500 */
+  display:block;font-size:.75rem;color:#64748b;margin-bottom:2px;
 }
 .detail-item .v {
-  font-weight: 600;
-  color: #1f2937; /* gray-800 */
+  font-weight:600;color:#1c2a41;word-break:break-all;
 }
-.detail-item.uuid .v {
-  max-width: 100%;
-  overflow: auto;
-  white-space: nowrap;
-}
+.detail-item.uuid { grid-column:1/-1; }
 
-/* blok konfigurasi (WS/GRPC) */
+/* Blok konfigurasi */
 .cfg-block {
-  border: 1px dashed var(--fdz-border);
-  border-radius: var(--fdz-radius-lg);
-  background: #fff;
+  background:#282c34;color:#abb2bf;
+  border:1px solid #3a3f4b; border-radius: .6rem;
+  padding:.5rem .75rem;
 }
-.cfg-title {
-  font-size: .82rem;
-  color: #475569; /* slate-600 */
-  font-weight: 600;
-  padding: .6rem .8rem .2rem .8rem;
-}
-.cfg-row {
-  display: flex;
-  align-items: stretch;
-  gap: .5rem;
-  padding: .4rem .6rem .8rem .6rem;
-}
+.cfg-title { font-size:.75rem;font-weight:700;color:#61afef;margin-bottom:.25rem; }
+.cfg-row { display:flex;align-items:center;gap:.5rem; }
 .cfg-code {
-  display: block;
-  width: 100%;
-  padding: .75rem .9rem;
-  background: var(--gray-50);
-  border: 1px solid var(--fdz-border);
-  border-radius: var(--fdz-radius-md);
-  overflow: auto;
-  white-space: nowrap;
-  font-size: .85rem;
+  display:block;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size:.85rem;color:#e6e6e6;background:transparent;
 }
 .cfg-copy {
-  border-radius: var(--fdz-radius-md);
-  border: 1px solid var(--fdz-border);
-  background: #fff;
-  transition: transform .05s ease, box-shadow .15s ease;
+  border:1px solid #4b5263;color:#abb2bf;
+  border-radius:.5rem;
 }
-.cfg-copy:hover {
-  box-shadow: var(--fdz-shadow);
-}
-.cfg-copy:active {
-  transform: translateY(1px);
+.cfg-copy:hover { background:#3a3f4b;color:#fff; }
+
+/* Tombol pembayaran di kanan */
+#btnOpenPayment { border-radius:.75rem; }
+#btnOpenPayment.disabled { pointer-events:none; opacity:.55; }
+
+/* Error box */
+#errorBox .alert, #errorBoxRight .alert {
+  border-radius:.75rem;
 }
 
-/* Monospace helper */
-.monospace { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
-
-/* Tombol & link pembayaran */
-#btnOpenPayment {
-  border-radius: 12px;
-}
-#btnOpenPayment.disabled {
-  pointer-events: none;
-  opacity: .55;
-}
-
-/* Alerts */
-#errorBox .alert {
-  border-radius: var(--fdz-radius-lg);
-  border: 1px solid #fecaca; /* red-200 */
-  background: var(--danger-50);
-}
-
-/* Tip info/hint */
-#hint {
-  padding: .5rem .75rem;
-  border-radius: 10px;
-  background: var(--gray-50);
-  border: 1px dashed var(--fdz-border);
-}
-
-/* Fine-tuning */
-.card-result .btn {
-  border-radius: 12px;
-}
-.card-result .btn-success {
-  box-shadow: 0 8px 18px rgba(22, 163, 74, .15);
-}
-.card-result .btn-outline-secondary {
-  border-color: var(--fdz-border);
-}
-
-/* Fokus state form */
-.card-form .form-control:focus,
-.card-form .form-select:focus {
-  border-color: var(--primary-500);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, .15);
-}
-
-/* Spinner kecil biar lebih halus */
-.spinner-border {
-  width: 1.8rem;
-  height: 1.8rem;
-  border-width: .2rem;
-}
+/* Spinner ukuran biar halus */
+.spinner-border { width:1.8rem;height:1.8rem;border-width:.2rem; }
