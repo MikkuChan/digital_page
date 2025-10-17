@@ -1,4 +1,6 @@
-/* Katalog OrderVPN — polished UI/UX (search, sort, skeleton, persist payment, redirect to order-status) */
+/* Katalog OrderVPN — polished UI/UX (search, sort, skeleton, persist payment, redirect to order-status)
+   Update: email wajib + kirim orderId+uf+email ke order-status
+*/
 
 const API_BASE = (window.API_BASE || '').replace(/\/+$/, '') || `${location.origin}`;
 const LS_LAST_PAYMENT = 'fdz_last_payment';
@@ -13,8 +15,10 @@ let qSearch = '';
 let qSort = 'price-asc';
 
 // ====== persist helpers
-const saveLastPayment = (o) => { try { localStorage.setItem(LS_LAST_PAYMENT, JSON.stringify({ ...o, ts: Date.now() })) } catch {} };
-const clearLastPayment = () => { try { localStorage.removeItem(LS_LAST_PAYMENT) } catch {} };
+const saveLastPayment = (o) => {
+  try { localStorage.setItem(LS_LAST_PAYMENT, JSON.stringify({ ...o, ts: Date.now() })); } catch {}
+};
+const clearLastPayment = () => { try { localStorage.removeItem(LS_LAST_PAYMENT); } catch {} };
 
 // ====== refs (yang ada di halaman katalog)
 const grid      = document.getElementById('catalogGrid');
@@ -140,7 +144,9 @@ async function doCheckout() {
   const email    = (co_email.value || '').trim();
 
   if (!username) return alert('Username wajib diisi.');
-  if (email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return alert('Email tidak valid.');
+  // EMAIL SEKARANG WAJIB
+  if (!email) return alert('Email wajib diisi.');
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return alert('Format email tidak valid.');
 
   const usernameFinal = withSuffix(username);
 
@@ -152,9 +158,9 @@ async function doCheckout() {
     const { orderId, paymentUrl, reference } = res;
     if (!orderId || !paymentUrl) throw new Error('Respon API tidak valid.');
 
-    // simpan untuk halaman status
+    // simpan untuk referensi (restore/riwayat)
     try { localStorage.setItem(LS_LAST_ORDER, orderId); } catch {}
-    saveLastPayment({ orderId, paymentUrl, reference });
+    saveLastPayment({ orderId, paymentUrl, reference, uf: usernameFinal, email });
 
     // buka tab pembayaran
     if (!paymentWindow || paymentWindow.closed) {
@@ -164,8 +170,9 @@ async function doCheckout() {
       paymentWindow.focus();
     }
 
-    // redirect ke halaman status (polling & tampil akun di sana)
-    location.href = `order-status.html?orderId=${encodeURIComponent(orderId)}`;
+    // redirect ke halaman status (membawa auth minimal: orderId + uf + email)
+    const q = new URLSearchParams({ orderId, uf: usernameFinal, email });
+    location.href = `order-status.html?${q.toString()}`;
   } catch (e) {
     alert(e.message || 'Gagal membuat invoice');
   } finally {
