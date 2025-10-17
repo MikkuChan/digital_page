@@ -21,7 +21,7 @@
   <!-- overlay -->
   <div class="loading-overlay" id="loadingOverlay"><div class="loading-spinner"></div></div>
 
-  <!-- NAVBAR (match halaman lain) -->
+  <!-- NAVBAR -->
   <nav class="navbar navbar-expand-lg fixed-top">
     <div class="container">
       <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
@@ -58,6 +58,9 @@
         <p class="lead text-secondary mx-auto mb-4" style="max-width:700px">
           Masukkan <b>Order ID</b>, <b>Username Final (uf)</b>, dan <b>Email</b> yang kamu pakai saat order.
         </p>
+        <div class="d-flex justify-content-center gap-2">
+          <a href="ordervpn.html" class="btn btn-outline-primary"><i class="bi bi-cart4 me-1"></i> Order Paket Baru</a>
+        </div>
       </div>
     </section>
 
@@ -126,9 +129,10 @@
                 <div class="card-body d-flex flex-wrap align-items-center gap-3">
                   <span class="text-muted small">Metode yang didukung:</span>
                   <div class="pm-badges">
-                    <span class="pm pm-qris">QRIS</span>
-                    <span class="pm pm-va">VA</span>
+                    <span class="pm pm-bank">Bank Transfer</span>
                     <span class="pm pm-ew">E-Wallet</span>
+                    <span class="pm pm-qris">QRIS</span>
+                    <span class="pm pm-retail">Retail</span>
                   </div>
                   <a id="btnOpenPaymentInline" class="btn btn-outline-primary ms-auto disabled" target="_blank" rel="noopener">
                     <i class="bi bi-box-arrow-up-right me-1"></i> Buka Halaman Pembayaran
@@ -160,21 +164,60 @@
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
 
-          <!-- Tips -->
-          <div class="card card-tips mt-4">
-            <div class="card-body p-4">
-              <div class="d-flex align-items-center gap-2 mb-2">
-                <i class="bi bi-lightbulb"></i>
-                <strong>Tips:</strong>
+              <!-- FAQ & Peringatan -->
+              <div class="card card-faq mt-4">
+                <div class="card-body p-4">
+                  <h3 class="h6 mb-3"><i class="bi bi-info-circle me-2"></i>FAQ & Peringatan</h3>
+                  <div class="accordion" id="faqAcc">
+                    <div class="accordion-item">
+                      <h2 class="accordion-header" id="h0">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#c0">
+                          Jangan refresh setelah redirect dari pembayaran
+                        </button>
+                      </h2>
+                      <div id="c0" class="accordion-collapse collapse show" data-bs-parent="#faqAcc">
+                        <div class="accordion-body">
+                          Kalau sudah bayar dan kamu diarahkan ke halaman ini, <b>jangan di-refresh</b> sebelum akun muncul.
+                          Gunakan tombol <b>Cek &amp; Mulai Pantau</b> untuk memonitor hingga status menjadi <b>Dibayar</b> dan akun muncul.
+                        </div>
+                      </div>
+                    </div>
+                    <div class="accordion-item">
+                      <h2 class="accordion-header" id="h1">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c1">
+                          Akun tidak muncul setelah bayar?
+                        </button>
+                      </h2>
+                      <div id="c1" class="accordion-collapse collapse" data-bs-parent="#faqAcc">
+                        <div class="accordion-body">
+                          Pastikan koneksi stabil, lalu klik <b>Buka Halaman Pembayaran</b> untuk memastikan statusnya paid.
+                          Jika sudah paid, tunggu sebentar &amp; biarkan sistem memproses (biasanya &lt; 1 menit).
+                        </div>
+                      </div>
+                    </div>
+                    <div class="accordion-item">
+                      <h2 class="accordion-header" id="h2">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c2">
+                          Berapa lama data disimpan?
+                        </button>
+                      </h2>
+                      <div id="c2" class="accordion-collapse collapse" data-bs-parent="#faqAcc">
+                        <div class="accordion-body">
+                          Detail akun yang sudah terbit disimpan di cache browser selama <b><span id="cacheHours">–</span> jam</b>,
+                          supaya tetap tampil walau halaman di-refresh. Kamu tetap bisa menyalin / mengunduh lagi kapan saja.
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="mt-3">
+                    <a href="ordervpn.html" class="btn btn-outline-secondary btn-sm">
+                      <i class="bi bi-arrow-left-circle me-1"></i> Kembali ke Katalog
+                    </a>
+                  </div>
+                </div>
               </div>
-              <ul class="mb-0 small text-muted">
-                <li>Kalau halaman tertutup, buka lagi & isi Order ID + uf + Email untuk restore.</li>
-                <li>Simak tombol <b>Buka Halaman Pembayaran</b> jika status masih “Menunggu”.</li>
-                <li>Setelah akun muncul, klik <b>Salin Semua</b> atau <b>Download .txt</b>.</li>
-              </ul>
+
             </div>
           </div>
         </div>
