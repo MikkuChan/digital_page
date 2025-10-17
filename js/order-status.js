@@ -1,92 +1,105 @@
-/* order-status.js (improved UI + progress tracker + mobile/link fixes) */
+/* order-status.js — FIX: pakai LS_LAST_PAYMENT dari ordervpn, link payment always clickable,
+   auto-restore orderId+uf+email+paymentUrl, bersihkan saat PAID/FAILED. */
+
 const API_BASE = (window.API_BASE || '').replace(/\/+$/, '') || `${location.origin}`;
 const POLL_INTERVAL_MS = 5000;
 const POLL_TIMEOUT_MS  = 10 * 60 * 1000;
-const LS_LOOKUP  = 'fdz_last_lookup';
-const LS_PAYURL  = 'fdz_last_payurl';
 
-const q  = (sel) => document.querySelector(sel);
-const qa = (sel) => [...document.querySelectorAll(sel)];
+const LS_LAST_PAYMENT = 'fdz_last_payment';   // <— SAMA dengan ordervpn.js
+const LS_LAST_LOOKUP  = 'fdz_last_lookup';    // buat manual lookup fallback
 
-// form
-const orderIdInput = q('#orderIdInput');
-const ufInput      = q('#ufInput');
-const emailInput   = q('#emailInput');
-const lookupForm   = q('#lookupForm');
-const errorBox     = q('#errorBox');
-const hintEl       = q('#hint');
+// ===== short DOM helpers
+const $  = (s)=>document.querySelector(s);
+const $$ = (s)=>[...document.querySelectorAll(s)];
 
-// status/result (right)
-const statusBox    = q('#statusBox');
-const resultBox    = q('#resultBox');
-const errorBoxR    = q('#errorBoxRight');
-const orderIdText  = q('#orderIdText');
-const ufText       = q('#ufText');
-const statusBadge  = q('#statusBadge');
-const btnOpenPay   = q('#btnOpenPayment');
-const btnOpenPayInline = q('#btnOpenPaymentInline');
+// inputs
+const orderIdInput = $('#orderIdInput');
+const ufInput      = $('#ufInput');
+const emailInput   = $('#emailInput');
+const lookupForm   = $('#lookupForm');
+const errorBox     = $('#errorBox');
+const hintEl       = $('#hint');
+
+// status/result
+const statusBox   = $('#statusBox');
+const resultBox   = $('#resultBox');
+const errorBoxR   = $('#errorBoxRight');
+const orderIdText = $('#orderIdText');
+const ufText      = $('#ufText');
+const statusBadge = $('#statusBadge');
+const btnOpenPay  = $('#btnOpenPayment');
+const btnOpenPayInline = $('#btnOpenPaymentInline');
 
 // account fields
-const accUsername  = q('#accUsername');
-const accUUID      = q('#accUUID');
-const accDomain    = q('#accDomain');
-const accQuota     = q('#accQuota');
-const accCreated   = q('#accCreated');
-const accExpired   = q('#accExpired');
-const blkWsTls     = q('#blk-ws-tls');
-const blkWsNtls    = q('#blk-ws-ntls');
-const blkGrpc      = q('#blk-grpc');
-const accWsTls     = q('#accWsTls');
-const accWsNtls    = q('#accWsNtls');
-const accGrpc      = q('#accGrpc');
-const copyAllBtn   = q('#copyAllBtn');
-const downloadBtn  = q('#downloadConfigBtn');
+const accUsername = $('#accUsername');
+const accUUID     = $('#accUUID');
+const accDomain   = $('#accDomain');
+const accQuota    = $('#accQuota');
+const accCreated  = $('#accCreated');
+const accExpired  = $('#accExpired');
+const blkWsTls    = $('#blk-ws-tls');
+const blkWsNtls   = $('#blk-ws-ntls');
+const blkGrpc     = $('#blk-grpc');
+const accWsTls    = $('#accWsTls');
+const accWsNtls   = $('#accWsNtls');
+const accGrpc     = $('#accGrpc');
+const copyAllBtn  = $('#copyAllBtn');
+const downloadBtn = $('#downloadConfigBtn');
 
 // steps
-const steps = qa('.status-steps .step');
+const steps = $$('.status-steps .step');
 
 let pollTimer = null;
-let pollTimerStart = 0;
+let pollStart = 0;
 
-const show = (el)=> el && (el.style.display = '');
-const hide = (el)=> el && (el.style.display = 'none');
-const setText = (el,t)=> el && (el.textContent = t ?? '');
-const showErr = (target,msg)=>{ if(!target)return; target.innerHTML = `<div class="alert alert-danger">${msg}</div>`; show(target); };
-const clearErr = (target)=>{ if(!target)return; target.innerHTML=''; hide(target); };
+// ===== utils
+const show   = (el)=> el && (el.style.display = '');
+const hide   = (el)=> el && (el.style.display = 'none');
+const setTxt = (el,t)=> el && (el.textContent = t ?? '');
+const showErr   = (el,msg)=>{ if(!el) return; el.innerHTML = `<div class="alert alert-danger">${msg}</div>`; show(el); };
+const clearErr  = (el)=>{ if(!el) return; el.innerHTML=''; hide(el); };
 
-/* ===== payment link helpers ===== */
-function applyPaymentLink(el, url){
-  if (!el) return;
-  if (url) {
-    el.href = url;
-    el.classList.remove('disabled');
-    el.innerHTML = `<i class="bi bi-box-arrow-up-right me-1"></i> Buka Halaman Pembayaran`;
-  } else {
-    el.removeAttribute('href');
-    el.classList.add('disabled');
-    el.innerHTML = `<i class="bi bi-slash-circle me-1"></i> Tidak ada sesi pembayaran`;
-  }
+function readLastPayment(){
+  try { return JSON.parse(localStorage.getItem(LS_LAST_PAYMENT) || 'null'); }
+  catch { return null; }
 }
-function setPaymentUrl(url){
-  // persist if exists, else clear
-  if (url) {
-    try { localStorage.setItem(LS_PAYURL, url); } catch {}
-  } else {
-    try { localStorage.removeItem(LS_PAYURL); } catch {}
-  }
-  applyPaymentLink(btnOpenPay, url);
-  applyPaymentLink(btnOpenPayInline, url);
+function writeLastPayment(obj){
+  try { localStorage.setItem(LS_LAST_PAYMENT, JSON.stringify({ ...obj, ts: Date.now() })); } catch {}
+}
+function clearLastPayment(){
+  try { localStorage.removeItem(LS_LAST_PAYMENT); } catch {}
 }
 
-/* ===== steps ===== */
-function setStepsByStatus(status, hasAccount){
-  steps.forEach(s => s.classList.remove('active','done'));
+// ===== payment link
+function setPaymentLink(url){
+  const apply = (a) => {
+    if (!a) return;
+    if (url) {
+      a.href = url;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.classList.remove('disabled');
+      a.innerHTML = `<i class="bi bi-box-arrow-up-right me-1"></i> Buka Halaman Pembayaran`;
+      a.style.pointerEvents = 'auto';
+    } else {
+      a.removeAttribute('href');
+      a.classList.add('disabled');
+      a.innerHTML = `<i class="bi bi-slash-circle me-1"></i> Tidak ada sesi pembayaran`;
+      a.style.pointerEvents = 'none';
+    }
+  };
+  apply(btnOpenPay);
+  apply(btnOpenPayInline);
+}
+
+// ===== steps UI
+function setSteps(status, hasAccount){
+  steps.forEach(s=>s.classList.remove('active','done'));
   steps[0].classList.add('active');
-
   const s = String(status||'').toUpperCase();
-  if (s === 'FAILED') { steps[1].classList.add('active'); return; }
 
-  if (s === 'PENDING' || s === '') { steps[1].classList.add('active'); return; }
+  if (s === 'FAILED') { steps[1].classList.add('active'); return; }
+  if (!s || s === 'PENDING') { steps[1].classList.add('active'); return; }
 
   if (s === 'PAID' && !hasAccount) {
     steps[0].classList.add('done'); steps[1].classList.add('done'); steps[2].classList.add('active'); return;
@@ -96,16 +109,16 @@ function setStepsByStatus(status, hasAccount){
   }
 }
 
-/* ===== account render ===== */
+// ===== account render & actions
 function buildTextDump(data){
-  if (data.accountFields && data.accountFields.username) {
+  if (data.accountFields?.username) {
     const p = data.accountFields;
     const lines = [
       '=== FADZDIGITAL VPN ACCOUNT ===',
       `Username : ${p.username || ''}`,
       `UUID     : ${p.uuid || ''}`,
       `Domain   : ${p.domain || ''}`,
-      `Quota    : ${p.quota_gb || '?'} GB`,
+      `Quota    : ${p.quota_gb ?? '?'} GB`,
       `Created  : ${p.created || ''}`,
       `Expired  : ${p.expired || ''}`,
       '',
@@ -118,97 +131,90 @@ function buildTextDump(data){
   }
   return data.accountConfig || '';
 }
-
 function setupActions(data){
   const text = buildTextDump(data);
   copyAllBtn.onclick = async ()=>{
     await navigator.clipboard.writeText(text);
     const h = copyAllBtn.innerHTML;
     copyAllBtn.innerHTML = `<i class="bi bi-clipboard-check"></i> Disalin!`;
-    setTimeout(()=>copyAllBtn.innerHTML=h,1500);
+    setTimeout(()=>copyAllBtn.innerHTML=h, 1500);
   };
   downloadBtn.onclick = ()=>{
-    const blob = new Blob([text], {type:'text/plain;charset=utf-8'});
-    const url = URL.createObjectURL(blob);
+    const blob = new Blob([text], { type:'text/plain;charset=utf-8' });
+    const url  = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url; a.download = `${data.orderId || 'vpn-account'}.txt`;
     document.body.appendChild(a); a.click(); a.remove();
     URL.revokeObjectURL(url);
   };
 }
-
 function renderAccount(data){
-  hide(statusBox);
-  show(resultBox);
-
+  hide(statusBox); show(resultBox);
   const p = data.accountFields || {};
-  setText(accUsername, p.username || '-');
-  setText(accUUID, p.uuid || '-');
-  setText(accDomain, p.domain || '-');
-  setText(accQuota, (p.quota_gb != null ? p.quota_gb : '?') + ' GB');
-  setText(accCreated, p.created || '-');
-  setText(accExpired, p.expired || '-');
+  setTxt(accUsername, p.username || '-');
+  setTxt(accUUID, p.uuid || '-');
+  setTxt(accDomain, p.domain || '-');
+  setTxt(accQuota, (p.quota_gb ?? '?') + ' GB');
+  setTxt(accCreated, p.created || '-');
+  setTxt(accExpired, p.expired || '-');
 
-  if (p.ws_tls)   { setText(accWsTls, p.ws_tls);   show(blkWsTls); } else hide(blkWsTls);
-  if (p.ws_ntls)  { setText(accWsNtls, p.ws_ntls); show(blkWsNtls);} else hide(blkWsNtls);
-  if (p.grpc)     { setText(accGrpc, p.grpc);      show(blkGrpc);  } else hide(blkGrpc);
+  if (p.ws_tls)  { setTxt(accWsTls, p.ws_tls);  show(blkWsTls); } else hide(blkWsTls);
+  if (p.ws_ntls) { setTxt(accWsNtls, p.ws_ntls);show(blkWsNtls);} else hide(blkWsNtls);
+  if (p.grpc)    { setTxt(accGrpc,  p.grpc);    show(blkGrpc);  } else hide(blkGrpc);
 
   setupActions(data);
-  setStepsByStatus('PAID', true);
-
-  // akun sudah jadi → hapus link payment
-  setPaymentUrl('');
+  setSteps('PAID', true);
+  // akun sudah jadi → bersihkan sesi pembayaran
+  setPaymentLink('');
+  clearLastPayment();
 }
 
-/* ===== API ===== */
+// ===== API
 async function fetchStatus(orderId, uf, email){
   const url = `${API_BASE}/pay/status?orderId=${encodeURIComponent(orderId)}&uf=${encodeURIComponent(uf)}&email=${encodeURIComponent(email)}`;
-  const r = await fetch(url, { headers: { accept: 'application/json' } });
-  const data = await r.json();
-  if (!r.ok) throw new Error(data?.message || 'Order tidak ditemukan.');
-  return data;
+  const r = await fetch(url, { headers: { accept:'application/json' } });
+  const d = await r.json();
+  if (!r.ok) throw new Error(d?.message || 'Order tidak ditemukan.');
+  return d;
 }
 
-/* ===== polling ===== */
-async function startPolling({orderId, uf, email}){
+// ===== polling
+async function startPolling({ orderId, uf, email }){
   clearErr(errorBox); clearErr(errorBoxR);
   hide(resultBox); show(statusBox);
 
-  setText(orderIdText, orderId);
-  setText(ufText, uf);
+  setTxt(orderIdText, orderId);
+  setTxt(ufText, uf);
   statusBadge.textContent = 'Memeriksa…';
-  statusBadge.className   = 'badge bg-info badge-pulse';
+  statusBadge.className = 'badge bg-info badge-pulse';
+  setSteps('PENDING', false);
 
-  setStepsByStatus('PENDING', false);
+  // restore link dari last_payment kalau ada
+  const last = readLastPayment();
+  if (last?.paymentUrl) setPaymentLink(last.paymentUrl);
 
-  // restore pay link kalau ada simpanan
-  try {
-    const saved = localStorage.getItem(LS_PAYURL);
-    if (saved) setPaymentUrl(saved);
-  } catch {}
-
-  pollTimerStart = Date.now();
+  pollStart = Date.now();
   const tick = async ()=>{
-    if (Date.now() - pollTimerStart > POLL_TIMEOUT_MS) {
-      statusBadge.textContent = 'Timeout';
-      statusBadge.className   = 'badge bg-secondary';
-      stopPolling(); return;
+    if (Date.now() - pollStart > POLL_TIMEOUT_MS) {
+      statusBadge.textContent = 'Timeout'; statusBadge.className = 'badge bg-secondary';
+      return stopPolling();
     }
     try{
       const data = await fetchStatus(orderId, uf, email);
 
-      // aturan link payment:
-      // - kalau API kasih paymentUrl → pakai & simpan
-      // - kalau tidak ada & status masih PENDING → coba pakai yang tersimpan
-      // - kalau PAID/FAILED → kosongkan & hapus simpanan
+      // atur link pembayaran
       const st = String(data.status || '').toUpperCase();
       if (data.paymentUrl) {
-        setPaymentUrl(data.paymentUrl);
+        setPaymentLink(data.paymentUrl);
+        // update store supaya tetap ada saat pindah halaman
+        writeLastPayment({ orderId, uf, email, paymentUrl: data.paymentUrl, reference: data.reference || '' });
       } else if (st === 'PENDING') {
-        const saved = localStorage.getItem(LS_PAYURL);
-        setPaymentUrl(saved || '');
+        const lp = readLastPayment();
+        setPaymentLink(lp?.paymentUrl || '');
       } else {
-        setPaymentUrl(''); // bersihkan
+        // PAID/FAILED → matikan link & hapus sesi
+        setPaymentLink('');
+        clearLastPayment();
       }
 
       const hasAccount = !!(data.accountFields && data.accountFields.username);
@@ -222,31 +228,30 @@ async function startPolling({orderId, uf, email}){
         } else {
           statusBadge.textContent = 'Dibayar (menyiapkan akun)…';
           statusBadge.className   = 'badge bg-warning text-dark';
-          setStepsByStatus('PAID', false);
+          setSteps('PAID', false);
         }
       } else if (st === 'FAILED') {
         statusBadge.textContent = 'Gagal ✖';
         statusBadge.className   = 'badge bg-danger';
-        setStepsByStatus('FAILED', false);
-        setPaymentUrl(''); // pastikan nonaktif
+        setSteps('FAILED', false);
         stopPolling();
       } else {
         statusBadge.textContent = 'Menunggu pembayaran…';
         statusBadge.className   = 'badge bg-warning text-dark badge-pulse';
-        setStepsByStatus('PENDING', false);
+        setSteps('PENDING', false);
       }
     }catch(e){
       showErr(errorBoxR, e.message || 'Terjadi kesalahan.');
     }
   };
+
   await tick();
   pollTimer = setInterval(tick, POLL_INTERVAL_MS);
 }
-
 function stopPolling(){ if (pollTimer) { clearInterval(pollTimer); pollTimer = null; } }
 
-/* ===== events ===== */
-lookupForm.addEventListener('submit', (e)=>{
+// ===== events
+lookupForm.addEventListener('submit',(e)=>{
   e.preventDefault();
   clearErr(errorBox); clearErr(errorBoxR);
 
@@ -258,50 +263,56 @@ lookupForm.addEventListener('submit', (e)=>{
   if (!uf)      return showErr(errorBox, 'Username Final (uf) wajib diisi.');
   if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return showErr(errorBox, 'Email wajib & harus valid.');
 
-  try { localStorage.setItem(LS_LOOKUP, JSON.stringify({orderId, uf, email})); } catch {}
-  startPolling({orderId, uf, email});
+  try { localStorage.setItem(LS_LAST_LOOKUP, JSON.stringify({orderId, uf, email})); } catch {}
+  startPolling({ orderId, uf, email });
 });
 
-// copy buttons
+// copy single row
 document.addEventListener('click', async (e)=>{
   const btn = e.target.closest('.cfg-copy'); if(!btn) return;
-  const id = btn.dataset.target; const el = document.getElementById(id);
+  const id  = btn.dataset.target; const el = document.getElementById(id);
   if (el) {
     await navigator.clipboard.writeText(el.textContent);
     const h = btn.innerHTML; btn.innerHTML = '<i class="bi bi-check-lg"></i>';
-    setTimeout(()=>btn.innerHTML=h,1500);
+    setTimeout(()=>btn.innerHTML=h, 1500);
   }
 });
 
-// auto init
+// ===== init (restore dari URL atau localStorage yg diisi ordervpn.js)
 (function init(){
   const u = new URL(location.href);
-  const orderId = u.searchParams.get('orderId') || '';
-  const uf      = u.searchParams.get('uf')      || '';
-  const email   = u.searchParams.get('email')   || '';
+  const qs = {
+    orderId: u.searchParams.get('orderId') || '',
+    uf     : u.searchParams.get('uf')      || '',
+    email  : u.searchParams.get('email')   || ''
+  };
 
-  let restored = {orderId, uf, email};
-  if (!orderId || !uf || !email) {
+  let restore = { ...qs };
+
+  // kalau URL kurang lengkap, coba dari last_payment yg dibuat di ordervpn.js
+  const last = readLastPayment();
+  if ((!restore.orderId || !restore.uf || !restore.email) && last?.orderId && last?.uf && last?.email) {
+    restore = { orderId: last.orderId, uf: last.uf, email: last.email };
+  }
+
+  // terakhir, coba dari lookup manual
+  if (!restore.orderId || !restore.uf || !restore.email) {
     try {
-      const saved = JSON.parse(localStorage.getItem(LS_LOOKUP) || 'null');
-      if (saved && saved.orderId && saved.uf && saved.email) restored = saved;
+      const lk = JSON.parse(localStorage.getItem(LS_LAST_LOOKUP) || 'null');
+      if (lk?.orderId && lk?.uf && lk?.email) restore = lk;
     } catch {}
   }
 
-  if (restored.orderId) orderIdInput.value = restored.orderId;
-  if (restored.uf)      ufInput.value = restored.uf;
-  if (restored.email)   emailInput.value = restored.email;
+  if (restore.orderId) orderIdInput.value = restore.orderId;
+  if (restore.uf)      ufInput.value      = restore.uf;
+  if (restore.email)   emailInput.value   = restore.email;
 
-  // set link payment dari simpanan (kalau ada) sebelum polling
-  try {
-    const savedPay = localStorage.getItem(LS_PAYURL);
-    if (savedPay) setPaymentUrl(savedPay);
-    else setPaymentUrl('');
-  } catch { setPaymentUrl(''); }
+  // set link dari storage biar tombol langsung aktif meski API belum kebaca
+  setPaymentLink(last?.paymentUrl || '');
 
-  if (restored.orderId && restored.uf && restored.email) {
+  if (restore.orderId && restore.uf && restore.email) {
     hintEl.style.display = '';
-    hintEl.textContent = 'Data lookup dipulihkan otomatis dari URL/sesi sebelumnya.';
-    startPolling(restored);
+    hintEl.textContent = 'Data lookup dipulihkan otomatis dari URL / sesi sebelumnya.';
+    startPolling(restore);
   }
 })();
