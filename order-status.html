@@ -47,14 +47,10 @@
 
   <main class="container" style="margin-top:100px;min-height:72vh;">
     <!-- HERO / HEADER -->
-    <section class="mb-4">
-      <div class="d-flex align-items-center gap-3">
-        <i class="bi bi-receipt fs-2 text-primary"></i>
-        <div>
-          <h1 class="h3 mb-0 text-dark-blue">Status Pesanan</h1>
-          <div class="text-muted small">Masukkan Order ID, Username Final, dan Email yang dipakai saat order.</div>
-        </div>
-      </div>
+    <section class="mb-4 page-hero">
+      <span class="pill"><i class="bi bi-lightning-charge-fill me-1"></i> Status Pesanan</span>
+      <h1 class="h3 mb-2 text-dark-blue">Lacak Pembayaran & Dapatkan Detail Akun</h1>
+      <p class="text-muted mb-0 small">Gunakan <b>Order ID</b>, <b>Username Final (uf)</b>, dan <b>Email</b> yang dipakai saat order.</p>
     </section>
 
     <!-- FORM LOOKUP -->
@@ -81,7 +77,7 @@
               <i class="bi bi-box-arrow-up-right"></i> Buka Halaman Pembayaran
             </a>
             <a href="ordervpn.html" class="btn btn-light">
-              <i class="bi bi-cart3"></i> Kembali ke Katalog
+              <i class="bi bi-cart3"></i> Katalog
             </a>
           </div>
         </form>
@@ -96,10 +92,10 @@
           <div id="spinner" class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>
           <div>
             <div class="fw-bold text-dark-blue">Order: <code id="orderIdText">-</code></div>
-            <div>Status: <span id="statusBadge" class="badge bg-secondary">Memeriksa…</span></div>
+            <div>Status: <span id="statusBadge" class="badge badge-pulse bg-secondary">Memeriksa…</span></div>
           </div>
         </div>
-        <div class="small text-muted">Halaman ini akan memeriksa status secara berkala.</div>
+        <div class="small text-muted">Status menyegarkan otomatis setiap beberapa detik.</div>
       </div>
     </section>
 
@@ -109,8 +105,8 @@
         <div class="d-flex align-items-center gap-3 mb-3">
           <i class="bi bi-check-circle-fill fs-2 text-success"></i>
           <div>
-            <h3 class="h5 mb-0 text-dark-blue">Akun Berhasil Dibuat!</h3>
-            <p class="mb-0 text-muted small">Simpan detail akun Anda dengan aman.</p>
+            <h3 class="h5 mb-0 text-dark-blue">Akun Berhasil Dibuat</h3>
+            <p class="mb-0 text-muted small">Simpan detail akun Anda dengan aman. Bisa salin cepat atau unduh .txt</p>
           </div>
         </div>
 
