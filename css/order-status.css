@@ -1,16 +1,17 @@
-/* ==== order-status.css (mobile fixes) ==== */
+/* ==== order-status.css (layout baru + mobile polish) ==== */
 :root{
   --fdz-border: #e9ecef;
   --fdz-gray: #f8f9fa;
   --fdz-slate: #64748b;
   --fdz-dark: #1c2a41;
+  --primary: #0d6efd;
   --radius-lg: 1rem;
   --radius-md: .75rem;
   --shadow-soft: 0 8px 24px rgba(0,0,0,.06);
 }
 
-/* base cards */
-.card-form, .card-status, .card-result, .card-tips, .pay-hint{
+/* ===== Base cards ===== */
+.card-form, .card-status, .card-result, .card-tips, .card-faq, .pay-hint{
   border:1px solid var(--fdz-border);
   border-radius: var(--radius-lg);
   background:#fff;
@@ -19,15 +20,15 @@
 }
 .card-form:hover{ transform: translateY(-3px); }
 
-/* badge hero */
+/* ===== Hero badge ===== */
 .badge-hero{
   display:inline-flex;align-items:center;gap:.5rem;
-  background:#fff;color:var(--primary-dark);
+  background:#fff;color:var(--primary);
   padding:.5rem 1rem;border-radius:999px;
   border:1px solid var(--fdz-border);
 }
 
-/* ===== progress steps ===== */
+/* ===== Progress steps ===== */
 .status-steps{
   display:flex;align-items:center;gap:.75rem;justify-content:space-between;
   padding:1rem;border:1px dashed var(--fdz-border);border-radius:.9rem;background:linear-gradient(180deg,#fff,#fdfefe);
@@ -49,7 +50,7 @@
 .status-steps .step.active .label{ color:var(--fdz-dark);font-weight:600; }
 .status-steps .step.done .dot{ background:linear-gradient(180deg,#22c55e,#a7f3d0); color:#fff;border-color:#22c55e; }
 
-/* ==== MOBILE layout for steps ==== */
+/* ==== Mobile layout for steps ==== */
 @media (max-width: 576px){
   .status-steps{
     display:grid; grid-template-columns: 1fr 1fr; gap:.75rem; padding:.9rem;
@@ -58,7 +59,7 @@
   .status-steps .step{ min-width:unset; background:#ffffff; border:1px solid var(--fdz-border); border-radius:.75rem; padding:.5rem .2rem; }
 }
 
-/* payment hint */
+/* ===== Payment hint + actions ===== */
 .pm-badges{ display:flex; gap:.5rem; flex-wrap:wrap; }
 .pm{
   display:inline-flex;align-items:center;justify-content:center;
@@ -66,13 +67,25 @@
   background:#f1f5f9;border:1px solid var(--fdz-border);
   font-size:.8rem;font-weight:600;color:#334155;
 }
-.pm-qris{ background:#fff7ed;border-color:#fed7aa;color:#c2410c; }
-.pm-va{ background:#eef2ff;border-color:#c7d2fe;color:#3730a3;}
-.pm-ew{ background:#ecfeff;border-color:#a5f3fc;color:#155e75;}
-#btnOpenPaymentInline{ border-radius:.75rem; }
-#btnOpenPaymentInline.disabled{ pointer-events:none; opacity:.55; }
+.pm-bank{ border-color:#b6e0fe;background:#eaf6ff;color:#0b5ed7; }
+.pm-ew{ border-color:#ffd6a5;background:#fff7e6;color:#b45309; }
+.pm-qris{ border-color:#ffc2c2;background:#fff0f0;color:#b91c1c; }
+.pm-retail{ border-color:#cdeccf;background:#f1fff1;color:#166534; }
 
-/* timeline */
+.pay-actions{ display:flex; gap:.5rem; align-items:center; }
+.pay-actions .btn{ border-radius:.75rem; white-space:nowrap; }
+#btnOpenPaymentInline.disabled,
+#btnOpenPayment.disabled{
+  pointer-events:none; opacity:.6;
+}
+
+/* mobile: stack the two buttons full width */
+@media (max-width: 576px){
+  .pay-actions{ width:100%; flex-direction:column; align-items:stretch; }
+  .pay-actions .btn{ width:100%; }
+}
+
+/* ===== Timeline ===== */
 .timeline{ position:relative;padding:1rem;border:1px solid var(--fdz-border);border-radius:.9rem;background:#fff; }
 .timeline .t-item{ display:flex; gap:.75rem; margin:.6rem 0; position:relative; padding-left:1.25rem; }
 .timeline .t-item::before{
@@ -87,7 +100,7 @@
 .timeline .t-content .t-title{ font-weight:600;color:var(--fdz-dark); }
 .timeline .t-content .t-desc{ font-size:.9rem;color:var(--fdz-slate); }
 
-/* account details */
+/* ===== Account details ===== */
 .account-details-grid{ display:grid;grid-template-columns:1fr;gap:.75rem; }
 @media(min-width:576px){ .account-details-grid{ grid-template-columns:repeat(2,1fr); } }
 .detail-item{
@@ -97,16 +110,18 @@
 .detail-item .v{ font-weight:600;color:var(--fdz-dark);word-break:break-all; }
 .detail-item.uuid{ grid-column:1/-1; }
 
-/* code blocks */
+/* ===== Code blocks ===== */
 .cfg-block{ background:#0f172a;color:#cbd5e1;border:1px solid #273449;border-radius:.65rem;padding:.6rem .75rem; }
 .cfg-title{ font-size:.75rem;color:#60a5fa;font-weight:700;margin-bottom:.25rem; }
 .cfg-row{ display:flex;align-items:center;gap:.5rem; }
-.cfg-code{ width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;font-size:.85rem;color:#e5e7eb; }
+.cfg-code{
+  width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;font-size:.85rem;color:#e5e7eb;
+}
 .cfg-copy{ border:1px solid #334155;color:#94a3b8;border-radius:.5rem; }
 .cfg-copy:hover{ background:#1e293b;color:#fff; }
 
-/* badge pulse */
+/* ===== Badge pulse on status ===== */
 .badge-pulse{ position:relative; }
 .badge-pulse::after{
   content:"";position:absolute;inset:-6px;border-radius:999px;border:2px solid rgba(13,110,253,.2);
@@ -114,23 +129,24 @@
 }
 @keyframes stPulse{ 0%{opacity:.7;transform:scale(1)} 70%{opacity:0;transform:scale(1.35)} 100%{opacity:0;transform:scale(1.35)} }
 
-/* right-side buttons */
+/* Right-side payment btn */
 #btnOpenPayment{ border-radius:.75rem; }
-#btnOpenPayment.disabled{ pointer-events:none; opacity:.55; }
 
-/* error boxes */
+/* Error boxes */
 #errorBox .alert, #errorBoxRight .alert{ border-radius:.75rem; }
 
-.pm-badges{display:flex;flex-wrap:wrap;gap:.5rem}
-.pm{padding:.35rem .6rem;border-radius:999px;font-size:.8rem;font-weight:600;border:1px solid #e5e7eb;background:#fff}
-.pm-bank{border-color:#b6e0fe;background:#eaf6ff}
-.pm-ew{border-color:#ffd6a5;background:#fff7e6}
-.pm-qris{border-color:#ffc2c2;background:#fff0f0}
-.pm-retail{border-color:#cdeccf;background:#f1fff1}
+/* Spinner tweak */
+.spinner-border{ width:1.8rem;height:1.8rem;border-width:.2rem; }
+
+/* ===== Small fixes ===== */
+/* pastikan seluruh kartu & konten tidak memotong tombol di iOS (overflow) */
+.card-body{ overflow:visible; }
+
+/* jaga jarak antar kartu tips/faq di mobile */
 @media (max-width: 576px){
-  .pay-hint .btn{width:100%}
+  .card-tips, .card-faq{ margin-top: .5rem; }
 }
 
-
-/* spinner tweak */
-.spinner-border{ width:1.8rem;height:1.8rem;border-width:.2rem; }
+/* click target list group/accordion lebih nyaman */
+.accordion-button{ border-radius:.5rem; }
+.accordion-item{ border: 1px solid var(--fdz-border); border-radius:.75rem; overflow:hidden; }
