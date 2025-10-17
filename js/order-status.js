@@ -1,61 +1,58 @@
-/* order-status.js — fetch status pakai orderId + uf + email, UI dipoles */
-
+/* order-status.js */
 const API_BASE = (window.API_BASE || '').replace(/\/+$/, '') || `${location.origin}`;
 const POLL_INTERVAL_MS = 5000;
 const POLL_TIMEOUT_MS  = 10 * 60 * 1000;
-const LS_LAST_PAYMENT  = 'fdz_last_payment';   // berisi {orderId, paymentUrl, reference, uf, email, ts}
-const LS_LAST_ORDER    = 'fdz_last_order';     // menyimpan last orderId saja (optional)
 
-const orderIdInput = document.getElementById('orderIdInput');
-const ufInput      = document.getElementById('ufInput');
-const emailInput   = document.getElementById('emailInput');
+const LS_LOOKUP = 'fdz_last_lookup'; // simpan {orderId, uf, email}
+const q = (sel) => document.querySelector(sel);
 
-const btnLookup    = document.getElementById('btnLookup');
-const btnOpenPay   = document.getElementById('btnOpenPayment');
+// elemen kiri (form)
+const orderIdInput = q('#orderIdInput');
+const ufInput      = q('#ufInput');
+const emailInput   = q('#emailInput');
+const btnLookup    = q('#btnLookup');
+const errorBox     = q('#errorBox');
+const hintEl       = q('#hint');
 
-const statusBox    = document.getElementById('statusBox');
-const resultBox    = document.getElementById('resultBox');
-const errorBox     = document.getElementById('errorBox');
-const orderIdText  = document.getElementById('orderIdText');
-const statusBadge  = document.getElementById('statusBadge');
-const hintEl       = document.getElementById('hint');
+// elemen kanan (status/result)
+const statusBox   = q('#statusBox');
+const resultBox   = q('#resultBox');
+const errorBoxR   = q('#errorBoxRight');
+const orderIdText = q('#orderIdText');
+const ufText      = q('#ufText');
+const statusBadge = q('#statusBadge');
+const btnOpenPay  = q('#btnOpenPayment');
 
 // account fields
-const accUsername  = document.getElementById('accUsername');
-const accUUID      = document.getElementById('accUUID');
-const accDomain    = document.getElementById('accDomain');
-const accQuota     = document.getElementById('accQuota');
-const accCreated   = document.getElementById('accCreated');
-const accExpired   = document.getElementById('accExpired');
-const blkWsTls     = document.getElementById('blk-ws-tls');
-const blkWsNtls    = document.getElementById('blk-ws-ntls');
-const blkGrpc      = document.getElementById('blk-grpc');
-const accWsTls     = document.getElementById('accWsTls');
-const accWsNtls    = document.getElementById('accWsNtls');
-const accGrpc      = document.getElementById('accGrpc');
-const copyAllBtn   = document.getElementById('copyAllBtn');
-const downloadBtn  = document.getElementById('downloadConfigBtn');
+const accUsername = q('#accUsername');
+const accUUID     = q('#accUUID');
+const accDomain   = q('#accDomain');
+const accQuota    = q('#accQuota');
+const accCreated  = q('#accCreated');
+const accExpired  = q('#accExpired');
+const blkWsTls    = q('#blk-ws-tls');
+const blkWsNtls   = q('#blk-ws-ntls');
+const blkGrpc     = q('#blk-grpc');
+const accWsTls    = q('#accWsTls');
+const accWsNtls   = q('#accWsNtls');
+const accGrpc     = q('#accGrpc');
+const copyAllBtn  = q('#copyAllBtn');
+const downloadBtn = q('#downloadConfigBtn');
 
 let pollTimer = null;
 
-const show   = (el) => el && (el.style.display = '');
-const hide   = (el) => el && (el.style.display = 'none');
-const setText= (el, t) => el && (el.textContent = t ?? '');
-const validEmail = (s) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(String(s||'').trim());
+const show = (el) => el && (el.style.display = '');
+const hide = (el) => el && (el.style.display = 'none');
+const setText = (el, t) => el && (el.textContent = t ?? '');
 
-function showError(msg) {
-  errorBox.innerHTML = `<div class="alert alert-danger">${msg}</div>`;
-  show(errorBox);
+function showErr(target, msg) {
+  if (!target) return;
+  target.innerHTML = `<div class="alert alert-danger">${msg}</div>`;
+  show(target);
 }
-function clearError() {
-  errorBox.innerHTML = '';
-  hide(errorBox);
-}
+function clearErr(target){ if (target) { target.innerHTML=''; hide(target); } }
 
-function getLastPayment(){
-  try { return JSON.parse(localStorage.getItem(LS_LAST_PAYMENT) || 'null'); } catch { return null; }
-}
-function setPaymentUrl(url){
+function setPaymentUrl(url) {
   if (url) {
     btnOpenPay.href = url;
     btnOpenPay.classList.remove('disabled');
@@ -63,6 +60,28 @@ function setPaymentUrl(url){
     btnOpenPay.removeAttribute('href');
     btnOpenPay.classList.add('disabled');
   }
+}
+
+function buildTextDump(data) {
+  if (data.accountFields && data.accountFields.username) {
+    const p = data.accountFields;
+    const lines = [
+      '=== FADZDIGITAL VPN ACCOUNT ===',
+      `Username : ${p.username || ''}`,
+      `UUID     : ${p.uuid || ''}`,
+      `Domain   : ${p.domain || ''}`,
+      `Quota    : ${p.quota_gb || '?'} GB`,
+      `Created  : ${p.created || ''}`,
+      `Expired  : ${p.expired || ''}`,
+      '',
+      p.ws_tls  ? `[WS TLS]\n${p.ws_tls}\n`   : '',
+      p.ws_ntls ? `[WS Non-TLS]\n${p.ws_ntls}\n` : '',
+      p.grpc    ? `[gRPC]\n${p.grpc}\n`      : '',
+      'Simpan file ini untuk impor konfigurasi.'
+    ];
+    return lines.filter(Boolean).join('\n');
+  }
+  return data.accountConfig || '';
 }
 
 function setupActions(data) {
@@ -84,65 +103,43 @@ function setupActions(data) {
   };
 }
 
-function buildTextDump(data) {
-  if (data.accountFields && data.accountFields.username) {
-    const p = data.accountFields;
-    const lines = [
-      '=== FADZDIGITAL VPN ACCOUNT ===',
-      `Username : ${p.username || ''}`,
-      `UUID     : ${p.uuid || ''}`,
-      `Domain   : ${p.domain || ''}`,
-      `Quota    : ${p.quota_gb || '?'} GB`,
-      `Created  : ${p.created || ''}`,
-      `Expired  : ${p.expired || ''}`,
-      '',
-      p.ws_tls ? `[WS TLS]\n${p.ws_tls}\n` : '',
-      p.ws_ntls ? `[WS Non-TLS]\n${p.ws_ntls}\n` : '',
-      p.grpc ? `[gRPC]\n${p.grpc}\n` : '',
-      'Simpan file ini untuk impor konfigurasi.'
-    ];
-    return lines.filter(Boolean).join('\n');
-  }
-  return data.accountConfig || '';
-}
-
-function showAccount(data) {
+function renderAccount(data){
   hide(statusBox);
   show(resultBox);
-  const p = data.accountFields || {};
-  setText(accUsername, p.username);
-  setText(accUUID, p.uuid);
-  setText(accDomain, p.domain);
-  setText(accQuota, `${p.quota_gb ?? '?'} GB`);
-  setText(accCreated, p.created);
-  setText(accExpired, p.expired);
 
-  if (p.ws_tls) { setText(accWsTls, p.ws_tls); show(blkWsTls); } else hide(blkWsTls);
-  if (p.ws_ntls) { setText(accWsNtls, p.ws_ntls); show(blkWsNtls); } else hide(blkWsNtls);
-  if (p.grpc) { setText(accGrpc, p.grpc); show(blkGrpc); } else hide(blkGrpc);
+  const p = data.accountFields || {};
+  setText(accUsername, p.username || '-');
+  setText(accUUID, p.uuid || '-');
+  setText(accDomain, p.domain || '-');
+  setText(accQuota, (p.quota_gb != null ? p.quota_gb : '?') + ' GB');
+  setText(accCreated, p.created || '-');
+  setText(accExpired, p.expired || '-');
+
+  if (p.ws_tls)   { setText(accWsTls, p.ws_tls);   show(blkWsTls);   } else hide(blkWsTls);
+  if (p.ws_ntls)  { setText(accWsNtls, p.ws_ntls); show(blkWsNtls);  } else hide(blkWsNtls);
+  if (p.grpc)     { setText(accGrpc, p.grpc);      show(blkGrpc);    } else hide(blkGrpc);
 
   setupActions(data);
 }
 
-/** fetch status (AMAN): wajib orderId + uf + email */
 async function fetchStatus(orderId, uf, email){
-  const u = new URL(`${API_BASE}/pay/status`);
-  u.searchParams.set('orderId', orderId);
-  u.searchParams.set('uf', uf);
-  u.searchParams.set('email', email);
-  const r = await fetch(u.toString(), { headers: { accept: 'application/json' } });
-  const data = await r.json().catch(()=>null);
-  if (!r.ok || !data) throw new Error(data?.message || 'Order tidak ditemukan / parameter tidak cocok.');
+  const url = `${API_BASE}/pay/status?orderId=${encodeURIComponent(orderId)}&uf=${encodeURIComponent(uf)}&email=${encodeURIComponent(email)}`;
+  const r = await fetch(url, { headers: { accept: 'application/json' } });
+  const data = await r.json();
+  if (!r.ok) throw new Error(data?.message || 'Order tidak ditemukan.');
   return data;
 }
 
-async function startPolling(orderId, uf, email){
-  clearError();
+async function startPolling({orderId, uf, email}){
+  clearErr(errorBox);
+  clearErr(errorBoxR);
   hide(resultBox);
   show(statusBox);
+
   setText(orderIdText, orderId);
+  setText(ufText, uf);
   statusBadge.textContent = 'Memeriksa…';
-  statusBadge.className = 'badge bg-info';
+  statusBadge.className = 'badge bg-info badge-pulse';
 
   const start = Date.now();
   const tick = async () => {
@@ -154,20 +151,14 @@ async function startPolling(orderId, uf, email){
     }
     try {
       const data = await fetchStatus(orderId, uf, email);
-      // set payment URL jika tersedia (atau dari last payment)
-      if (data?.paymentUrl) {
-        setPaymentUrl(data.paymentUrl);
-      } else {
-        const last = getLastPayment();
-        setPaymentUrl(last?.orderId === orderId ? last.paymentUrl : '');
-      }
-
+      setPaymentUrl(data?.paymentUrl || '');
       const st = String(data.status || '').toUpperCase();
+
       if (st === 'PAID') {
-        statusBadge.textContent = 'Dibayar ✔';
-        statusBadge.className = 'badge bg-success';
         if (data.accountFields && data.accountFields.username) {
-          showAccount(data);
+          statusBadge.textContent = 'Dibayar ✔';
+          statusBadge.className = 'badge bg-success';
+          renderAccount(data);
           stopPolling();
         } else {
           statusBadge.textContent = 'Dibayar (menyiapkan akun)…';
@@ -179,75 +170,71 @@ async function startPolling(orderId, uf, email){
         stopPolling();
       } else {
         statusBadge.textContent = 'Menunggu pembayaran…';
-        statusBadge.className = 'badge bg-warning text-dark';
+        statusBadge.className = 'badge bg-warning text-dark badge-pulse';
       }
     } catch (e) {
-      showError(e.message);
+      showErr(errorBoxR, e.message || 'Terjadi kesalahan.');
     }
   };
   await tick();
   pollTimer = setInterval(tick, POLL_INTERVAL_MS);
 }
 
-function stopPolling(){
-  if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
-}
+function stopPolling(){ if (pollTimer) { clearInterval(pollTimer); pollTimer = null; } }
 
-// copy buttons (WS/GRPC)
+// form submit
+q('#lookupForm').addEventListener('submit', (e)=>{
+  e.preventDefault();
+  clearErr(errorBox); clearErr(errorBoxR);
+
+  const orderId = (orderIdInput.value || '').trim();
+  const uf      = (ufInput.value || '').trim();
+  const email   = (emailInput.value || '').trim();
+
+  if (!orderId) return showErr(errorBox, 'Order ID wajib diisi.');
+  if (!uf)      return showErr(errorBox, 'Username Final (uf) wajib diisi.');
+  if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return showErr(errorBox, 'Email wajib & harus valid.');
+
+  try { localStorage.setItem(LS_LOOKUP, JSON.stringify({orderId, uf, email})); } catch {}
+  startPolling({orderId, uf, email});
+});
+
+// copy line buttons (cfg)
 document.addEventListener('click', async (e) => {
   const btn = e.target.closest('.cfg-copy');
-  if (btn) {
-    const id = btn.dataset.target;
-    const el = document.getElementById(id);
-    if (el) {
-      await navigator.clipboard.writeText(el.textContent);
-      const h = btn.innerHTML;
-      btn.innerHTML = '<i class="bi bi-check-lg"></i>';
-      setTimeout(()=>btn.innerHTML=h, 1500);
-    }
+  if (!btn) return;
+  const id = btn.dataset.target;
+  const el = document.getElementById(id);
+  if (el) {
+    await navigator.clipboard.writeText(el.textContent);
+    const h = btn.innerHTML;
+    btn.innerHTML = '<i class="bi bi-check-lg"></i>';
+    setTimeout(()=>btn.innerHTML=h, 1500);
   }
 });
 
-// form submit
-document.getElementById('lookupForm').addEventListener('submit', (e)=>{
-  e.preventDefault();
-  clearError();
-
-  const oid = (orderIdInput.value || '').trim();
-  const uf  = (ufInput.value || '').trim().toLowerCase();
-  const em  = (emailInput.value || '').trim();
-
-  if (!oid) return showError('Order ID wajib diisi.');
-  if (!uf)  return showError('Username Final (uf) wajib diisi.');
-  if (!em || !validEmail(em)) return showError('Email wajib diisi dan harus valid.');
-
-  try { localStorage.setItem(LS_LAST_ORDER, oid); } catch {}
-  startPolling(oid, uf, em);
-});
-
-// Auto-init dari query/localStorage
+// auto init: ambil dari URL / localStorage
 (function init(){
-  const url = new URL(location.href);
-  const qid   = url.searchParams.get('orderId') || '';
-  const quf   = url.searchParams.get('uf') || '';
-  const qmail = url.searchParams.get('email') || '';
-  const last  = getLastPayment(); // {orderId,paymentUrl,uf,email}
+  const u = new URL(location.href);
+  const orderId = u.searchParams.get('orderId') || '';
+  const uf      = u.searchParams.get('uf')      || '';
+  const email   = u.searchParams.get('email')   || '';
 
-  // Prefill input dari query atau dari last payment
-  const orderIdPref = qid || (last?.orderId || localStorage.getItem(LS_LAST_ORDER) || '');
-  const ufPref      = quf || (last?.uf || '');
-  const emailPref   = qmail || (last?.email || '');
+  let restored = {orderId, uf, email};
+  if (!orderId || !uf || !email) {
+    try {
+      const saved = JSON.parse(localStorage.getItem(LS_LOOKUP) || 'null');
+      if (saved && saved.orderId && saved.uf && saved.email) restored = saved;
+    } catch {}
+  }
 
-  if (orderIdPref) orderIdInput.value = orderIdPref;
-  if (ufPref)      ufInput.value      = ufPref;
-  if (emailPref)   emailInput.value   = emailPref;
+  if (restored.orderId) orderIdInput.value = restored.orderId;
+  if (restored.uf)      ufInput.value = restored.uf;
+  if (restored.email)   emailInput.value = restored.email;
 
-  if (last?.paymentUrl && last?.orderId === orderIdPref) setPaymentUrl(last.paymentUrl);
-
-  // Auto start polling jika tiga parameter lengkap
-  if (orderIdPref && ufPref && emailPref) {
+  if (restored.orderId && restored.uf && restored.email) {
     hintEl.style.display = '';
-    hintEl.textContent = 'Parameter terdeteksi otomatis dari sesi/URL. Memeriksa status…';
-    startPolling(orderIdPref, ufPref, emailPref);
+    hintEl.textContent = 'Data lookup dipulihkan otomatis dari URL/sesi sebelumnya.';
+    startPolling(restored);
   }
 })();
