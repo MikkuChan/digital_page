@@ -1,8 +1,9 @@
-/* order-status.js (improved UI + progress tracker) */
+/* order-status.js (improved UI + progress tracker + mobile/link fixes) */
 const API_BASE = (window.API_BASE || '').replace(/\/+$/, '') || `${location.origin}`;
 const POLL_INTERVAL_MS = 5000;
 const POLL_TIMEOUT_MS  = 10 * 60 * 1000;
-const LS_LOOKUP = 'fdz_last_lookup';
+const LS_LOOKUP  = 'fdz_last_lookup';
+const LS_PAYURL  = 'fdz_last_payurl';
 
 const q  = (sel) => document.querySelector(sel);
 const qa = (sel) => [...document.querySelectorAll(sel)];
@@ -45,6 +46,7 @@ const downloadBtn  = q('#downloadConfigBtn');
 const steps = qa('.status-steps .step');
 
 let pollTimer = null;
+let pollTimerStart = 0;
 
 const show = (el)=> el && (el.style.display = '');
 const hide = (el)=> el && (el.style.display = 'none');
@@ -52,41 +54,49 @@ const setText = (el,t)=> el && (el.textContent = t ?? '');
 const showErr = (target,msg)=>{ if(!target)return; target.innerHTML = `<div class="alert alert-danger">${msg}</div>`; show(target); };
 const clearErr = (target)=>{ if(!target)return; target.innerHTML=''; hide(target); };
 
+/* ===== payment link helpers ===== */
+function applyPaymentLink(el, url){
+  if (!el) return;
+  if (url) {
+    el.href = url;
+    el.classList.remove('disabled');
+    el.innerHTML = `<i class="bi bi-box-arrow-up-right me-1"></i> Buka Halaman Pembayaran`;
+  } else {
+    el.removeAttribute('href');
+    el.classList.add('disabled');
+    el.innerHTML = `<i class="bi bi-slash-circle me-1"></i> Tidak ada sesi pembayaran`;
+  }
+}
 function setPaymentUrl(url){
-  const toggle = (a, has)=>{ if(has){ a.href=url; a.classList.remove('disabled'); } else { a.removeAttribute('href'); a.classList.add('disabled'); } };
-  toggle(btnOpenPay, !!url);
-  toggle(btnOpenPayInline, !!url);
+  // persist if exists, else clear
+  if (url) {
+    try { localStorage.setItem(LS_PAYURL, url); } catch {}
+  } else {
+    try { localStorage.removeItem(LS_PAYURL); } catch {}
+  }
+  applyPaymentLink(btnOpenPay, url);
+  applyPaymentLink(btnOpenPayInline, url);
 }
 
+/* ===== steps ===== */
 function setStepsByStatus(status, hasAccount){
-  // reset
   steps.forEach(s => s.classList.remove('active','done'));
-  // order dibuat minimal step 1 aktif
   steps[0].classList.add('active');
 
   const s = String(status||'').toUpperCase();
   if (s === 'FAILED') { steps[1].classList.add('active'); return; }
 
-  if (s === 'PENDING' || s === '') {
-    steps[1].classList.add('active');
-    return;
-  }
+  if (s === 'PENDING' || s === '') { steps[1].classList.add('active'); return; }
 
   if (s === 'PAID' && !hasAccount) {
-    steps[0].classList.add('done');
-    steps[1].classList.add('done');
-    steps[2].classList.add('active');
-    return;
+    steps[0].classList.add('done'); steps[1].classList.add('done'); steps[2].classList.add('active'); return;
   }
-
   if (s === 'PAID' && hasAccount) {
-    steps[0].classList.add('done');
-    steps[1].classList.add('done');
-    steps[2].classList.add('done');
-    steps[3].classList.add('active');
+    steps[0].classList.add('done'); steps[1].classList.add('done'); steps[2].classList.add('done'); steps[3].classList.add('active');
   }
 }
 
+/* ===== account render ===== */
 function buildTextDump(data){
   if (data.accountFields && data.accountFields.username) {
     const p = data.accountFields;
@@ -145,8 +155,12 @@ function renderAccount(data){
 
   setupActions(data);
   setStepsByStatus('PAID', true);
+
+  // akun sudah jadi → hapus link payment
+  setPaymentUrl('');
 }
 
+/* ===== API ===== */
 async function fetchStatus(orderId, uf, email){
   const url = `${API_BASE}/pay/status?orderId=${encodeURIComponent(orderId)}&uf=${encodeURIComponent(uf)}&email=${encodeURIComponent(email)}`;
   const r = await fetch(url, { headers: { accept: 'application/json' } });
@@ -155,7 +169,7 @@ async function fetchStatus(orderId, uf, email){
   return data;
 }
 
-let pollTimerStart = 0;
+/* ===== polling ===== */
 async function startPolling({orderId, uf, email}){
   clearErr(errorBox); clearErr(errorBoxR);
   hide(resultBox); show(statusBox);
@@ -167,6 +181,12 @@ async function startPolling({orderId, uf, email}){
 
   setStepsByStatus('PENDING', false);
 
+  // restore pay link kalau ada simpanan
+  try {
+    const saved = localStorage.getItem(LS_PAYURL);
+    if (saved) setPaymentUrl(saved);
+  } catch {}
+
   pollTimerStart = Date.now();
   const tick = async ()=>{
     if (Date.now() - pollTimerStart > POLL_TIMEOUT_MS) {
@@ -176,8 +196,21 @@ async function startPolling({orderId, uf, email}){
     }
     try{
       const data = await fetchStatus(orderId, uf, email);
-      setPaymentUrl(data?.paymentUrl || '');
+
+      // aturan link payment:
+      // - kalau API kasih paymentUrl → pakai & simpan
+      // - kalau tidak ada & status masih PENDING → coba pakai yang tersimpan
+      // - kalau PAID/FAILED → kosongkan & hapus simpanan
       const st = String(data.status || '').toUpperCase();
+      if (data.paymentUrl) {
+        setPaymentUrl(data.paymentUrl);
+      } else if (st === 'PENDING') {
+        const saved = localStorage.getItem(LS_PAYURL);
+        setPaymentUrl(saved || '');
+      } else {
+        setPaymentUrl(''); // bersihkan
+      }
+
       const hasAccount = !!(data.accountFields && data.accountFields.username);
 
       if (st === 'PAID') {
@@ -195,6 +228,7 @@ async function startPolling({orderId, uf, email}){
         statusBadge.textContent = 'Gagal ✖';
         statusBadge.className   = 'badge bg-danger';
         setStepsByStatus('FAILED', false);
+        setPaymentUrl(''); // pastikan nonaktif
         stopPolling();
       } else {
         statusBadge.textContent = 'Menunggu pembayaran…';
@@ -211,7 +245,7 @@ async function startPolling({orderId, uf, email}){
 
 function stopPolling(){ if (pollTimer) { clearInterval(pollTimer); pollTimer = null; } }
 
-// submit
+/* ===== events ===== */
 lookupForm.addEventListener('submit', (e)=>{
   e.preventDefault();
   clearErr(errorBox); clearErr(errorBoxR);
@@ -228,7 +262,7 @@ lookupForm.addEventListener('submit', (e)=>{
   startPolling({orderId, uf, email});
 });
 
-// cfg copy buttons
+// copy buttons
 document.addEventListener('click', async (e)=>{
   const btn = e.target.closest('.cfg-copy'); if(!btn) return;
   const id = btn.dataset.target; const el = document.getElementById(id);
@@ -239,7 +273,7 @@ document.addEventListener('click', async (e)=>{
   }
 });
 
-// auto init (URL / localStorage)
+// auto init
 (function init(){
   const u = new URL(location.href);
   const orderId = u.searchParams.get('orderId') || '';
@@ -257,6 +291,13 @@ document.addEventListener('click', async (e)=>{
   if (restored.orderId) orderIdInput.value = restored.orderId;
   if (restored.uf)      ufInput.value = restored.uf;
   if (restored.email)   emailInput.value = restored.email;
+
+  // set link payment dari simpanan (kalau ada) sebelum polling
+  try {
+    const savedPay = localStorage.getItem(LS_PAYURL);
+    if (savedPay) setPaymentUrl(savedPay);
+    else setPaymentUrl('');
+  } catch { setPaymentUrl(''); }
 
   if (restored.orderId && restored.uf && restored.email) {
     hintEl.style.display = '';
