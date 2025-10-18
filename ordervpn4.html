@@ -1,277 +1,436 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8" />
-    <title>Order VPN – fadzdigital</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Beli akun VPN otomatis. Pilih paket, bayar, akun langsung terbit." />
-    <link rel="icon" href="https://raw.githubusercontent.com/fadzdigital/image/main/favicon.ico" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
-    <link href="css/style.css" rel="stylesheet" />
-    <link href="css/clash-converter.css" rel="stylesheet" />
-    <link href="css/ordervpn4.css" rel="stylesheet" />
-    <script>
-        window.API_BASE = "https://call.fadzdigital.store/";
-    </script>
+  <meta charset="UTF-8" />
+  <title>Katalog VPN – fadzdigital</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Katalog paket VPN. Pilih server, bayar via Duitku, akun aktif otomatis." />
+  <link rel="icon" href="https://raw.githubusercontent.com/fadzdigital/image/main/favicon.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link href="css/style.css" rel="stylesheet" />
+  <link href="css/ordervpn4.css" rel="stylesheet" />
+  <script>window.API_BASE="https://call.fadzdigital.store";</script>
 </head>
-
 <body>
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="loading-spinner"></div>
+  <!-- overlay -->
+  <div class="loading-overlay" id="loadingOverlay"><div class="loading-spinner"></div></div>
+
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg fixed-top">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
+        <img src="https://raw.githubusercontent.com/fadzdigital/image/main/fadzdigital.png" alt="fadzdigital Logo" style="height:38px; width:auto; object-fit:contain;" />
+        <span class="text-gradient" style="font-size:2rem; font-weight:700;">fadzdigital</span>
+      </a>
+      <button class="navbar-toggler border-0 p-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav mx-auto">
+          <li class="nav-item"><a class="nav-link" href="index.html">Beranda</a></li>
+          <li class="nav-item"><a class="nav-link" href="index.html#features">Fitur</a></li>
+          <li class="nav-item"><a class="nav-link active" href="ordervpn.html">Order VPN</a></li>
+          <li class="nav-item"><a class="nav-link" href="tutorial.html">Tutorial</a></li>
+          <li class="nav-item"><a class="nav-link" href="tools.html">Tools</a></li>
+          <li class="nav-item"><a class="nav-link" href="index.html#contact">Kontak</a></li>
+        </ul>
+        <div class="d-flex align-items-center gap-3">
+          <a href="https://wa.me/6285727035336" class="btn btn-success d-none d-lg-inline-flex">WhatsApp</a>
+          <a href="https://t.me/fadzdigital" class="btn btn-primary">Telegram</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main style="margin-top:90px;min-height:100vh;">
+    <!-- HERO -->
+<section class="order-hero hero-plus text-center font-display py-5 mb-0">
+  <div class="container position-relative">
+    <!-- badge headline -->
+    <span class="badge-hero mb-3">
+      <i class="bi bi-rocket-takeoff me-2"></i> Order VPN Otomatis
+    </span>
+
+    <!-- title (tanpa garis/underline) -->
+    <h1 class="display-5 display-md-4 fw-bold mb-2 text-dark-blue">
+      Beli <span class="text-gradient">VPN</span> Premium — Instan
+    </h1>
+
+    <!-- subcopy -->
+    <p class="lead text-secondary mx-auto mb-4" style="max-width:720px;">
+      Pilih paket sesuai kebutuhan • Bayar via <b>Duitku</b> • Akun aktif otomatis setelah <i>paid</i>
+    </p>
+
+    <!-- chips keunggulan -->
+    <div class="hero-chips d-flex flex-wrap justify-content-center gap-2 mb-4">
+      <span class="chip"><i class="bi bi-shield-check me-1"></i> Server Stabil</span>
+      <span class="chip"><i class="bi bi-lightning-charge me-1"></i> Proses &lt; 1 Menit</span>
+      <span class="chip"><i class="bi bi-phone me-1"></i> Support v2rayNG/NV/Neko</span>
+      <span class="chip"><i class="bi bi-gear me-1"></i> Auto Config</span>
     </div>
 
-    <nav class="navbar navbar-expand-lg fixed-top">
-        <div class="container">
-            <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
-                <img src="https://raw.githubusercontent.com/fadzdigital/image/main/fadzdigital.png" alt="fadzdigital Logo" style="height:38px; width:auto; object-fit:contain;" />
-                <span class="text-gradient" style="font-size:2rem; font-weight:700;">fadzdigital</span>
+    <!-- CTA (teks baru) -->
+    <div class="d-flex justify-content-center gap-2">
+      <a href="#catalog" class="btn btn-primary btn-lg px-4">
+        <i class="bi bi-bag-check me-2"></i> Mulai Pilih Paket
+      </a>
+      <a href="tutorial.html" class="btn btn-outline-primary btn-lg px-4">
+        <i class="bi bi-book me-2"></i> Bantuan &amp; Tutorial
+      </a>
+    </div>
+  </div>
+</section>
+
+
+    <!-- FILTER BAR + GRID -->
+    <section class="container py-4">
+      <!-- Filter bar -->
+      <div class="catalog-filter card mb-3 filter-bar">
+        <div class="card-body d-flex flex-wrap gap-3 align-items-center">
+          <!-- Varian -->
+          <div class="d-flex align-items-center gap-2">
+            <span class="text-muted fw-medium">Varian:</span>
+            <div class="segmented" role="group" aria-label="Pilih Varian">
+              <button class="seg-btn active" data-filter-variant="HP">HP</button>
+              <button class="seg-btn" data-filter-variant="STB">STB</button>
+            </div>
+          </div>
+          <!-- Region -->
+          <div class="d-flex align-items-center gap-2">
+            <span class="text-muted fw-medium">Region:</span>
+            <div class="segmented" role="group" aria-label="Pilih Region">
+              <button class="seg-btn active" data-filter-region="SG">Singapore</button>
+              <button class="seg-btn" data-filter-region="ID">Indonesia</button>
+            </div>
+          </div>
+          <!-- Kanan -->
+          <div class="ms-auto d-flex flex-wrap gap-2 align-items-center flex-1-min">
+            <div class="search-ctrl input-group input-group-sm">
+              <span class="input-group-text"><i class="bi bi-search"></i></span>
+              <input id="searchBox" class="form-control" placeholder="Cari: label/server…" />
+            </div>
+            <div class="sort-ctrl input-group input-group-sm">
+              <span class="input-group-text"><i class="bi bi-sort-down"></i></span>
+              <select id="sortSel" class="form-select">
+                <option value="price-asc">Harga termurah</option>
+                <option value="price-desc">Harga termahal</option>
+                <option value="quota-desc">Kuota terbesar</option>
+                <option value="quota-asc">Kuota terkecil</option>
+                <option value="label-asc">Nama A→Z</option>
+              </select>
+            </div>
+            <div id="promoPill" class="promo-pill" data-status="off">
+              <i class="bi bi-ticket-perforated me-1"></i>
+              <span id="promoInfo">Tidak aktif</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- metode bayar hint -->
+        <div class="filter-methods px-3 pb-3">
+          <div class="d-flex flex-wrap align-items-center gap-2">
+            <span class="text-muted small">Metode yang didukung:</span>
+            <div class="pm-badges">
+              <span class="pm pm-bank">Bank Transfer</span>
+              <span class="pm pm-ew">E-Wallet</span>
+              <span class="pm pm-qris">QRIS</span>
+              <span class="pm pm-retail">Retail</span>
+            </div>
+            <a href="order-status.html" class="btn btn-outline-secondary ms-auto btn-sm">
+              <i class="bi bi-clipboard2-check me-1"></i> Cek Status / Lanjutkan
             </a>
-            <button class="navbar-toggler border-0 p-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav mx-auto">
-                    <li class="nav-item"><a class="nav-link" href="index.html">Beranda</a></li>
-                    <li class="nav-item"><a class="nav-link" href="index.html#features">Fitur</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="ordervpn.html">Order VPN</a></li>
-                    <li class="nav-item"><a class="nav-link" href="tutorial.html">Tutorial</a></li>
-                    <li class="nav-item"><a class="nav-link" href="tools.html">Tools</a></li>
-                    <li class="nav-item"><a class="nav-link" href="index.html#contact">Kontak</a></li>
-                </ul>
-                <div class="d-flex align-items-center gap-3">
-                    <a href="https://wa.me/6285727035336" class="btn btn-success d-none d-lg-inline-flex">WhatsApp</a>
-                    <a href="https://t.me/fadzdigital" class="btn btn-primary">Telegram</a>
-                </div>
-            </div>
+          </div>
         </div>
-    </nav>
+      </div>
 
-    <main style="margin-top:90px;min-height:100vh;">
-        <section class="order-hero text-center font-display py-5 mb-0">
-            <div class="container">
-                <span class="badge-hero mb-3">
-                    <i class="bi bi-rocket-takeoff me-2"></i>Order VPN Otomatis
-                </span>
-                <h1 class="display-4 fw-bold mb-3 text-dark-blue">
-                    Beli <span class="text-gradient">VPN</span> Premium Otomatis
-                </h1>
-                <p class="lead text-secondary mx-auto mb-4" style="max-width:650px;">
-                    Pilih paket sesuai kebutuhan • Bayar via <b>Duitku</b> • Akun aktif instan
-                </p>
-            </div>
-        </section>
-
-        <section class="container py-5">
-            <div class="row g-4 g-lg-5">
-                <div class="col-lg-7">
-                    <div class="card card-form">
-                        <div class="card-body p-4 p-lg-5">
-                            <div class="d-flex align-items-center gap-3 mb-4">
-                                <i class="bi bi-cart4 fs-2 text-primary"></i>
-                                <h2 class="h3 fw-bold mb-0 text-dark-blue">Formulir Pemesanan</h2>
-                            </div>
-
-                            <form id="orderForm" class="order-form">
-                                <div class="mb-4">
-                                    <label class="form-label fw-bold d-flex align-items-center gap-2">
-                                        <span class="form-step-number">1</span> Pilih Varian & Server
-                                    </label>
-                                    <div class="row g-3">
-                                        <div class="col-sm-6">
-                                            <label class="form-label small text-muted">Varian</label>
-                                            <select id="variant" class="form-select">
-                                                <option value="" disabled selected>-- Pilih Varian --</option>
-                                                <option value="HP">HP</option>
-                                                <option value="STB">STB</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <label class="form-label small text-muted">Region</label>
-                                            <select id="region" class="form-select" disabled>
-                                                <option>Pilih Varian Dahulu</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-12">
-                                            <label class="form-label small text-muted">Server</label>
-                                            <select id="serverId" class="form-select" disabled>
-                                                <option>Pilih Region Dahulu</option>
-                                            </select>
-                                            <div class="form-text">Harga dan spesifikasi sesuai server yang dipilih.</div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="mb-4">
-                                    <label class="form-label fw-bold d-flex align-items-center gap-2">
-                                        <span class="form-step-number">2</span> Kode Promo (Opsional)
-                                    </label>
-                                    <input id="promoCode" class="form-control" placeholder="contoh: fadzpromo12" />
-                                </div>
-
-                                <div class="mb-4">
-                                    <label class="form-label fw-bold d-flex align-items-center gap-2">
-                                        <span class="form-step-number">3</span> Detail Akun
-                                    </label>
-                                    <div class="row g-3">
-                                        <div class="col-md-6">
-                                            <label for="protocol" class="form-label small text-muted">Protokol</label>
-                                            <select id="protocol" class="form-select">
-                                                <option value="vmess">VMess</option>
-                                                <option value="vless">VLESS</option>
-                                                <option value="trojan">Trojan</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="username" class="form-label small text-muted">Username</label>
-                                            <input id="username" class="form-control" placeholder="misal: userkeren" required />
-                                            <div class="form-text">Sistem akan menambah <code>-XYZ</code> agar unik.</div>
-                                        </div>
-                                        <div class="col-12">
-                                            <label for="email" class="form-label small text-muted">Email (Wajib)</label>
-                                            <input id="email" type="email" class="form-control" placeholder="contoh@gmail.com" />
-                                            <div class="form-text">Detail akun akan dikirim ke email ini.</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="order-summary">
-                                     <h5 class="summary-title">Ringkasan Pesanan</h5>
-                                     <div class="summary-item">
-                                         <span class="summary-key">Detail</span>
-                                         <span class="summary-value" id="detailsPreview">-</span>
-                                     </div>
-                                     <div class="summary-item">
-                                         <span class="summary-key">Username Final</span>
-                                         <code class="summary-value" id="usernameFinalPreview">user-123</code>
-                                     </div>
-                                     <hr class="summary-divider">
-                                     <div class="summary-item total">
-                                         <span class="summary-key">Total Bayar</span>
-                                         <span class="summary-value fw-bold" id="pricePreview">Rp 0 / 30 hari</span>
-                                     </div>
-                                </div>
-
-                                <button id="submitBtn" class="btn btn-primary w-100 btn-lg mt-4">
-                                    <i class="bi bi-shield-check me-2"></i>Lanjutkan ke Pembayaran
-                                </button>
-
-                                <div id="errorBox" class="mt-3" style="display:none;"></div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-5">
-                    <div class="position-sticky" style="top: 100px;">
-                        <div class="card card-status" id="waitingBox" style="display:none;">
-                            <div class="card-body p-4">
-                                <div class="d-flex align-items-center gap-3 mb-3">
-                                     <div class="spinner-border text-primary" role="status">
-                                        <span class="visually-hidden">Loading...</span>
-                                    </div>
-                                    <h3 class="h5 fw-bold mb-0 text-dark-blue">Menunggu Pembayaran</h3>
-                                </div>
-                                <p class="text-muted">Order ID: <code id="orderIdText">-</code></p>
-                                <div class="mb-3">Status: <span id="statusText" class="badge bg-warning text-dark">Menunggu…</span></div>
-                                <a id="payLink" href="#" target="_blank" class="btn btn-outline-primary w-100">
-                                    <i class="bi bi-box-arrow-up-right me-1"></i> Buka Halaman Pembayaran
-                                </a>
-                            </div>
-                        </div>
-
-                        <div class="card card-result" id="resultBox" style="display:none;">
-                            <div class="card-body p-4">
-                                <div class="d-flex align-items-center gap-3 mb-3">
-                                    <i class="bi bi-check-circle-fill fs-2 text-success"></i>
-                                    <div>
-                                        <h3 class="h5 fw-bold mb-0 text-dark-blue">Akun Berhasil Dibuat!</h3>
-                                        <p class="mb-0 text-muted small">Simpan detail akun Anda.</p>
-                                    </div>
-                                </div>
-                                
-                                <div class="account-details-grid mb-4">
-                                    <div class="detail-item"><span class="k">Username</span><span class="v" id="accUsername">-</span></div>
-                                    <div class="detail-item"><span class="k">Domain</span><span class="v" id="accDomain">-</span></div>
-                                    <div class="detail-item"><span class="k">Quota</span><span class="v" id="accQuota">-</span></div>
-                                    <div class="detail-item"><span class="k">Dibuat</span><span class="v" id="accCreated">-</span></div>
-                                    <div class="detail-item"><span class="k">Kadaluwarsa</span><span class="v" id="accExpired">-</span></div>
-                                    <div class="detail-item uuid"><span class="k">UUID</span><span class="v monospace" id="accUUID">-</span></div>
-                                </div>
-
-                                <div id="blk-ws-tls" class="cfg-block mb-2" style="display:none;">
-                                    <div class="cfg-title">WS TLS</div>
-                                    <div class="cfg-row">
-                                        <code id="accWsTls" class="cfg-code"></code>
-                                        <button class="btn btn-sm btn-light cfg-copy" data-target="accWsTls" title="Salin"><i class="bi bi-clipboard"></i></button>
-                                    </div>
-                                </div>
-
-                                <div id="blk-ws-ntls" class="cfg-block mb-2" style="display:none;">
-                                    <div class="cfg-title">WS Non-TLS</div>
-                                    <div class="cfg-row">
-                                        <code id="accWsNtls" class="cfg-code"></code>
-                                        <button class="btn btn-sm btn-light cfg-copy" data-target="accWsNtls" title="Salin"><i class="bi bi-clipboard"></i></button>
-                                    </div>
-                                </div>
-
-                                <div id="blk-grpc" class="cfg-block mb-3" style="display:none;">
-                                    <div class="cfg-title">gRPC</div>
-                                    <div class="cfg-row">
-                                        <code id="accGrpc" class="cfg-code"></code>
-                                        <button class="btn btn-sm btn-light cfg-copy" data-target="accGrpc" title="Salin"><i class="bi bi-clipboard"></i></button>
-                                    </div>
-                                </div>
-
-                                <div class="d-grid gap-2 d-sm-flex">
-                                    <button id="copyAllBtn" class="btn btn-outline-secondary flex-fill">
-                                        <i class="bi bi-clipboard-check"></i> Salin Semua
-                                    </button>
-                                    <button id="downloadConfigBtn" class="btn btn-success flex-fill">
-                                        <i class="bi bi-download"></i> Download .txt
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <footer class="py-4" style="background: var(--gray-900); color: var(--gray-100);">
-        <div class="container text-center">
-            <div class="mb-2">
-                <span class="fw-bold font-display text-gradient" style="font-size:1.3rem;">fadzdigital</span>
-            </div>
-            <div class="mb-2 small">
-                &copy; 2025 fadzdigital. All rights reserved.<br />Made with 💙 in Indonesia
-            </div>
-            <div>
-                <a href="index.html" class="text-primary small text-decoration-none mx-2">Beranda</a>
-                <a href="ordervpn.html" class="text-primary small text-decoration-none mx-2">Order VPN</a>
-                <a href="tutorial.html" class="text-primary small text-decoration-none mx-2">Tutorial</a>
-                <a href="tools.html" class="text-primary small text-decoration-none mx-2">Tools</a>
-                <a href="index.html#contact" class="text-primary small text-decoration-none mx-2">Kontak</a>
-            </div>
+      <!-- Banner restore pembayaran -->
+      <div id="waitingBox" class="card pay-restore mb-3" style="display:none;">
+        <div class="card-body d-flex flex-wrap gap-3 align-items-center">
+          <div class="spinner-border text-primary" role="status"></div>
+          <div>
+            <div class="fw-semibold">Sesi pembayaran terdeteksi</div>
+            <div class="small">Order ID: <code id="orderIdText">-</code></div>
+          </div>
+          <div class="ms-auto d-flex gap-2">
+            <a id="payLink" href="#" target="_blank" class="btn btn-outline-primary">
+              <i class="bi bi-box-arrow-up-right me-1"></i> Buka Pembayaran
+            </a>
+            <a id="btnMonitor" href="order-status.html" class="btn btn-primary">
+              <i class="bi bi-activity me-1"></i> Pantau Status
+            </a>
+          </div>
         </div>
-    </footer>
+      </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="js/ordervpn4.js"></script>
-    <script>
-        // Hilangkan overlay loading halus
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                const el = document.getElementById('loadingOverlay');
-                if (!el) return;
-                el.style.opacity = '0';
-                setTimeout(() => (el.style.display = 'none'), 600);
-            }, 400);
-        });
-    </script>
+      <!-- Grid katalog -->
+      <div id="catalogGrid" class="catalog-grid"></div>
+
+      <!-- Skeleton loading -->
+      <div id="skeletonGrid" class="catalog-grid">
+        <div class="card-prod skeleton"></div>
+        <div class="card-prod skeleton"></div>
+        <div class="card-prod skeleton"></div>
+        <div class="card-prod skeleton d-none d-sm-block"></div>
+        <div class="card-prod skeleton d-none d-lg-block"></div>
+      </div>
+    </section>
+
+<!-- FAQ -->
+<section class="container py-5">
+  <div class="card faq-card">
+    <div class="faq-topbar"></div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+        <div>
+          <div class="faq-eyebrow text-uppercase">Butuh Bantuan?</div>
+          <h3 class="h5 mb-0">Pertanyaan yang Sering Ditanyakan</h3>
+        </div>
+        <span class="badge rounded-pill bg-primary-subtle text-primary-emphasis">Realtime • 24/7</span>
+      </div>
+
+      <div class="faq-desc text-muted mb-4">
+        Jawaban cepat seputar cara order, pembayaran, dan aktivasi akun. Klik untuk membuka detailnya.
+      </div>
+
+      <div class="faq-grid">
+        <div class="accordion faq-accordion" id="faqAcc">
+          <!-- Item 1 -->
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="f0">
+              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#c0" aria-expanded="true" aria-controls="c0">
+                <span class="faq-icon bg-blue"><i class="bi bi-cart-check"></i></span>
+                Bagaimana cara order?
+              </button>
+            </h2>
+            <div id="c0" class="accordion-collapse collapse show" data-bs-parent="#faqAcc" aria-labelledby="f0">
+              <div class="accordion-body">
+                1) Pilih <b>Varian</b> & <b>Region</b> → klik <b>Beli</b> pada kartu server.<br/>
+                2) Isi <b>protokol</b>, <b>username</b>, dan <b>email (wajib)</b> di modal checkout.<br/>
+                3) (Opsional) Masukkan <b>kode promo</b> jika ada, diskon langsung diterapkan.<br/>
+                4) Bayar via <b>Duitku</b> (Bank Transfer, E-Wallet, QRIS, Retail).<br/>
+                5) Setelah <i>paid</i>, detail akun tampil otomatis & juga dikirim ke email.
+              </div>
+            </div>
+          </div>
+
+          <!-- Item 2 -->
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="f1">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c1" aria-expanded="false" aria-controls="c1">
+                <span class="faq-icon bg-green"><i class="bi bi-lightning-charge"></i></span>
+                Setelah bayar, kapan akun aktif?
+              </button>
+            </h2>
+            <div id="c1" class="accordion-collapse collapse" data-bs-parent="#faqAcc" aria-labelledby="f1">
+              <div class="accordion-body">
+                Instan. Sistem memproses otomatis dan menampilkan detail akun di <b>halaman status</b> (<i>biasanya &lt; 1 menit</i>).
+              </div>
+            </div>
+          </div>
+
+          <!-- Item 3 -->
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="f2">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c2" aria-expanded="false" aria-controls="c2">
+                <span class="faq-icon bg-purple"><i class="bi bi-diagram-3"></i></span>
+                Protokol yang tersedia?
+              </button>
+            </h2>
+            <div id="c2" class="accordion-collapse collapse" data-bs-parent="#faqAcc" aria-labelledby="f2">
+              <div class="accordion-body">
+                <b>VMess</b>, <b>VLESS</b>, dan <b>Trojan</b> : kompatibel dengan v2rayNG, NapsternetV, Nekobox, dll.
+              </div>
+            </div>
+          </div>
+
+          <!-- Item 4 -->
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="f3">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c3" aria-expanded="false" aria-controls="c3">
+                <span class="faq-icon bg-amber"><i class="bi bi-link-45deg"></i></span>
+                Halaman tertutup saat bayar, bagaimana?
+              </button>
+            </h2>
+            <div id="c3" class="accordion-collapse collapse" data-bs-parent="#faqAcc" aria-labelledby="f3">
+              <div class="accordion-body">
+                Link pembayaran disimpan otomatis. Buka lagi halaman ini & tombol <b>Buka Pembayaran</b> akan muncul
+                di banner “Sesi pembayaran terdeteksi”. Kamu juga bisa klik <b>Cek Status / Lanjutkan</b>.
+              </div>
+            </div>
+          </div>
+
+          <!-- Item 5 -->
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="f4">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c4" aria-expanded="false" aria-controls="c4">
+                <span class="faq-icon bg-red"><i class="bi bi-arrow-counterclockwise"></i></span>
+                Apakah bisa refund?
+              </button>
+            </h2>
+            <div id="c4" class="accordion-collapse collapse" data-bs-parent="#faqAcc" aria-labelledby="f4">
+              <div class="accordion-body">
+                Jika terjadi kesalahan sistem (akun tidak terbit &gt; 1 Jam) dan pembayaran sukses,
+                hubungi admin, kami bantu sesuai kebijakan.
+              </div>
+            </div>
+          </div>
+        </div> <!--/accordion-->
+      </div> <!--/faq-grid-->
+    </div>
+  </div>
+</section>
+</main>
+
+  <!-- MODAL CHECKOUT -->
+  <div class="modal fade" id="checkoutModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content modal-checkout">
+        <div class="modal-header ch-header">
+          <div>
+            <div class="ch-eyebrow"><i class="bi bi-lock-fill me-1"></i>Checkout Aman</div>
+            <h5 class="modal-title" id="checkoutTitle">Beli Paket</h5>
+          </div>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body ch-body">
+          <div class="row g-4">
+            <!-- Left: Form -->
+            <div class="col-lg-7">
+              <form class="vstack gap-3" onsubmit="return false;">
+                <input id="co_variant" class="d-none" />
+                <input id="co_region" class="d-none" />
+                <input id="co_serverId" class="d-none" />
+
+                <!-- Username + Preview -->
+                <div>
+                  <label class="form-label small text-muted">Username</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-person"></i></span>
+                    <input id="co_username" class="form-control" placeholder="misal: userkeren" />
+                  </div>
+                  <div class="small mt-1 text-muted">
+                    Username final: <code id="co_usernamePreview">-</code> <span class="text-secondary">(otomatis ditambah suffix)</span>
+                  </div>
+                </div>
+
+                <!-- Email -->
+                <div>
+                  <label class="form-label small text-muted">Email <span class="text-danger">*</span></label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                    <input id="co_email" type="email" class="form-control" placeholder="contoh@gmail.com" required />
+                  </div>
+                  <div class="small text-muted mt-1">Dipakai untuk kirim detail akun & verifikasi status order.</div>
+                </div>
+
+                <!-- Protokol -->
+                <div class="row g-2">
+                  <div class="col-md-6">
+                    <label class="form-label small text-muted">Protokol</label>
+                    <select id="co_protocol" class="form-select">
+                      <option value="vmess">VMess</option>
+                      <option value="vless">VLESS</option>
+                      <option value="trojan">Trojan</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label small text-muted d-flex align-items-center gap-2">
+                      Kode Promo
+                      <span class="badge bg-light text-primary border" id="modalPromoMsg" style="display:none;">
+                        Promo aktif: -Rp <span id="modalPromoAmount">0</span>
+                      </span>
+                    </label>
+                    <input id="co_promo" class="form-control" placeholder="Example: fdz-new" />
+                    <div class="form-text" id="modalPromoHelp">Masukkan kode promo jika ada.</div>
+                  </div>
+                </div>
+
+                <!-- Trust mini -->
+                <div class="ch-trust small text-muted">
+                  <i class="bi bi-shield-check me-1"></i> Pastikan data pesanan sudah benar sebelum lanjut pembayaran.
+                </div>
+              </form>
+            </div>
+
+            <!-- Right: Summary -->
+            <div class="col-lg-5">
+              <div class="ch-summary p-3">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                  <div class="fw-semibold">Ringkasan</div>
+                  <span class="badge rounded-pill bg-primary-subtle text-primary-emphasis" id="ch_badgeRegion">-</span>
+                </div>
+                <div class="ch-item">
+                  <div class="k">Varian</div><div class="v" id="ch_varian">-</div>
+                </div>
+                <div class="ch-item">
+                  <div class="k">Server</div><div class="v" id="ch_server">-</div>
+                </div>
+                <div class="ch-item">
+                  <div class="k">Protokol</div><div class="v" id="ch_protocol">VMess</div>
+                </div>
+                <hr class="my-2">
+                <div class="ch-price my-2">
+                  <div class="base">Rp <span id="ch_priceBase">0</span></div>
+                  <div class="final">Total Bayar <span>Rp <span id="ch_priceFinal">0</span></span></div>
+                  <div class="note small text-muted" id="ch_priceNote">—</div>
+                </div>
+                <div class="ch-methods mt-2">
+                  <span class="pm pm-bank">Bank Transfer</span>
+                  <span class="pm pm-ew">E-Wallet</span>
+                  <span class="pm pm-qris">QRIS</span>
+                  <span class="pm pm-retail">Retail</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer ch-footer">
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
+          <button id="btnCheckout" type="button" class="btn btn-primary">
+            <i class="bi bi-shield-check me-1"></i> Lanjutkan Pembayaran
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="py-4" style="background: var(--gray-900); color: var(--gray-100);">
+    <div class="container text-center">
+      <div class="mb-2">
+        <span class="fw-bold font-display text-gradient" style="font-size:1.3rem;">fadzdigital</span>
+      </div>
+      <div class="mb-2 small">
+        &copy; 2025 fadzdigital. All rights reserved.<br />Made with 💙 in Indonesia
+      </div>
+      <div>
+        <a href="index.html" class="text-primary small text-decoration-none mx-2">Beranda</a>
+        <a href="ordervpn.html" class="text-primary small text-decoration-none mx-2">Order VPN</a>
+        <a href="tutorial.html" class="text-primary small text-decoration-none mx-2">Tutorial</a>
+        <a href="tools.html" class="text-primary small text-decoration-none mx-2">Tools</a>
+        <a href="index.html#contact" class="text-primary small text-decoration-none mx-2">Kontak</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/ordervpn4.js"></script>
+  <script>
+    // Hilangkan overlay loading halus
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        const el = document.getElementById('loadingOverlay');
+        if (!el) return;
+        el.style.opacity = '0';
+        setTimeout(() => (el.style.display = 'none'), 600);
+      }, 400);
+    });
+  </script>
 </body>
 </html>
