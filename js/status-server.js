@@ -1,6 +1,4 @@
-/* ========= Status Server — fadzdigital =========
- * Ubah API_BASE ke domain Worker kamu.
- */
+/* ========= Status Server — fadzdigital ========= */
 const API_BASE = 'https://call.fadzdigital.store';
 
 // ====== Konstanta & state ======
@@ -198,7 +196,7 @@ function render(list, meta) {
   const port = meta?.port ?? 5888;
   const path = meta?.path ?? '/health';
   const timeout = meta?.timeoutMs ?? 2000;
-  el.metaInfo.innerHTML = `Cek via <code>http://host:${port}${path}</code> • timeout ${timeout} ms • terakhir dicek: ${fmtTime(meta?.checkedAt || Date.now())}`;
+  el.metaInfo.innerHTML = `Terakhir dicek: ${fmtTime(meta?.checkedAt || Date.now())}`;
 }
 
 // ====== Actions ======
