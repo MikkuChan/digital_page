@@ -13,7 +13,21 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
   <link href="css/style.css" rel="stylesheet" />
   <link href="css/ordervpn4.css" rel="stylesheet" />
-  <script>window.API_BASE="https://call.fadzdigital.store";</script>
+  <script>
+    /* ===== Konfigurasi API & Rotasi Aset per JAM =====
+       Urutan folder yang dirorasi: backv1 -> backv2 -> backv3 -> (ulang)
+       Slot dihitung dari jam UTC saat ini (gampang & konsisten di semua device).
+    */
+    window.API_BASE = "https://call.fadzdigital.store";
+
+    const ROTATION_BASES = ["assets/backv1", "assets/backv2", "assets/backv3"];
+    const hourSlot = Math.floor(Date.now() / (60 * 60 * 1000)) % ROTATION_BASES.length;
+    const chosenBase = ROTATION_BASES[hourSlot];
+
+    // Digunakan ordervpn.js saat load manifest gambar
+    window.ASSET_BASE = chosenBase;
+    window.ASSET_MANIFEST = `${chosenBase}/manifest.json`;
+  </script>
 </head>
 <body>
   <!-- overlay -->
@@ -48,43 +62,19 @@
 
   <main style="margin-top:90px;min-height:100vh;">
     <!-- HERO -->
-<section class="order-hero hero-plus text-center font-display py-5 mb-0">
-  <div class="container position-relative">
-    <!-- badge headline -->
-    <span class="badge-hero mb-3">
-      <i class="bi bi-rocket-takeoff me-2"></i> Order VPN Otomatis
-    </span>
-
-    <!-- title (tanpa garis/underline) -->
-    <h1 class="display-5 display-md-4 fw-bold mb-2 text-dark-blue">
-      Beli <span class="text-gradient">VPN</span> Premium — Instan
-    </h1>
-
-    <!-- subcopy -->
-    <p class="lead text-secondary mx-auto mb-4" style="max-width:720px;">
-      Pilih paket sesuai kebutuhan • Bayar via <b>Duitku</b> • Akun aktif otomatis setelah <i>paid</i>
-    </p>
-
-    <!-- chips keunggulan -->
-    <div class="hero-chips d-flex flex-wrap justify-content-center gap-2 mb-4">
-      <span class="chip"><i class="bi bi-shield-check me-1"></i> Server Stabil</span>
-      <span class="chip"><i class="bi bi-lightning-charge me-1"></i> Proses &lt; 1 Menit</span>
-      <span class="chip"><i class="bi bi-phone me-1"></i> Support v2rayNG/NV/Neko</span>
-      <span class="chip"><i class="bi bi-gear me-1"></i> Auto Config</span>
-    </div>
-
-    <!-- CTA (teks baru) -->
-    <div class="d-flex justify-content-center gap-2">
-      <a href="#catalog" class="btn btn-primary btn-lg px-4">
-        <i class="bi bi-bag-check me-2"></i> Mulai Pilih Paket
-      </a>
-      <a href="tutorial.html" class="btn btn-outline-primary btn-lg px-4">
-        <i class="bi bi-book me-2"></i> Bantuan &amp; Tutorial
-      </a>
-    </div>
-  </div>
-</section>
-
+    <section class="order-hero text-center font-display py-5 mb-0">
+      <div class="container">
+        <span class="badge-hero mb-3">
+          <i class="bi bi-rocket-takeoff me-2"></i>Order VPN Otomatis
+        </span>
+        <h1 class="display-4 fw-bold mb-3 text-dark-blue">
+          Beli <span class="text-gradient">VPN</span> Premium Otomatis
+        </h1>
+        <p class="lead text-secondary mx-auto mb-4" style="max-width:650px;">
+          Pilih paket sesuai kebutuhan • Bayar via <b>Duitku</b> • Akun aktif instan
+        </p>
+      </div>
+    </section>
 
     <!-- FILTER BAR + GRID -->
     <section class="container py-4">
@@ -141,7 +131,7 @@
               <span class="pm pm-retail">Retail</span>
             </div>
             <a href="order-status.html" class="btn btn-outline-secondary ms-auto btn-sm">
-              <i class="bi bi-clipboard2-check me-1"></i> Cek Status / Lanjutkan
+              <i class="bi bi-clipboard2-check me-1"></i> Cek Status Pesanan
             </a>
           </div>
         </div>
@@ -179,113 +169,113 @@
       </div>
     </section>
 
-<!-- FAQ -->
-<section class="container py-5">
-  <div class="card faq-card">
-    <div class="faq-topbar"></div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
-        <div>
-          <div class="faq-eyebrow text-uppercase">Butuh Bantuan?</div>
-          <h3 class="h5 mb-0">Pertanyaan yang Sering Ditanyakan</h3>
+    <!-- FAQ -->
+    <section class="container py-5">
+      <div class="card faq-card">
+        <div class="faq-topbar"></div>
+        <div class="card-body">
+          <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+            <div>
+              <div class="faq-eyebrow text-uppercase">Butuh Bantuan?</div>
+              <h3 class="h5 mb-0">Pertanyaan yang Sering Ditanyakan</h3>
+            </div>
+            <span class="badge rounded-pill bg-primary-subtle text-primary-emphasis">Realtime • 24/7</span>
+          </div>
+
+          <div class="faq-desc text-muted mb-4">
+            Jawaban cepat seputar cara order, pembayaran, dan aktivasi akun. Klik untuk membuka detailnya.
+          </div>
+
+          <div class="faq-grid">
+            <div class="accordion faq-accordion" id="faqAcc">
+              <!-- Item 1 -->
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="f0">
+                  <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#c0" aria-expanded="true" aria-controls="c0">
+                    <span class="faq-icon bg-blue"><i class="bi bi-cart-check"></i></span>
+                    Bagaimana cara order?
+                  </button>
+                </h2>
+                <div id="c0" class="accordion-collapse collapse show" data-bs-parent="#faqAcc" aria-labelledby="f0">
+                  <div class="accordion-body">
+                    1) Pilih <b>Varian</b> & <b>Region</b> → klik <b>Beli</b> pada kartu server.<br/>
+                    2) Isi <b>protokol</b>, <b>username</b>, dan <b>email (wajib)</b> di modal checkout.<br/>
+                    3) (Opsional) Masukkan <b>kode promo</b> jika ada, diskon langsung diterapkan.<br/>
+                    4) Bayar via <b>Duitku</b> (Bank Transfer, E-Wallet, QRIS, Retail).<br/>
+                    5) Setelah <i>paid</i>, detail akun tampil otomatis & juga dikirim ke email.
+                  </div>
+                </div>
+              </div>
+
+              <!-- Item 2 -->
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="f1">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c1" aria-expanded="false" aria-controls="c1">
+                    <span class="faq-icon bg-green"><i class="bi bi-lightning-charge"></i></span>
+                    Setelah bayar, kapan akun aktif?
+                  </button>
+                </h2>
+                <div id="c1" class="accordion-collapse collapse" data-bs-parent="#faqAcc" aria-labelledby="f1">
+                  <div class="accordion-body">
+                    Instan. Sistem memproses otomatis dan menampilkan detail akun di <b>halaman status</b> (<i>biasanya &lt; 1 menit</i>).
+                  </div>
+                </div>
+              </div>
+
+              <!-- Item 3 -->
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="f2">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c2" aria-expanded="false" aria-controls="c2">
+                    <span class="faq-icon bg-purple"><i class="bi bi-diagram-3"></i></span>
+                    Protokol yang tersedia?
+                  </button>
+                </h2>
+                <div id="c2" class="accordion-collapse collapse" data-bs-parent="#faqAcc" aria-labelledby="f2">
+                  <div class="accordion-body">
+                    <b>VMess</b>, <b>VLESS</b>, dan <b>Trojan</b> : kompatibel dengan v2rayNG, NapsternetV, Nekobox, dll.
+                  </div>
+                </div>
+              </div>
+
+              <!-- Item 4 -->
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="f3">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c3" aria-expanded="false" aria-controls="c3">
+                    <span class="faq-icon bg-amber"><i class="bi bi-link-45deg"></i></span>
+                    Halaman tertutup saat bayar, bagaimana?
+                  </button>
+                </h2>
+                <div id="c3" class="accordion-collapse collapse" data-bs-parent="#faqAcc" aria-labelledby="f3">
+                  <div class="accordion-body">
+                    Link pembayaran disimpan otomatis. Buka lagi halaman ini & tombol <b>Buka Pembayaran</b> akan muncul
+                    di banner “Sesi pembayaran terdeteksi”. Kamu juga bisa klik <b>Cek Status / Lanjutkan</b>.
+                  </div>
+                </div>
+              </div>
+
+              <!-- Item 5 -->
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="f4">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c4" aria-expanded="false" aria-controls="c4">
+                    <span class="faq-icon bg-red"><i class="bi bi-arrow-counterclockwise"></i></span>
+                    Apakah bisa refund?
+                  </button>
+                </h2>
+                <div id="c4" class="accordion-collapse collapse" data-bs-parent="#faqAcc" aria-labelledby="f4">
+                  <div class="accordion-body">
+                    Jika terjadi kesalahan sistem (akun tidak terbit &gt; 1 Jam) dan pembayaran sukses,
+                    hubungi admin, kami bantu sesuai kebijakan.
+                  </div>
+                </div>
+              </div>
+            </div> <!--/accordion-->
+          </div> <!--/faq-grid-->
         </div>
-        <span class="badge rounded-pill bg-primary-subtle text-primary-emphasis">Realtime • 24/7</span>
       </div>
+    </section>
+  </main>
 
-      <div class="faq-desc text-muted mb-4">
-        Jawaban cepat seputar cara order, pembayaran, dan aktivasi akun. Klik untuk membuka detailnya.
-      </div>
-
-      <div class="faq-grid">
-        <div class="accordion faq-accordion" id="faqAcc">
-          <!-- Item 1 -->
-          <div class="accordion-item">
-            <h2 class="accordion-header" id="f0">
-              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#c0" aria-expanded="true" aria-controls="c0">
-                <span class="faq-icon bg-blue"><i class="bi bi-cart-check"></i></span>
-                Bagaimana cara order?
-              </button>
-            </h2>
-            <div id="c0" class="accordion-collapse collapse show" data-bs-parent="#faqAcc" aria-labelledby="f0">
-              <div class="accordion-body">
-                1) Pilih <b>Varian</b> & <b>Region</b> → klik <b>Beli</b> pada kartu server.<br/>
-                2) Isi <b>protokol</b>, <b>username</b>, dan <b>email (wajib)</b> di modal checkout.<br/>
-                3) (Opsional) Masukkan <b>kode promo</b> jika ada, diskon langsung diterapkan.<br/>
-                4) Bayar via <b>Duitku</b> (Bank Transfer, E-Wallet, QRIS, Retail).<br/>
-                5) Setelah <i>paid</i>, detail akun tampil otomatis & juga dikirim ke email.
-              </div>
-            </div>
-          </div>
-
-          <!-- Item 2 -->
-          <div class="accordion-item">
-            <h2 class="accordion-header" id="f1">
-              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c1" aria-expanded="false" aria-controls="c1">
-                <span class="faq-icon bg-green"><i class="bi bi-lightning-charge"></i></span>
-                Setelah bayar, kapan akun aktif?
-              </button>
-            </h2>
-            <div id="c1" class="accordion-collapse collapse" data-bs-parent="#faqAcc" aria-labelledby="f1">
-              <div class="accordion-body">
-                Instan. Sistem memproses otomatis dan menampilkan detail akun di <b>halaman status</b> (<i>biasanya &lt; 1 menit</i>).
-              </div>
-            </div>
-          </div>
-
-          <!-- Item 3 -->
-          <div class="accordion-item">
-            <h2 class="accordion-header" id="f2">
-              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c2" aria-expanded="false" aria-controls="c2">
-                <span class="faq-icon bg-purple"><i class="bi bi-diagram-3"></i></span>
-                Protokol yang tersedia?
-              </button>
-            </h2>
-            <div id="c2" class="accordion-collapse collapse" data-bs-parent="#faqAcc" aria-labelledby="f2">
-              <div class="accordion-body">
-                <b>VMess</b>, <b>VLESS</b>, dan <b>Trojan</b> : kompatibel dengan v2rayNG, NapsternetV, Nekobox, dll.
-              </div>
-            </div>
-          </div>
-
-          <!-- Item 4 -->
-          <div class="accordion-item">
-            <h2 class="accordion-header" id="f3">
-              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c3" aria-expanded="false" aria-controls="c3">
-                <span class="faq-icon bg-amber"><i class="bi bi-link-45deg"></i></span>
-                Halaman tertutup saat bayar, bagaimana?
-              </button>
-            </h2>
-            <div id="c3" class="accordion-collapse collapse" data-bs-parent="#faqAcc" aria-labelledby="f3">
-              <div class="accordion-body">
-                Link pembayaran disimpan otomatis. Buka lagi halaman ini & tombol <b>Buka Pembayaran</b> akan muncul
-                di banner “Sesi pembayaran terdeteksi”. Kamu juga bisa klik <b>Cek Status / Lanjutkan</b>.
-              </div>
-            </div>
-          </div>
-
-          <!-- Item 5 -->
-          <div class="accordion-item">
-            <h2 class="accordion-header" id="f4">
-              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c4" aria-expanded="false" aria-controls="c4">
-                <span class="faq-icon bg-red"><i class="bi bi-arrow-counterclockwise"></i></span>
-                Apakah bisa refund?
-              </button>
-            </h2>
-            <div id="c4" class="accordion-collapse collapse" data-bs-parent="#faqAcc" aria-labelledby="f4">
-              <div class="accordion-body">
-                Jika terjadi kesalahan sistem (akun tidak terbit &gt; 1 Jam) dan pembayaran sukses,
-                hubungi admin, kami bantu sesuai kebijakan.
-              </div>
-            </div>
-          </div>
-        </div> <!--/accordion-->
-      </div> <!--/faq-grid-->
-    </div>
-  </div>
-</section>
-</main>
-
-  <!-- MODAL CHECKOUT -->
+  <!-- MODAL CHECKOUT (tetap seperti versi sebelumnya) -->
   <div class="modal fade" id="checkoutModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
       <div class="modal-content modal-checkout">
@@ -299,14 +289,12 @@
 
         <div class="modal-body ch-body">
           <div class="row g-4">
-            <!-- Left: Form -->
             <div class="col-lg-7">
               <form class="vstack gap-3" onsubmit="return false;">
                 <input id="co_variant" class="d-none" />
                 <input id="co_region" class="d-none" />
                 <input id="co_serverId" class="d-none" />
 
-                <!-- Username + Preview -->
                 <div>
                   <label class="form-label small text-muted">Username</label>
                   <div class="input-group">
@@ -318,7 +306,6 @@
                   </div>
                 </div>
 
-                <!-- Email -->
                 <div>
                   <label class="form-label small text-muted">Email <span class="text-danger">*</span></label>
                   <div class="input-group">
@@ -328,7 +315,6 @@
                   <div class="small text-muted mt-1">Dipakai untuk kirim detail akun & verifikasi status order.</div>
                 </div>
 
-                <!-- Protokol -->
                 <div class="row g-2">
                   <div class="col-md-6">
                     <label class="form-label small text-muted">Protokol</label>
@@ -350,29 +336,21 @@
                   </div>
                 </div>
 
-                <!-- Trust mini -->
                 <div class="ch-trust small text-muted">
                   <i class="bi bi-shield-check me-1"></i> Pastikan data pesanan sudah benar sebelum lanjut pembayaran.
                 </div>
               </form>
             </div>
 
-            <!-- Right: Summary -->
             <div class="col-lg-5">
               <div class="ch-summary p-3">
                 <div class="d-flex align-items-center justify-content-between mb-2">
                   <div class="fw-semibold">Ringkasan</div>
                   <span class="badge rounded-pill bg-primary-subtle text-primary-emphasis" id="ch_badgeRegion">-</span>
                 </div>
-                <div class="ch-item">
-                  <div class="k">Varian</div><div class="v" id="ch_varian">-</div>
-                </div>
-                <div class="ch-item">
-                  <div class="k">Server</div><div class="v" id="ch_server">-</div>
-                </div>
-                <div class="ch-item">
-                  <div class="k">Protokol</div><div class="v" id="ch_protocol">VMess</div>
-                </div>
+                <div class="ch-item"><div class="k">Varian</div><div class="v" id="ch_varian">-</div></div>
+                <div class="ch-item"><div class="k">Server</div><div class="v" id="ch_server">-</div></div>
+                <div class="ch-item"><div class="k">Protokol</div><div class="v" id="ch_protocol">VMess</div></div>
                 <hr class="my-2">
                 <div class="ch-price my-2">
                   <div class="base">Rp <span id="ch_priceBase">0</span></div>
