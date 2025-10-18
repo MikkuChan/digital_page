@@ -316,30 +316,3 @@
 /* FAQ – single column (no side panel) */
 .faq-grid{ grid-template-columns: 1fr !important; }
 
-/* ===== Hero Plus (tanpa accent/garis warna) ===== */
-.hero-plus{
-  position: relative;
-  background:
-    radial-gradient(1200px 300px at 50% 0%, rgba(13,110,253,.06), transparent 60%),
-    linear-gradient(180deg,#fff 0%, #f3f7ff 100%);
-}
-
-/* hilangkan underline/garis aksen pada judul */
-.hero-title .hero-underline,
-.hero-title .hero-underline::after{ display:none !important; }
-
-/* chips di hero */
-.hero-chips .chip{
-  display:inline-flex; align-items:center; gap:.35rem;
-  padding:.45rem .75rem;
-  border-radius:999px;
-  background:#fff;
-  border:1px solid var(--border);
-  color:#0f172a; font-weight:600; font-size:.9rem;
-  box-shadow: 0 4px 12px rgba(2,6,23,.06);
-}
-
-/* responsif tipis */
-@media (max-width:576px){
-  .hero-plus h1{ font-size: 2rem; }
-}
