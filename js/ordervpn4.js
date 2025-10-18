@@ -1,9 +1,9 @@
-/* Katalog OrderVPN — polished UI/UX (search, sort, skeleton, persist payment, redirect to order-status)
+/* Katalog OrderVPN — polished UI/UX (search, sort, skeleton, persist payment, redirect ke order-status)
    Update besar:
-   - Rotasi aset per jam (assets/backv1|backv2|backv3) dengan manifest.json
-   - Thumbnail kartu produk diambil dari manifest & stabil per-produk (serverId + hourSlot)
-   - Tetap support override via window.ASSET_BASE & window.ASSET_MANIFEST dari HTML
-   - HAPUS fallback Unsplash agar mudah cek backv berfungsi atau tidak
+   - Rotasi aset per jam (assets/backv1|backv2|backv3) via manifest.json
+   - Thumbnail produk dari manifest & stabil per-produk (serverId + hourSlot)
+   - Checkout modal: preview username final, harga realtime (promo-aware), trust note
+   - Badge “Best Value” DINAMIS: item termurah (+ yang ≤5% di atas termurah)
 */
 
 const API_BASE = (window.API_BASE || '').replace(/\/+$/, '') || `${location.origin}`;
@@ -19,7 +19,7 @@ let qSearch = '';
 let qSort = 'price-asc';
 
 /* ===================== ASET GAMBAR (ROTASI PER JAM) ===================== */
-// Jika HTML TIDAK menyetel window.ASSET_BASE/MANIFEST, kita fallback ke rotasi default 3 folder.
+// Kalau HTML tidak set ASSET_BASE/MANIFEST, rotasi default ke backv1/backv2/backv3 per jam.
 (function ensureAssetRotationDefaults(){
   if (!window.ASSET_BASE || !window.ASSET_MANIFEST) {
     const ROTATION_BASES = ["assets/backv1","assets/backv2","assets/backv3"];
@@ -33,11 +33,10 @@ let ASSET_BASE = window.ASSET_BASE;
 let ASSET_MANIFEST = window.ASSET_MANIFEST;
 let assetImages = [];
 
-// Baca daftar file dari manifest
+// Baca daftar file dari manifest (tanpa fallback Unsplash — biar ketahuan kalau belum setup)
 async function loadAssetManifest() {
   try {
     const r = await fetch(ASSET_MANIFEST, { headers: { accept: 'application/json' } });
-    if (!r.ok) throw new Error(`Manifest HTTP ${r.status}`);
     const arr = await r.json();
     if (Array.isArray(arr) && arr.length) {
       assetImages = arr
@@ -45,15 +44,17 @@ async function loadAssetManifest() {
         .filter((v, i, a) => a.indexOf(v) === i); // unique
     }
   } catch (e) {
-    console.warn('[ordervpn] Gagal memuat manifest:', e?.message || e);
-    // Tidak ada fallback—biarkan kosong agar mudah terlihat saat backv tidak berfungsi
+    console.error('Gagal load manifest gambar:', e);
+  }
+  if (!assetImages.length) {
+    console.warn('Manifest gambar kosong. Pastikan file ada & path benar:', ASSET_MANIFEST);
   }
 }
 
-// Pilih gambar stabil berdasarkan serverId + slot jam (berubah tiap jam, konsisten dlm jam tsb)
+// Pilih gambar stabil berdasarkan serverId + slot jam (berubah tiap jam, konsisten 1 jam itu)
 function pickImageFor(serverId) {
-  if (!assetImages.length) return ''; // no fallback
-  const hourSlot = Math.floor(Date.now() / (60 * 60 * 1000)); // integer berubah tiap jam
+  if (!assetImages.length) return '';
+  const hourSlot = Math.floor(Date.now() / (60 * 60 * 1000));
   const hash = String(serverId || '').split('').reduce((a, c) => (a * 33 + c.charCodeAt(0)) >>> 0, 5381);
   const idx = Math.abs((hash + hourSlot) % assetImages.length);
   return assetImages[idx];
@@ -72,7 +73,7 @@ const promoInfo = document.getElementById('promoInfo');
 const searchBox = document.getElementById('searchBox');
 const sortSel   = document.getElementById('sortSel');
 
-// restore banner elements
+// restore banner
 const waitingBox = document.getElementById('waitingBox');
 const orderIdText = document.getElementById('orderIdText');
 const payLink    = document.getElementById('payLink');
@@ -136,7 +137,7 @@ async function loadConfig() {
   const promoPill = document.getElementById('promoPill');
   if (promoPill) promoPill.dataset.status = isPromoOn ? 'on' : 'off';
 
-  // modal hint tentang promo
+  // modal hint promo
   if (modalPromoMsg && modalPromoAmount && modalPromoHelp) {
     if (isPromoOn) {
       modalPromoAmount.textContent = rupiah(j.promo.discount || 0);
@@ -163,10 +164,19 @@ const products = (v, r) => {
   }));
 };
 
+/* ===================== BEST VALUE LOGIC ===================== */
+// set id produk yang harga-nya “best” (termurah & yang ≤5% di atasnya)
+function bestValueSet(items){
+  if (!items.length) return new Set();
+  const min = Math.min(...items.map(i => Number(i.price)||0));
+  const threshold = min * 1.05; // ≤5% dari harga termurah
+  return new Set(items.filter(i => (Number(i.price)||0) <= threshold).map(i => i.id));
+}
+
 /* ===================== RENDER ===================== */
-const card = (p) => `
+const card = (p, isBest = false) => `
 <article class="card-prod">
-  ${(p.price <= 10000) ? '<div class="badge-ribbon">Best Value</div>' : ''}
+  ${isBest ? '<div class="badge-ribbon">Best Value</div>' : ''}
   <img class="thumb" loading="lazy" src="${p.img}" alt="${p.label}">
   <div class="body">
     <h3 class="title">${p.region} ${p.variant} ${p.label}</h3>
@@ -199,9 +209,17 @@ function applySearchSort(items) {
   return out;
 }
 function render() {
-  const items = applySearchSort(products(curVariant, curRegion));
+  const base  = products(curVariant, curRegion);
+  const items = applySearchSort(base);
+  const bestIds = bestValueSet(base); // hitung dari list sebelum sorting
+
+  // kalau manifest kosong & kita butuh warning
+  if (!assetImages.length) {
+    console.warn('Tidak ada gambar di manifest. Kartu tetap dirender tanpa thumbnail.');
+  }
+
   grid.innerHTML = items.length
-    ? items.map(card).join('')
+    ? items.map(p => card(p, bestIds.has(p.id))).join('')
     : `<div class="alert alert-warning">Tidak ada item untuk filter ini. Ubah filter atau cek konfigurasi PRICE_${curRegion}_${curVariant}.</div>`;
 }
 
@@ -242,11 +260,11 @@ function refreshModalPreview(){
 function openModal(title, v, r, sid) {
   document.getElementById('checkoutTitle').textContent = title;
   co_variant.value = v;
-  co_region.value = r;
-  co_serverId.value = sid;
-  co_protocol.value = 'vmess';
-  co_username.value = '';
-  co_email.value = '';
+  co_region.value  = r;
+  co_serverId.value= sid;
+  co_protocol.value= 'vmess';
+  co_username.value= '';
+  co_email.value   = '';
   if (co_promo) co_promo.value = '';
 
   // modal state
@@ -257,8 +275,8 @@ function openModal(title, v, r, sid) {
 
   // fill summary
   if (ch_badgeRegion) ch_badgeRegion.textContent = r;
-  if (ch_varian) ch_varian.textContent = v;
-  if (ch_server) ch_server.textContent = label;
+  if (ch_varian)      ch_varian.textContent = v;
+  if (ch_server)      ch_server.textContent = label;
 
   // first preview
   refreshModalPreview();
@@ -294,10 +312,10 @@ async function doCheckout() {
   const protocol = co_protocol.value;
   const username = sanitizeBase(co_username.value || 'user');
   const email    = (co_email.value || '').trim();
-  const promoCode = (co_promo?.value || '').trim();
+  const promoCode= (co_promo?.value || '').trim();
 
   if (!username) return alert('Username wajib diisi.');
-  if (!email) return alert('Email wajib diisi.');
+  if (!email)    return alert('Email wajib diisi.');
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return alert('Format email tidak valid.');
 
   const usernameFinal = usernameFinalWith(username, MOD_SUFFIX);
@@ -322,7 +340,7 @@ async function doCheckout() {
       paymentWindow.focus();
     }
 
-    // redirect ke halaman status (membawa auth minimal: orderId + uf + email)
+    // redirect ke halaman status (bawa orderId + uf + email)
     const q = new URLSearchParams({ orderId, uf: usernameFinal, email });
     location.href = `order-status.html?${q.toString()}`;
   } catch (e) {
