@@ -5,81 +5,82 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Status Server — fadzdigital</title>
   <link rel="stylesheet" href="css/status-server.css" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
 </head>
 <body>
-  <header class="page-header">
+  <header class="hero">
     <div class="container">
-      <h1>Status Server</h1>
-      <p class="muted">
-        Cek kesehatan host API VPN kami. Pilih region & variant untuk melihat host yang relevan.
-      </p>
+      <div class="hero-top">
+        <h1>Status Server</h1>
+        <a class="btn ghost" href="ordervpn.html">← Kembali ke Katalog</a>
+      </div>
+      <p class="sub">Pantau kesehatan host API VPN kami. Pilih region & varian—kalau ada host <span class="pill small red">DOWN</span>, pilih yang <span class="pill small green">UP</span> ya.</p>
+      <div class="controls">
+        <div class="ctrl">
+          <label>Region</label>
+          <div class="segmented" id="segRegion">
+            <button data-region="SG" class="active">SG</button>
+            <button data-region="ID">ID</button>
+          </div>
+        </div>
+        <div class="ctrl">
+          <label>Varian</label>
+          <div class="segmented" id="segVariant">
+            <button data-variant="HP" class="active">HP</button>
+            <button data-variant="STB">STB</button>
+          </div>
+        </div>
+        <div class="ctrl grow">
+          <label>Filter</label>
+          <div class="segmented" id="segFilter">
+            <button data-filter="all" class="active">Semua</button>
+            <button data-filter="up">UP</button>
+            <button data-filter="down">DOWN</button>
+          </div>
+        </div>
+        <div class="ctrl">
+          <label>Auto refresh</label>
+          <div class="toggle">
+            <input type="checkbox" id="autoToggle" />
+            <span class="slider"></span>
+          </div>
+          <div class="hint" id="autoHint">off</div>
+        </div>
+        <div class="ctrl">
+          <label>&nbsp;</label>
+          <button id="btnRefresh" class="btn primary">Refresh</button>
+        </div>
+      </div>
+      <div class="meta">
+        <div class="stat pill green" id="statUp">UP: 0</div>
+        <div class="stat pill red" id="statDown">DOWN: 0</div>
+        <div class="stat pill blue" id="statTotal">Total: 0</div>
+        <div class="spacer"></div>
+        <div class="muted" id="lastUpdated">—</div>
+      </div>
     </div>
   </header>
 
   <main class="container">
-    <section class="controls">
-      <div class="row">
-        <div class="col">
-          <label for="regionSel">Region</label>
-          <select id="regionSel">
-            <option value="SG">SG (Singapore)</option>
-            <option value="ID">ID (Indonesia)</option>
-          </select>
-        </div>
-        <div class="col">
-          <label for="variantSel">Variant</label>
-          <select id="variantSel">
-            <option value="HP">HP (300GB/30h)</option>
-            <option value="STB">STB (600GB/30h)</option>
-          </select>
-        </div>
-        <div class="col">
-          <label>&nbsp;</label>
-          <button id="btnRefresh" class="btn">Refresh</button>
-        </div>
-        <div class="col auto">
-          <label class="inline">
-            <input type="checkbox" id="autoToggle" />
-            Auto-refresh <span class="muted">(30 dtk)</span>
-          </label>
-        </div>
-      </div>
+    <div id="notice" class="notice hidden"></div>
 
-      <div class="stats">
-        <div class="badge up" id="statUp">UP: 0</div>
-        <div class="badge down" id="statDown">DOWN: 0</div>
-        <div class="badge info" id="statTotal">Total: 0</div>
-        <div class="right muted small" id="lastUpdated">—</div>
-      </div>
+    <!-- Grid of host cards -->
+    <section id="grid" class="grid">
+      <!-- cards injected here -->
     </section>
 
-    <section id="notice" class="notice hidden"></section>
-
-    <section class="table-wrap">
-      <table id="statusTable">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Host</th>
-            <th>Status</th>
-            <th>HTTP</th>
-            <th>Response (ms)</th>
-            <th>Info</th>
-          </tr>
-        </thead>
-        <tbody id="tbodyStatus">
-          <!-- rows injected by JS -->
-        </tbody>
-      </table>
-      <div id="emptyState" class="empty hidden">Tidak ada host untuk ditampilkan.</div>
-    </section>
+    <div id="emptyState" class="empty hidden">
+      Tidak ada host untuk ditampilkan.
+    </div>
 
     <footer class="foot">
-      <div class="muted small" id="metaInfo">
-        <!-- filled by JS: port/path/timeout -->
-      </div>
+      <div class="muted" id="metaInfo">—</div>
     </footer>
   </main>
+
+  <!-- toast -->
+  <div id="toast" class="toast"></div>
 
   <script src="js/status-server.js"></script>
 </body>
