@@ -1,0 +1,57 @@
+:root{
+  --bg: #0b0f14;
+  --card: #121821;
+  --text: #e6edf3;
+  --muted: #94a3b8;
+  --up: #16a34a;
+  --down: #ef4444;
+  --info: #3b82f6;
+  --accent: #38bdf8;
+  --border: #1f2937;
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif}
+
+.container{max-width:980px;margin:0 auto;padding:16px}
+
+.page-header{border-bottom:1px solid var(--border);background:linear-gradient(180deg,rgba(56,189,248,.06),transparent)}
+.page-header h1{margin:0 0 6px 0;font-size:28px}
+.page-header .muted{margin:0 0 12px 0}
+
+.controls{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin-top:16px}
+.controls .row{display:flex;gap:12px;flex-wrap:wrap}
+.controls .col{display:flex;flex-direction:column;gap:6px;min-width:140px}
+.controls .col.auto{justify-content:flex-end}
+label{font-size:13px;color:var(--muted)}
+select{background:#0f1720;color:var(--text);border:1px solid var(--border);border-radius:10px;padding:8px 10px}
+.btn{background:var(--accent);color:#002b36;border:0;border-radius:10px;padding:9px 14px;cursor:pointer;font-weight:600}
+.btn:hover{filter:brightness(1.05)}
+.inline{display:flex;gap:8px;align-items:center}
+
+.stats{display:flex;gap:8px;align-items:center;margin-top:12px}
+.badge{border-radius:999px;padding:6px 10px;font-weight:600}
+.badge.up{background:rgba(22,163,74,.15);color:var(--up);border:1px solid rgba(22,163,74,.3)}
+.badge.down{background:rgba(239,68,68,.15);color:var(--down);border:1px solid rgba(239,68,68,.3)}
+.badge.info{background:rgba(59,130,246,.15);color:var(--info);border:1px solid rgba(59,130,246,.3)}
+.right{margin-left:auto}
+.muted{color:var(--muted)}
+.small{font-size:12px}
+
+.notice{margin:12px 0;padding:12px;border-radius:12px;border:1px dashed var(--border);background:rgba(56,189,248,.06)}
+.notice.hidden{display:none}
+
+.table-wrap{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:0;margin-top:12px;overflow:hidden}
+table{width:100%;border-collapse:collapse}
+thead{background:#0f1720}
+th,td{padding:12px 14px;border-bottom:1px solid var(--border);text-align:left}
+tbody tr:hover{background:rgba(148,163,184,.06)}
+.status-pill{display:inline-flex;align-items:center;gap:8px;font-weight:700}
+.dot{width:10px;height:10px;border-radius:50%}
+.dot.up{background:var(--up);box-shadow:0 0 12px rgba(22,163,74,.7)}
+.dot.down{background:var(--down);box-shadow:0 0 12px rgba(239,68,68,.7)}
+
+.empty{padding:28px;text-align:center;color:var(--muted)}
+.hidden{display:none}
+
+.foot{display:flex;justify-content:flex-end;margin-top:10px}
