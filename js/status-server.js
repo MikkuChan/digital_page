@@ -13,7 +13,6 @@ const state = {
   auto: false,
   countdown: 0,
   timer: null,
-  // histori ping per host (untuk sparkline)
   history: new Map(), // host -> [{ms, ok, t}]
 };
 
@@ -36,7 +35,6 @@ const el = {
 };
 
 // ====== Utils ======
-const qs = (s, r = document) => r.querySelector(s);
 const fmtTime = ts => new Date(ts).toLocaleString('id-ID', { hour12: false });
 
 function toast(msg) {
@@ -74,8 +72,8 @@ function drawSpark(canvas, points) {
   const max = Math.max(100, ...ms, 1);
   const step = (canvas.clientWidth - 10) / Math.max(points.length - 1, 1);
 
-  // grid baseline
-  ctx.strokeStyle = 'rgba(148,163,184,.25)';
+  // baseline
+  ctx.strokeStyle = 'rgba(168,186,208,.25)';
   ctx.lineWidth = 1;
   ctx.beginPath();
   ctx.moveTo(0, h - 14);
@@ -83,7 +81,7 @@ function drawSpark(canvas, points) {
   ctx.stroke();
 
   // line
-  ctx.strokeStyle = '#38bdf8';
+  ctx.strokeStyle = '#22d3ee';
   ctx.lineWidth = 2;
   ctx.beginPath();
   points.forEach((p, i) => {
@@ -94,12 +92,12 @@ function drawSpark(canvas, points) {
   });
   ctx.stroke();
 
-  // dots (UP/DOWN)
+  // dots
   points.forEach((p, i) => {
     const x = 5 + i * step;
     const y = 4 + (1 - Math.min(p.ms || max, max) / max) * (canvas.clientHeight - 20);
-    ctx.fillStyle = p.ok ? '#16a34a' : '#ef4444';
-    ctx.beginPath(); ctx.arc(x, y, 2.5, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = p.ok ? '#22c55e' : '#f43f5e';
+    ctx.beginPath(); ctx.arc(x, y, 2.4, 0, Math.PI * 2); ctx.fill();
   });
 }
 
@@ -129,14 +127,13 @@ function cardTpl(it, idx) {
   const ms = typeof it.ms === 'number' ? `${it.ms} ms` : '—';
   const code = it.code || '—';
   const info = it.err || '';
-
   const id = `spark-${idx}`;
 
   return `
     <article class="card ${statusClass}" data-host="${it.host}" data-status="${statusClass}">
       <div class="top">
         <span class="dot ${statusClass}"></span>
-        <div class="host">${it.host}</div>
+        <div class="host" title="${it.host}">${it.host}</div>
         <div class="pill small ${statusClass === 'up' ? 'green' : 'red'}">${statusText}</div>
       </div>
 
@@ -149,7 +146,6 @@ function cardTpl(it, idx) {
         </div>
         <div class="actions">
           <button class="btn slim" data-copy="${it.host}">Copy host</button>
-          <a class="btn slim" href="http://${it.host}:${it.port || 5888}${it.path || '/health'}" target="_blank" rel="noopener">Buka /health</a>
         </div>
       </div>
 
@@ -168,7 +164,7 @@ function render(list, meta) {
   if (state.filter === 'up') shown = list.filter(x => x.ok);
   if (state.filter === 'down') shown = list.filter(x => !x.ok);
 
-  // sort: UP dulu, ms kecil dulu
+  // sort
   shown.sort((a,b) => {
     if (a.ok !== b.ok) return a.ok ? -1 : 1;
     const ma = typeof a.ms === 'number' ? a.ms : 9e9;
@@ -211,13 +207,8 @@ async function refreshNow() {
   try {
     const data = await fetchStatus(state.region, state.variant);
     const list = Array.isArray(data?.servers) ? data.servers : [];
-    render(
-      // menyertakan port/path agar link health benar
-      list.map(x => ({ ...x, port: data?.port ?? 5888, path: data?.path ?? '/health' })),
-      data
-    );
+    render(list.map(x => ({ ...x })), data);
     setNotice('');
-    // reset countdown
     state.countdown = Math.floor(AUTO_MS / 1000);
     updateAutoHint();
   } catch (e) {
@@ -256,26 +247,20 @@ function mountSegmented(seg, attr, key) {
   seg.addEventListener('click', (e) => {
     const btn = e.target.closest('button');
     if (!btn) return;
-    qsaActive(seg).forEach(b => b.classList.remove('active'));
+    [...seg.querySelectorAll('button')].forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     state[key] = btn.getAttribute(attr);
     refreshNow();
   });
 }
-function qsaActive(seg){ return [...seg.querySelectorAll('button')] }
 
 document.addEventListener('DOMContentLoaded', () => {
-  // segmented bindings
   mountSegmented(el.segRegion, 'data-region', 'region');
   mountSegmented(el.segVariant, 'data-variant', 'variant');
   mountSegmented(el.segFilter, 'data-filter',  'filter');
 
-  // auto toggle
   el.autoToggle.addEventListener('change', (e) => e.target.checked ? startAuto() : stopAuto());
-
-  // refresh button
   el.btnRefresh.addEventListener('click', refreshNow);
 
-  // initial load
   refreshNow();
 });
