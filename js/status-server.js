@@ -105,7 +105,7 @@ function renderStatus(payload) {
   const port = payload?.port ?? 5888;
   const path = payload?.path ?? '/health';
   const timeout = payload?.timeoutMs ?? 2000;
-  els.meta.innerHTML = `Cek via <code>http://host:${path}</code> (timeout ${timeout} ms), terakhir dicek: ${fmtTime(payload?.checkedAt || Date.now())}`;
+  els.meta.innerHTML = `Cek via <code>http://host${path}</code> (timeout ${timeout} ms), terakhir dicek: ${fmtTime(payload?.checkedAt || Date.now())}`;
 }
 
 async function refreshNow() {
