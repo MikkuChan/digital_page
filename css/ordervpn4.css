@@ -95,7 +95,7 @@
 .pay-restore{border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow)}
 .pay-restore .spinner-border{width:1.35rem;height:1.35rem;border-width:.15rem}
 
-/* ---------- Catalog Grid & Cards — upgraded ---------- */
+/* ---------- Catalog Grid & Cards ---------- */
 .catalog-grid{
   display:grid; gap:18px;
   grid-template-columns:repeat(1, minmax(0,1fr));
@@ -185,7 +185,7 @@
 }
 @keyframes shimmer{0%{background-position:100% 0}100%{background-position:-100% 0}}
 
-/* ---------- Modal Checkout (baru) ---------- */
+/* ---------- Modal Checkout ---------- */
 .modal-checkout{overflow:hidden;border-radius:14px}
 .ch-header{
   background:linear-gradient(90deg,#0d6efd 0%, #00b2ff 100%);
@@ -316,3 +316,45 @@
 /* FAQ – single column */
 .faq-grid{ grid-template-columns: 1fr !important; }
 
+/* ====== CTA Tip Bar & Button Status (FIX) ====== */
+.tip-bar{
+  background: linear-gradient(180deg, rgba(13,110,253,.08), rgba(13,110,253,.03));
+  border: 1px solid rgba(13,110,253,.15);
+  border-radius: 14px;
+}
+.tip-bar .bi-activity{ color:#0d6efd; }
+
+/* buat tombol outline tapi kontras jelas saat hover/active */
+.btn-status{
+  /* hilangkan efek blur supaya tidak pudar */
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+
+  border-width: 1.5px;
+  font-weight: 600;
+  /* warna default mengikuti outline-primary */
+  color: #0d6efd;
+  border-color: rgba(13,110,253,.45);
+  background-color: transparent;
+}
+
+.btn-status:hover{
+  color:#0b5ed7;
+  background-color:#e7f1ff;               /* jelas saat hover */
+  border-color:#0b5ed7;
+}
+
+/* saat focus/active: biru solid + teks putih; hindari tampilan “pudar” */
+.btn-status:focus,
+.btn-status:active,
+.btn-status.active,
+.show > .btn-status.dropdown-toggle{
+  color:#fff !important;
+  background-color:#0d6efd !important;
+  border-color:#0d6efd !important;
+  box-shadow:0 0 0 .2rem rgba(13,110,253,.25) !important;
+}
+
+/* kalau tombol berupa <a>, cegah warna visited ungu */
+a.btn-status,
+a.btn-status:visited{ color:inherit; }
