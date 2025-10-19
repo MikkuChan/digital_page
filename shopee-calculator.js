@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="id" class="light-mode">
+<head>
+  <meta charset="UTF-8" />
+  <title>Kalkulator Harga Jual Shopee – fadzdigital</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Hitung harga jual Shopee dengan komisi kategori, Promo XTRA, Gratis Ongkir XTRA (CAP), biaya proses, dan kemasan. Plus panduan mudah dipahami." />
+  <link rel="icon" href="https://raw.githubusercontent.com/fadzdigital/image/main/favicon.ico" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grootesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Bootstrap & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+
+  <!-- Chart.js (untuk donut breakdown) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <!-- Global & Page CSS -->
+  <link href="css/style.css" rel="stylesheet" />
+  <link href="css/shopee-calculator.css" rel="stylesheet" />
+</head>
+<body>
+  <!-- Loading -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg fixed-top">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
+        <img src="https://raw.githubusercontent.com/fadzdigital/image/main/fadzdigital.png" alt="fadzdigital Logo" style="height:38px; width:auto; object-fit:contain;" />
+        <span class="text-gradient" style="font-size:2rem; font-weight:700;">fadzdigital</span>
+      </a>
+      <button class="navbar-toggler border-0 p-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav mx-auto">
+          <li class="nav-item"><a class="nav-link" href="index.html">Beranda</a></li>
+          <li class="nav-item"><a class="nav-link" href="index.html#features">Fitur</a></li>
+          <li class="nav-item"><a class="nav-link" href="ordervpn.html">Order VPN</a></li>
+          <li class="nav-item"><a class="nav-link" href="tutorial.html">Tutorial</a></li>
+          <li class="nav-item"><a class="nav-link active" href="tools.html">Tools</a></li>
+          <li class="nav-item"><a class="nav-link" href="index.html#contact">Kontak</a></li>
+        </ul>
+        <div class="d-flex align-items-center gap-3">
+          <a href="https://wa.me/6285727035336" class="btn btn-success d-none d-lg-inline-flex">WhatsApp</a>
+          <a href="https://t.me/fadzdigital" class="btn btn-primary">Telegram</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main style="margin-top:90px;min-height:100vh;">
+    <!-- Hero -->
+    <section class="shopee-calc-hero text-center font-display py-5 mb-0" style="background: linear-gradient(180deg, #fff8f6 60%, #ffe0b2 100%);">
+      <div class="container">
+        <span class="badge-tools mb-4 px-4 py-2 fs-6 d-inline-flex align-items-center">
+          <i class="bi bi-cart-check me-2"></i>Kalkulator Jualan Shopee
+        </span>
+        <h1 class="display-5 fw-bold mb-3" style="letter-spacing:-1px; color:#333;">
+          Hitung <span class="text-gradient" style="background:linear-gradient(90deg,#ff7043,#ff5722);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Harga Jual</span> Shopee
+        </h1>
+        <p class="lead mx-auto mb-4" style="max-width:780px; font-size:1.05rem; color:#555;">
+          Masukkan <b>Modal</b> & <b>Margin</b>. Kalkulator akan memperhitungkan <b>komisi kategori</b>,
+          <b>Biaya Proses Rp1.250</b>, <b>Promo XTRA</b>, <b>Gratis Ongkir XTRA</b> (otomatis CAP 60k/40k/qty) dan <b>kemasan</b>.
+        </p>
+        <a href="#panduan" class="btn btn-outline-dark btn-sm rounded-pill px-3">
+          <i class="bi bi-arrow-down-circle me-1"></i> Baca Panduan Cepat
+        </a>
+      </div>
+    </section>
+
+    <!-- Kalkulator -->
+    <section class="container py-5">
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <div class="shopee-calc-card p-4 mb-4">
+            <h2 class="fs-4 fw-bold mb-4 d-flex align-items-center gap-2">
+              <i class="bi bi-calculator text-primary"></i> Formulir Kalkulasi
+            </h2>
+
+            <form id="calcForm">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="fw-semibold mb-2" for="modal"><i class="bi bi-cash-coin text-success"></i> Modal (Rp)</label>
+                  <div class="input-group">
+                    <span class="input-group-text">Rp</span>
+                    <input type="number" class="form-control" id="modal" placeholder="cth: 46500" required />
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label class="fw-semibold mb-2" for="margin"><i class="bi bi-graph-up text-info"></i> Margin Tambahan (Rp, opsional)</label>
+                  <div class="input-group">
+                    <span class="input-group-text">Rp</span>
+                    <input type="number" class="form-control" id="margin" placeholder="cth: 2000" />
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="fw-semibold mb-2" for="discount"><i class="bi bi-ticket-perforated text-warning"></i> Diskon Penjual (Rp, opsional)</label>
+                  <div class="input-group">
+                    <span class="input-group-text">Rp</span>
+                    <input type="number" class="form-control" id="discount" placeholder="Diskon yang kamu pasang di produk" />
+                  </div>
+                  <small class="text-muted">Dasar hitung Promo/GO = harga jual − diskon penjual</small>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="fw-semibold mb-2" for="packaging">
+                    <i class="bi bi-box-seam text-secondary"></i> Packaging/Kemasan (Rp, opsional)
+                    <span class="ms-1 text-muted" data-bs-toggle="tooltip"
+                          data-bs-title="Biaya kemasan: bubble wrap, kardus, lakban, stiker, dsb. BUKAN biaya Gratis Ongkir. Jika subsidi ongkir manual via voucher toko, masukkan nominalnya di Diskon Penjual.">
+                      <i class="bi bi-info-circle"></i>
+                    </span>
+                  </label>
+                  <div class="input-group">
+                    <span class="input-group-text">Rp</span>
+                    <input type="number" class="form-control" id="packaging" placeholder="cth: 2000" />
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="fw-semibold mb-2" for="sellerStatus"><i class="bi bi-person-badge text-primary"></i> Status Toko</label>
+                  <select class="form-select" id="sellerStatus" required>
+                    <option value="nonstar">Non-Star (≥50 pesanan)</option>
+                    <option value="star">Star / Star+</option>
+                    <option value="mall">Shopee Mall</option>
+                  </select>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="fw-semibold mb-2" for="category"><i class="bi bi-tags text-danger"></i> Kategori Produk</label>
+                  <select class="form-select" id="category" required></select>
+                </div>
+
+                <div class="col-12">
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="useGo" />
+                    <label class="form-check-label fw-semibold" for="useGo">
+                      Ikut Program <span class="text-warning">Gratis Ongkir XTRA</span>
+                    </label>
+                  </div>
+                </div>
+                <div class="col-md-6 go-fields hidden">
+                  <label class="fw-semibold mb-2" for="goRate"><i class="bi bi-truck"></i> Persentase GO XTRA (%)</label>
+                  <input type="number" class="form-control" id="goRate" placeholder="cth: 4" step="0.01" min="0" max="100" />
+                  <small class="text-muted">CAP otomatis Rp40.000/qty</small>
+                </div>
+
+                <div class="col-12 mt-2">
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="usePromo" checked />
+                    <label class="form-check-label fw-semibold" for="usePromo">
+                      Ikut Program <span class="text-danger">Promo XTRA</span>
+                    </label>
+                  </div>
+                </div>
+                <div class="col-md-6 promo-fields">
+                  <label class="fw-semibold mb-2" for="promoRate"><i class="bi bi-megaphone"></i> Persentase Promo XTRA (%)</label>
+                  <input type="number" class="form-control" id="promoRate" value="4.5" step="0.01" min="0" max="100" />
+                  <small class="text-muted">CAP otomatis Rp60.000/qty</small>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="fw-semibold mb-2" for="qty"><i class="bi bi-123"></i> Kuantitas per Produk</label>
+                  <input type="number" class="form-control" id="qty" value="1" min="1" />
+                </div>
+              </div>
+
+              <div class="d-flex gap-2 mt-4">
+                <button type="submit" class="btn btn-primary py-3 fw-bold flex-fill">
+                  <i class="bi bi-lightning-charge me-2"></i>Hitung Harga Jual
+                </button>
+                <button type="button" id="resetBtn" class="btn btn-outline-secondary py-3 fw-bold">
+                  <i class="bi bi-arrow-counterclockwise me-1"></i>Reset
+                </button>
+              </div>
+            </form>
+
+            <div class="alert alert-warning mt-4 small" role="alert">
+              <i class="bi bi-info-circle me-1"></i>
+              Hasil kalkulasi adalah estimasi. Shopee dapat mengubah persentase/limit sewaktu-waktu.
+            </div>
+          </div>
+
+          <!-- Hasil -->
+          <div id="result" class="shopee-calc-card p-4 hidden fade-in-up">
+            <h2 class="fs-4 fw-bold mb-3 d-flex align-items-center gap-2">
+              <i class="bi bi-clipboard-check text-success"></i> Hasil Perhitungan
+            </h2>
+
+            <div class="summary-box mb-3 p-3 rounded bg-light border d-flex align-items-center justify-content-between">
+              <div>
+                <div class="fw-semibold">Harga Jual Disarankan</div>
+                <div id="sellingPrice" class="fs-4 fw-bold text-primary mb-0"></div>
+              </div>
+              <div class="d-flex gap-2">
+                <button id="copyBtn" class="btn btn-outline-primary btn-sm"><i class="bi bi-clipboard-check me-1"></i> Salin Ringkasan</button>
+                <button id="printBtn" class="btn btn-outline-dark btn-sm"><i class="bi bi-printer me-1"></i> Cetak / PDF</button>
+              </div>
+            </div>
+
+            <div id="details"></div>
+
+            <!-- Chart breakdown -->
+            <div class="result-card mt-3">
+              <div class="card-head">
+                <div class="card-title">Diagram Pembagian Biaya</div>
+              </div>
+              <canvas id="feeChart" height="140"></canvas>
+            </div>
+          </div>
+
+          <!-- ===== Artikel (tetap, versi bagus) ===== -->
+          <article id="panduan" class="shopee-article shopee-calc-card p-4 mt-4">
+            <header class="mb-3">
+              <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="badge rounded-pill bg-primary-subtle text-primary fw-semibold">
+                  <i class="bi bi-book me-1"></i> Panduan Praktis
+                </span>
+                <span class="badge rounded-pill bg-warning-subtle text-warning fw-semibold">
+                  Update per 1 Nov 2025
+                </span>
+              </div>
+              <h2 class="fs-4 fw-bold">Panduan Perhitungan Harga Jual Shopee (Versi Gampang Dipahami)</h2>
+              <p class="text-muted mb-0 small">
+                Fokus ke hal yang sering bikin bingung: kapan pakai persen, kapan jadi nominal (CAP), dan cara cek
+                “uang yang benar-benar kamu terima”.
+              </p>
+            </header>
+
+            <section class="callout success mb-4">
+              <div class="callout-title"><i class="bi bi-lightning-charge"></i> Resep Cepat (3 Langkah)</div>
+              <ol class="mb-0">
+                <li><b>Tentukan Target Terima Bersih</b> = Modal + Margin.</li>
+                <li>Masukkan komisi + (opsional) Promo XTRA & GO XTRA. Kalkulator otomatis cek <b>CAP</b>.</li>
+                <li><b>Lihat Harga Jual</b> dan cek <b>Verifikasi Bersih</b>: harga jual − semua biaya = target terima bersih.</li>
+              </ol>
+            </section>
+
+            <nav class="shp-toc border rounded p-3 mb-4">
+              <strong class="d-block mb-2">Isi Materi</strong>
+              <ol class="mb-0 small">
+                <li><a href="#m1">Komponen Biaya</a></li>
+                <li><a href="#m2">Konversi Persentase</a></li>
+                <li><a href="#m3">Rumus & Logika CAP</a></li>
+                <li><a href="#m4">Tabel Komisi Kategori</a></li>
+                <li><a href="#m5">Contoh Step-by-Step</a></li>
+                <li><a href="#m6">Do & Don’t + Salah Kaprah</a></li>
+                <li><a href="#m7">FAQ Mini</a></li>
+              </ol>
+            </nav>
+
+            <section id="m1" class="mb-4">
+              <h3 class="h5 fw-bold">1) Komponen Biaya</h3>
+              <ul class="mb-2">
+                <li><b>Modal</b> dan <b>Margin</b> (target terima bersih).</li>
+                <li><b>Biaya Proses</b>: Rp1.250/ transaksi selesai (diprorata kalau 1 checkout berisi banyak item).</li>
+                <li><b>Komisi Kategori</b>: persen dari <u>harga jual</u>.</li>
+                <li><b>Promo XTRA</b> & <b>Gratis Ongkir XTRA</b>: persen dari <u>harga setelah diskon penjual</u> dengan <b>CAP</b> per qty (Promo 60k, GO 40k).</li>
+                <li><b>Kemasan</b>: bubble wrap, kardus, stiker (biaya di pihak kamu, bukan potongan Shopee).</li>
+              </ul>
+              <div class="callout info">
+                <div class="callout-title"><i class="bi bi-info-circle"></i> Bedakan ya</div>
+                “Gratis Ongkir” = program Shopee (pakai kolom GO XTRA). “Kemasan” = biaya bahan packing.
+              </div>
+            </section>
+
+            <section id="m2" class="mb-4">
+              <h3 class="h5 fw-bold">2) Konversi Persentase → Desimal</h3>
+              <p class="mb-2">Rumus: <code>persen ÷ 100</code> (misal 4,25% → 0,0425).</p>
+              <div class="table-responsive">
+                <table class="table table-sm table-striped table-bordered small">
+                  <thead class="table-light"><tr><th>Persen</th><th>Desimal</th><th>Persen</th><th>Desimal</th></tr></thead>
+                  <tbody>
+                    <tr><td>2,5%</td><td>0,025</td><td>8%</td><td>0,08</td></tr>
+                    <tr><td>4,25%</td><td>0,0425</td><td>9%</td><td>0,09</td></tr>
+                    <tr><td>5,75%</td><td>0,0575</td><td>10%</td><td>0,10</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <section id="m3" class="mb-4">
+              <h3 class="h5 fw-bold">3) Rumus & Logika CAP (Singkat)</h3>
+              <pre class="shp-code">Tanpa CAP:
+Harga = (Modal + Margin + Biaya Proses + Biaya Nominal Lain)
+        ÷ (1 − Komisi% − PromoXTRA% − GOXTRA%)
+
+Kena CAP:
+- Komponen yang kena CAP → pindah ke pembilang sebagai nominal (CAP × qty)
+- Persentasenya di penyebut dihapus</pre>
+              <p class="small text-muted mb-0">Dasar hitung XTRA: <i>harga setelah diskon penjual</i>. CAP: Promo 60.000/qty, GO 40.000/qty.</p>
+            </section>
+
+            <section id="m4" class="mb-4">
+              <h3 class="h5 fw-bold">4) Tabel Komisi Kategori</h3>
+              <div class="row g-3 small">
+                <div class="col-md-6">
+                  <h6 class="fw-bold">Non-Star (≥50 pesanan)</h6>
+                  <table class="table table-sm table-bordered">
+                    <thead class="table-light"><tr><th>Kategori</th><th>Final</th></tr></thead>
+                    <tbody>
+                      <tr><td>A</td><td>8,0%</td></tr>
+                      <tr><td>B</td><td>7,5%</td></tr>
+                      <tr><td>C</td><td>5,75%</td></tr>
+                      <tr><td>D</td><td>4,25%</td></tr>
+                      <tr><td>E</td><td>2,5%</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="col-md-6">
+                  <h6 class="fw-bold">Star / Star+</h6>
+                  <table class="table table-sm table-bordered">
+                    <thead class="table-light"><tr><th>Kategori</th><th>Final</th></tr></thead>
+                    <tbody>
+                      <tr><td>A</td><td>8,0%</td></tr>
+                      <tr><td>B</td><td>7,5%</td></tr>
+                      <tr><td>C</td><td>5,75%</td></tr>
+                      <tr><td>D</td><td>4,25%</td></tr>
+                      <tr><td>E</td><td>2,5%</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="col-12">
+                  <h6 class="fw-bold">Shopee Mall</h6>
+                  <table class="table table-sm table-bordered">
+                    <thead class="table-light"><tr><th>Kategori</th><th>Final</th></tr></thead>
+                    <tbody>
+                      <tr><td>A</td><td>10,2%</td></tr>
+                      <tr><td>B</td><td>9,7%</td></tr>
+                      <tr><td>C</td><td>7,2%</td></tr>
+                      <tr><td>D</td><td>6,2%</td></tr>
+                      <tr><td>E</td><td>5,2%</td></tr>
+                      <tr><td>F</td><td>3,2%</td></tr>
+                      <tr><td>G</td><td>2,5%</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </section>
+
+            <section id="m5" class="mb-4">
+              <h3 class="h5 fw-bold">5) Contoh Step-by-Step</h3>
+              <div class="example-box"><div class="example-title"><i class="bi bi-1-circle"></i> Tanpa Program XTRA</div><div class="small">Modal 46.500, Proses 1.250, Komisi 4,25% → Harga ≈ <b>49.870</b></div></div>
+              <div class="example-box"><div class="example-title"><i class="bi bi-2-circle"></i> Promo XTRA 4,5%</div><div class="small">Denominator = 1−(4,25%+4,5%)=0,9125 → Harga ≈ <b>52.329</b></div></div>
+              <div class="example-box"><div class="example-title"><i class="bi bi-3-circle"></i> Promo 4,5% + GO 4%</div><div class="small">Denominator = 1−(4,25%+4,5%+4%)=0,8725 → Harga ≈ <b>54.728</b></div></div>
+            </section>
+
+            <section id="m6" class="mb-4">
+              <h3 class="h5 fw-bold">6) Do & Don’t + Salah Kaprah</h3>
+              <div class="row g-3 small">
+                <div class="col-md-6">
+                  <div class="callout success mb-0">
+                    <div class="callout-title"><i class="bi bi-check2-circle"></i> Do</div>
+                    <ul class="mb-0"><li>Selalu verifikasi: harga − biaya = <b>terima bersih</b>.</li><li>Isi diskon penjual jika kamu pasang diskon.</li><li>Cek CAP kalau harga/qty tinggi.</li></ul>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="callout danger mb-0">
+                    <div class="callout-title"><i class="bi bi-x-circle"></i> Don’t</div>
+                    <ul class="mb-0"><li>Jangan hitung XTRA dari modal—dasarnya <b>harga setelah diskon</b>.</li><li>Jangan lupa biaya proses Rp1.250.</li><li>Jangan campur persen yang sudah kena CAP ke denominator.</li></ul>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section id="m7" class="mb-0">
+              <h3 class="h5 fw-bold">7) FAQ Mini</h3>
+              <div class="faq">
+                <div class="faq-item"><div class="faq-q"><i class="bi bi-question-circle"></i> Kenapa hasil beda dikit?</div><div class="faq-a">Ada pembulatan ke atas & pembulatan biaya per rupiah.</div></div>
+                <div class="faq-item"><div class="faq-q"><i class="bi bi-question-circle"></i> Voucher Shopee vs Diskon Penjual?</div><div class="faq-a">Voucher yang ditanggung Shopee tidak menurunkan basis XTRA. Yang menurunkan hanyalah <b>diskon yang kamu tanggung</b>.</div></div>
+              </div>
+            </section>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Toast copy -->
+  <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1080">
+    <div id="copyToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body"><i class="bi bi-clipboard-check me-1"></i> Ringkasan disalin!</div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="py-4" style="background: var(--gray-900); color:var(--gray-100)">
+    <div class="container text-center">
+      <div class="mb-2">
+        <span class="fw-bold font-display text-gradient" style="font-size:1.3rem;">fadzdigital</span>
+      </div>
+      <div class="mb-2 small">
+        &copy; 2025 fadzdigital. All rights reserved.<br />Made with 💙 in Indonesia
+      </div>
+      <div>
+        <a href="index.html" class="text-primary small text-decoration-none mx-2">Beranda</a>
+        <a href="ordervpn.html" class="text-primary small text-decoration-none mx-2">Order VPN</a>
+        <a href="tutorial.html" class="text-primary small text-decoration-none mx-2">Tutorial</a>
+        <a href="tools.html" class="text-primary small text-decoration-none mx-2">Tools</a>
+        <a href="index.html#contact" class="text-primary small text-decoration-none mx-2">Kontak</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/shopee-calculator.js"></script>
+
+  <script>
+    // Loading overlay
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.getElementById('loadingOverlay').style.opacity = '0';
+        setTimeout(() => { document.getElementById('loadingOverlay').style.display = 'none'; }, 600);
+      }, 400);
+    });
+    // Tooltip
+    [...document.querySelectorAll('[data-bs-toggle="tooltip"]')].forEach(el => new bootstrap.Tooltip(el));
+  </script>
+</body>
+</html>
