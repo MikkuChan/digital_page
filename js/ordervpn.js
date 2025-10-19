@@ -1,1 +1,329 @@
-function _0x476f(){const _0x144d16=['.txt','HTTP\x20','configText','<option>Pilih\x20Varian\x20Dahulu</option>','createObjectURL','stringify','ws_ntls','accCreated','accountFields','\x20hari','accDomain','quota','display','<i\x20class=\x22bi\x20bi-shield-check\x20me-2\x22></i>Lanjutkan\x20ke\x20Pembayaran','9064086FYOXdl','Timeout.\x20Silakan\x20buka\x20halaman\x20pembayaran\x20lagi.','copyAllBtn','errorBox','addEventListener','Submit\x20error:','change','option','email','submitBtn','/pay/create','click','5709960VfbBgT','POST','fdz_last_order','trim','username','closest','noopener','Rp\x20','blk-grpc','Indonesia','resultBox','null','join','<div\x20class=\x22alert\x20alert-danger\x22>','badge\x20bg-danger','Username\x20wajib\x20diisi.','===\x20FADZDIGITAL\x20VPN\x20ACCOUNT\x20===','text/plain;charset=utf-8','className','codes','open','\x20(promo\x20-Rp\x20','[gRPC]\x0a','404GyAIBQ','Gagal\x20memuat\x20daftar\x20server.\x20Silakan\x20muat\x20ulang\x20halaman.','accWsTls','DOMContentLoaded','expired','quota_gb','appendChild','<option>Pilih\x20Region\x20Dahulu</option>','region','Simpan\x20file\x20ini\x20untuk\x20impor\x20konfigurasi.','orderForm','&amp;','Order\x20tidak\x20ditemukan\x20/\x20error.','\x20GB','onclick','clipboard','toUpperCase','Quota\x20\x20\x20\x20:\x20','setItem','removeChild','Created\x20\x20:\x20','exp','PAID','blk-ws-tls','671935tPJlhf','[WS\x20Non-TLS]\x0a','includes','submit','badge\x20bg-warning\x20text-dark','test','accountConfig','href','2355952Ynllca','error','variants','length','payLink','<i\x20class=\x22bi\x20bi-check-lg\x22></i>','price','Respon\x20API\x20tidak\x20valid\x20(orderId/paymentUrl\x20kosong).','vpn-account','<i\x20class=\x22bi\x20bi-clipboard-check\x22></i>\x20Disalin!','text','Expired\x20\x20:\x20','2493WhlAYt','preventDefault','<option>Tidak\x20ada\x20server</option>','/config','_blank','id-ID','blk-ws-ntls','disabled','padStart','accQuota','map','grpc','getElementById','target','orderIdText','push','Gagal\x20membuat\x20invoice\x20(HTTP\x20','warn','revokeObjectURL','message','json','slice','paymentUrl','139710reSfzU','textContent','downloadConfigBtn','removeItem','serverId','protocol','promo','now','application/json','online','created','forEach','\x20•\x20','Format\x20email\x20tidak\x20valid.','accUUID','promoCode','&gt;','uuid','Akun\x20berhasil\x20dibuat.\x20Jika\x20detail\x20tidak\x20muncul,\x20hubungi\x20admin.','Menunggu\x20pembayaran...','floor','status','toLocaleString','detailsPreview','<span\x20class=\x22spinner-border\x20spinner-border-sm\x20me-2\x22></span>\x20Memproses...','Rp\x200\x20/\x2030\x20hari','replaceAll','statusText','writeText','Gagal\x20terhubung\x20ke\x20API.\x20Periksa\x20koneksi\x20Anda.','accGrpc','getSeconds','innerHTML','label','dataset','Username\x20:\x20','createElement','closed','fdz_last_payment','options','input','value','none','18519LmLUip','toLowerCase','orderId','Memeriksa\x20status\x20terakhir...','isArray','expDays','accWsNtls','selectedIndex','style','origin','ws_tls','Gagal\x20memuat\x20konfigurasi\x20dari\x20API:','download','24AwrjqI','<option>Varian\x20ini\x20tidak\x20tersedia</option>','parse','badge\x20bg-success','Pembayaran\x20gagal\x20✖','3483305xzuFFg'];_0x476f=function(){return _0x144d16;};return _0x476f();}const _0x158b8c=_0x11f6;(function(_0x502ae8,_0x373307){const _0x3f3cc9=_0x11f6,_0x11dad8=_0x502ae8();while(!![]){try{const _0x398214=-parseInt(_0x3f3cc9(0x16a))/0x1+-parseInt(_0x3f3cc9(0x172))/0x2+-parseInt(_0x3f3cc9(0x10e))/0x3*(-parseInt(_0x3f3cc9(0x152))/0x4)+parseInt(_0x3f3cc9(0x13b))/0x5+-parseInt(_0x3f3cc9(0x12f))/0x6+parseInt(_0x3f3cc9(0x120))/0x7*(-parseInt(_0x3f3cc9(0x11b))/0x8)+-parseInt(_0x3f3cc9(0x17e))/0x9*(-parseInt(_0x3f3cc9(0xe3))/0xa);if(_0x398214===_0x373307)break;else _0x11dad8['push'](_0x11dad8['shift']());}catch(_0x55cc2c){_0x11dad8['push'](_0x11dad8['shift']());}}}(_0x476f,0xbeeab));const API_BASE=(window['API_BASE']||'')['replace'](/\/+$/,'')||''+location[_0x158b8c(0x117)],POLL_INTERVAL_MS=0x1388,POLL_TIMEOUT_MS=0xa*0x3c*0x3e8,LS_LAST_ORDER=_0x158b8c(0x13d),LS_LAST_PAYMENT=_0x158b8c(0x109);function saveLastPayment(_0x11c8f0){const _0x5c7be9=_0x158b8c;try{localStorage[_0x5c7be9(0x164)](LS_LAST_PAYMENT,JSON[_0x5c7be9(0x126)]({..._0x11c8f0,'ts':Date[_0x5c7be9(0xea)]()}));}catch{}}function getLastPayment(){const _0x2efbdb=_0x158b8c;try{return JSON[_0x2efbdb(0x11d)](localStorage['getItem'](LS_LAST_PAYMENT)||_0x2efbdb(0x146));}catch{return null;}}function clearLastPayment(){const _0x45360e=_0x158b8c;try{localStorage[_0x45360e(0xe6)](LS_LAST_PAYMENT);}catch{}}const formEl=document[_0x158b8c(0x18a)](_0x158b8c(0x15c)),usernameEl=document[_0x158b8c(0x18a)](_0x158b8c(0x13f)),emailEl=document[_0x158b8c(0x18a)](_0x158b8c(0x137)),protocolEl=document[_0x158b8c(0x18a)](_0x158b8c(0xe8)),variantSel=document[_0x158b8c(0x18a)]('variant'),regionSel=document[_0x158b8c(0x18a)](_0x158b8c(0x15a)),serverSel=document[_0x158b8c(0x18a)](_0x158b8c(0xe7)),promoEl=document['getElementById'](_0x158b8c(0xf2)),usernameFinalPreview=document['getElementById']('usernameFinalPreview'),pricePreview=document[_0x158b8c(0x18a)]('pricePreview'),detailsPreview=document[_0x158b8c(0x18a)](_0x158b8c(0xfa)),submitBtn=document['getElementById'](_0x158b8c(0x138)),waitingBox=document[_0x158b8c(0x18a)]('waitingBox'),orderIdText=document[_0x158b8c(0x18a)](_0x158b8c(0x18c)),statusText=document[_0x158b8c(0x18a)](_0x158b8c(0xfe)),payLink=document[_0x158b8c(0x18a)](_0x158b8c(0x176)),resultBox=document[_0x158b8c(0x18a)](_0x158b8c(0x145)),configTextEl=document[_0x158b8c(0x18a)](_0x158b8c(0x123)),errorBox=document[_0x158b8c(0x18a)](_0x158b8c(0x132)),accUsername=document[_0x158b8c(0x18a)]('accUsername'),accUUID=document[_0x158b8c(0x18a)](_0x158b8c(0xf1)),accDomain=document[_0x158b8c(0x18a)](_0x158b8c(0x12b)),accQuota=document[_0x158b8c(0x18a)](_0x158b8c(0x187)),accCreated=document['getElementById'](_0x158b8c(0x128)),accExpired=document[_0x158b8c(0x18a)]('accExpired'),blkWsTls=document['getElementById'](_0x158b8c(0x169)),blkWsNtls=document[_0x158b8c(0x18a)](_0x158b8c(0x184)),blkGrpc=document[_0x158b8c(0x18a)](_0x158b8c(0x143)),accWsTls=document[_0x158b8c(0x18a)](_0x158b8c(0x154)),accWsNtls=document[_0x158b8c(0x18a)](_0x158b8c(0x114)),accGrpc=document[_0x158b8c(0x18a)](_0x158b8c(0x101)),copyAllBtn=document['getElementById'](_0x158b8c(0x131)),downloadBtn=document['getElementById'](_0x158b8c(0xe5));let CFG=null,pollTimer=null,paymentWindow=null;const show=_0x4df75a=>{const _0x32f353=_0x158b8c;if(_0x4df75a)_0x4df75a[_0x32f353(0x116)][_0x32f353(0x12d)]='';},hide=_0xf2e267=>{const _0x94031b=_0x158b8c;if(_0xf2e267)_0xf2e267[_0x94031b(0x116)][_0x94031b(0x12d)]=_0x94031b(0x10d);},setText=(_0x54bf17,_0x3bce3c)=>{const _0x4540be=_0x158b8c;if(_0x54bf17)_0x54bf17[_0x4540be(0xe4)]=_0x3bce3c??'';},htmlEscape=_0x22e6fd=>String(_0x22e6fd||'')['replaceAll']('&',_0x158b8c(0x15d))['replaceAll']('<','&lt;')[_0x158b8c(0xfd)]('>',_0x158b8c(0xf3));function showError(_0x227ad2){const _0x2409b9=_0x158b8c;if(!errorBox)return;errorBox[_0x2409b9(0x103)]=_0x2409b9(0x148)+htmlEscape(_0x227ad2)+'</div>',show(errorBox),setLoading(![]);}function clearError(){const _0x796215=_0x158b8c;errorBox&&(errorBox[_0x796215(0x103)]='',hide(errorBox));}function setLoading(_0x652476){const _0x530d16=_0x158b8c;if(!submitBtn)return;submitBtn['disabled']=_0x652476,submitBtn[_0x530d16(0x103)]=_0x652476?_0x530d16(0xfb):_0x530d16(0x12e);}const sanitizeBase=_0x191703=>String(_0x191703||'')['toLowerCase']()['replace'](/[^a-z0-9\-]/g,'')['slice'](0x0,0x14),rupiah=_0x153584=>(Number(_0x153584)||0x0)[_0x158b8c(0xf9)](_0x158b8c(0x183)),usernameWithSuffix=_0x5259b0=>{const _0x3ce9a3=_0x158b8c,_0x52b365=new Date(),_0xe1a6fa=String(_0x52b365[_0x3ce9a3(0x102)]())[_0x3ce9a3(0x186)](0x2,'0')+String(Math[_0x3ce9a3(0xf7)](_0x52b365['getMilliseconds']()/0xa))['padStart'](0x2,'0');return(sanitizeBase(_0x5259b0)+'-'+_0xe1a6fa)[_0x3ce9a3(0xe1)](0x0,0x18);};async function initializeForm(){const _0x4c1398=_0x158b8c;try{const _0x5c0cec=await fetch(API_BASE+_0x4c1398(0x181),{'headers':{'accept':_0x4c1398(0xeb)}});if(!_0x5c0cec['ok'])throw new Error(_0x4c1398(0x122)+_0x5c0cec[_0x4c1398(0xf8)]);CFG=await _0x5c0cec[_0x4c1398(0xe0)](),variantSel['disabled']=![],regionSel[_0x4c1398(0x185)]=!![],serverSel['disabled']=!![],regionSel[_0x4c1398(0x103)]='<option>Pilih\x20Varian\x20Dahulu</option>',serverSel['innerHTML']=_0x4c1398(0x159),updatePreview();}catch(_0x408713){console[_0x4c1398(0x173)](_0x4c1398(0x119),_0x408713),showError(_0x4c1398(0x153));}}function onVariantChange(){const _0x5d37a6=_0x158b8c;if(!CFG)return;const _0x3955ee=variantSel[_0x5d37a6(0x10c)];if(!_0x3955ee)return regionSel[_0x5d37a6(0x103)]=_0x5d37a6(0x124),serverSel[_0x5d37a6(0x103)]=_0x5d37a6(0x159),regionSel[_0x5d37a6(0x185)]=!![],serverSel[_0x5d37a6(0x185)]=!![],updatePreview();const _0x4edd32=CFG[_0x5d37a6(0x174)]?.[_0x3955ee]||{},_0x4152df=[];if(Array[_0x5d37a6(0x112)](_0x4edd32['ID'])&&_0x4edd32['ID'][_0x5d37a6(0x175)])_0x4152df[_0x5d37a6(0x18d)]({'value':'ID','text':_0x5d37a6(0x144)});if(Array['isArray'](_0x4edd32['SG'])&&_0x4edd32['SG'][_0x5d37a6(0x175)])_0x4152df[_0x5d37a6(0x18d)]({'value':'SG','text':'Singapore'});regionSel[_0x5d37a6(0x103)]='',_0x4152df[_0x5d37a6(0x175)]>0x0?(regionSel['innerHTML']='<option\x20value=\x22\x22>--\x20Pilih\x20Region\x20--</option>',_0x4152df[_0x5d37a6(0xee)](_0x321d5f=>{const _0x5f9a76=_0x5d37a6,_0x5944fe=document[_0x5f9a76(0x107)](_0x5f9a76(0x136));_0x5944fe[_0x5f9a76(0x10c)]=_0x321d5f['value'],_0x5944fe[_0x5f9a76(0xe4)]=_0x321d5f[_0x5f9a76(0x17c)],regionSel[_0x5f9a76(0x158)](_0x5944fe);}),regionSel[_0x5d37a6(0x185)]=![]):(regionSel[_0x5d37a6(0x103)]=_0x5d37a6(0x11c),regionSel[_0x5d37a6(0x185)]=!![]),serverSel[_0x5d37a6(0x103)]=_0x5d37a6(0x159),serverSel[_0x5d37a6(0x185)]=!![],updatePreview();}function onRegionChange(){const _0x381701=_0x158b8c;if(!CFG)return;const _0x4b1345=variantSel['value'],_0x396176=regionSel[_0x381701(0x10c)];if(!_0x396176)return serverSel[_0x381701(0x103)]=_0x381701(0x159),serverSel[_0x381701(0x185)]=!![],updatePreview();const _0x510916=CFG[_0x381701(0x174)]?.[_0x4b1345]?.[_0x396176]||[];serverSel[_0x381701(0x103)]='',_0x510916['length']>0x0?(_0x510916[_0x381701(0xee)](_0x488025=>{const _0x39be87=_0x381701,_0x1ef851=document[_0x39be87(0x107)]('option');_0x1ef851[_0x39be87(0x10c)]=_0x488025['id'],_0x1ef851[_0x39be87(0xe4)]=_0x488025['label']+'\x20—\x20Rp\x20'+rupiah(_0x488025[_0x39be87(0x178)]),_0x1ef851[_0x39be87(0x105)][_0x39be87(0x178)]=_0x488025[_0x39be87(0x178)],_0x1ef851['dataset']['label']=_0x488025[_0x39be87(0x104)],_0x1ef851[_0x39be87(0x105)][_0x39be87(0x12c)]=_0x488025['quotaGB']??'',_0x1ef851[_0x39be87(0x105)]['exp']=_0x488025[_0x39be87(0x113)]??'',serverSel[_0x39be87(0x158)](_0x1ef851);}),serverSel[_0x381701(0x185)]=![]):(serverSel[_0x381701(0x103)]=_0x381701(0x180),serverSel[_0x381701(0x185)]=!![]),updatePreview();}function updatePreview(){const _0x280b66=_0x158b8c;setText(usernameFinalPreview,usernameWithSuffix(usernameEl[_0x280b66(0x10c)]||'user'));const _0x11cab4=serverSel[_0x280b66(0x10a)][serverSel[_0x280b66(0x115)]];if(serverSel[_0x280b66(0x185)]||!_0x11cab4||!_0x11cab4[_0x280b66(0x105)][_0x280b66(0x178)]){setText(pricePreview,_0x280b66(0xfc)),setText(detailsPreview,'Lengkapi\x20pilihan\x20di\x20atas');return;}const _0xfa13ae=parseInt(_0x11cab4[_0x280b66(0x105)][_0x280b66(0x178)],0xa)||0x0;let _0x2799ab=_0xfa13ae,_0x160ddd='';const _0x45b98f=promoEl[_0x280b66(0x10c)][_0x280b66(0x13e)]()[_0x280b66(0x10f)]();if(_0x45b98f&&CFG?.[_0x280b66(0xe9)]?.[_0x280b66(0xf8)]===_0x280b66(0xec)){const _0x31e358=(CFG[_0x280b66(0xe9)][_0x280b66(0x14e)]||[])[_0x280b66(0x188)](_0x3d7327=>String(_0x3d7327)[_0x280b66(0x10f)]());if(_0x31e358[_0x280b66(0x16c)](_0x45b98f)){const _0x52a7ed=Number(CFG[_0x280b66(0xe9)]['discount']||0x0);_0x2799ab=Math['max'](0x0,_0xfa13ae-_0x52a7ed),_0x160ddd=_0x52a7ed>0x0?_0x280b66(0x150)+rupiah(_0x52a7ed)+')':'';}}setText(pricePreview,_0x280b66(0x142)+rupiah(_0x2799ab)+'\x20/\x20'+(_0x11cab4['dataset'][_0x280b66(0x167)]||0x1e)+_0x280b66(0x12a)+_0x160ddd);const _0x19fa12=regionSel[_0x280b66(0x10a)][regionSel['selectedIndex']]?.[_0x280b66(0x17c)]||'',_0x4cb1c4=variantSel[_0x280b66(0x10a)][variantSel[_0x280b66(0x115)]]?.[_0x280b66(0x17c)]||'';setText(detailsPreview,_0x4cb1c4+_0x280b66(0xef)+_0x19fa12+_0x280b66(0xef)+_0x11cab4[_0x280b66(0x105)][_0x280b66(0x104)]);}async function handleSubmit(_0x33bc44){const _0x4e6f1b=_0x158b8c;_0x33bc44[_0x4e6f1b(0x17f)](),clearError(),hide(resultBox),hide(waitingBox);if(submitBtn?.['disabled'])return;setLoading(!![]);const _0x307db1=sanitizeBase(usernameEl[_0x4e6f1b(0x10c)]||'');if(!_0x307db1)return setLoading(![]),showError(_0x4e6f1b(0x14a));const _0x8d04c8=(emailEl[_0x4e6f1b(0x10c)]||'')[_0x4e6f1b(0x13e)]();if(_0x8d04c8&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/[_0x4e6f1b(0x16f)](_0x8d04c8))return setLoading(![]),showError(_0x4e6f1b(0xf0));const _0x40814e=serverSel[_0x4e6f1b(0x10a)][serverSel[_0x4e6f1b(0x115)]];if(!_0x40814e||serverSel['disabled']||!serverSel[_0x4e6f1b(0x10c)])return setLoading(![]),showError('Varian,\x20Region,\x20dan\x20Server\x20harus\x20dipilih.');const _0x233e47={'variant':variantSel[_0x4e6f1b(0x10c)],'region':regionSel['value'],'serverId':serverSel[_0x4e6f1b(0x10c)],'promoCode':promoEl['value'][_0x4e6f1b(0x13e)](),'protocol':protocolEl[_0x4e6f1b(0x10c)],'username':_0x307db1,'usernameFinal':usernameFinalPreview['textContent'],'email':_0x8d04c8};try{const _0x102246=await fetch(API_BASE+_0x4e6f1b(0x139),{'method':_0x4e6f1b(0x13c),'headers':{'Content-Type':_0x4e6f1b(0xeb)},'body':JSON[_0x4e6f1b(0x126)](_0x233e47)});let _0x5333b7=null;try{_0x5333b7=await _0x102246[_0x4e6f1b(0xe0)]();}catch{_0x5333b7=null;}setLoading(![]);if(!_0x102246['ok']||!_0x5333b7)return showError(_0x5333b7&&_0x5333b7[_0x4e6f1b(0xdf)]||_0x4e6f1b(0x18e)+_0x102246[_0x4e6f1b(0xf8)]+').');const {orderId:_0x128339,paymentUrl:_0x5372c3,reference:_0x5d5c99}=_0x5333b7;if(!_0x128339||!_0x5372c3)return showError(_0x4e6f1b(0x179));try{localStorage[_0x4e6f1b(0x164)](LS_LAST_ORDER,_0x128339);}catch{}saveLastPayment({'orderId':_0x128339,'paymentUrl':_0x5372c3,'reference':_0x5d5c99}),setText(orderIdText,_0x128339),statusText[_0x4e6f1b(0xe4)]='Menunggu\x20pembayaran...',statusText[_0x4e6f1b(0x14d)]='badge\x20bg-warning\x20text-dark',payLink[_0x4e6f1b(0x171)]=_0x5372c3,show(waitingBox);try{!paymentWindow||paymentWindow[_0x4e6f1b(0x108)]?paymentWindow=window[_0x4e6f1b(0x14f)](_0x5372c3,_0x4e6f1b(0x182),_0x4e6f1b(0x141)):paymentWindow['focus']();}catch{}pollStatus(_0x128339);}catch(_0x25aaff){setLoading(![]),showError(_0x4e6f1b(0x100)),console[_0x4e6f1b(0x173)](_0x4e6f1b(0x134),_0x25aaff);}}async function pollStatus(_0x277655){const _0xa5fb9a=_0x158b8c,_0x2b19b6=Date[_0xa5fb9a(0xea)]();let _0x320299=0x0;stopPoll();const _0x130ac8=async()=>{const _0x1cb9d8=_0xa5fb9a;if(Date[_0x1cb9d8(0xea)]()-_0x2b19b6>POLL_TIMEOUT_MS)return statusText[_0x1cb9d8(0xe4)]=_0x1cb9d8(0x130),statusText[_0x1cb9d8(0x14d)]='badge\x20bg-secondary',stopPoll();try{const _0x58dba9=await fetch(API_BASE+'/pay/status?orderId='+encodeURIComponent(_0x277655),{'headers':{'accept':'application/json'}});let _0x25942f=null;try{_0x25942f=await _0x58dba9[_0x1cb9d8(0xe0)]();}catch{_0x25942f=null;}if(!_0x58dba9['ok']||!_0x25942f)return statusText[_0x1cb9d8(0xe4)]=_0x1cb9d8(0x15e),statusText['className']=_0x1cb9d8(0x149),stopPoll();if(_0x25942f[_0x1cb9d8(0xe2)]){payLink[_0x1cb9d8(0x171)]=_0x25942f[_0x1cb9d8(0xe2)];const _0x2158f7=getLastPayment(),_0x4ced77=_0x25942f[_0x1cb9d8(0x110)]||_0x277655;_0x2158f7&&_0x2158f7[_0x1cb9d8(0x110)]===_0x4ced77&&saveLastPayment({..._0x2158f7,'paymentUrl':_0x25942f[_0x1cb9d8(0xe2)]});}const _0x1e1541=String(_0x25942f[_0x1cb9d8(0xf8)]||'')[_0x1cb9d8(0x162)]();if(_0x1e1541===_0x1cb9d8(0x168))return statusText[_0x1cb9d8(0xe4)]='Pembayaran\x20diterima\x20✔',statusText[_0x1cb9d8(0x14d)]=_0x1cb9d8(0x11e),clearLastPayment(),showResultConfig(_0x25942f),stopPoll();else{if(_0x1e1541==='FAILED')return statusText[_0x1cb9d8(0xe4)]=_0x1cb9d8(0x11f),statusText[_0x1cb9d8(0x14d)]=_0x1cb9d8(0x149),clearLastPayment(),stopPoll();else statusText[_0x1cb9d8(0xe4)]=_0x1cb9d8(0xf6),statusText[_0x1cb9d8(0x14d)]=_0x1cb9d8(0x16e);}}catch(_0x1651f9){_0x320299++,console[_0x1cb9d8(0x18f)]('Polling\x20error\x20(akan\x20dicoba\x20lagi):',_0x1651f9);}};await _0x130ac8(),pollTimer=setInterval(_0x130ac8,POLL_INTERVAL_MS);}function stopPoll(){pollTimer&&(clearInterval(pollTimer),pollTimer=null);}function showResultConfig(_0x25e6d7){const _0x4b6ade=_0x158b8c;hide(waitingBox),show(resultBox);const _0x5c4d6d=_0x25e6d7[_0x4b6ade(0x129)],_0x3b06a0=(_0x25e6d7[_0x4b6ade(0x170)]||'')[_0x4b6ade(0x13e)]();if(_0x5c4d6d&&_0x5c4d6d['username']){if(configTextEl)hide(configTextEl);setText(accUsername,_0x5c4d6d['username']),setText(accUUID,_0x5c4d6d[_0x4b6ade(0xf4)]||'-'),setText(accDomain,_0x5c4d6d['domain']||'-'),setText(accQuota,_0x5c4d6d[_0x4b6ade(0x157)]!=null?_0x5c4d6d[_0x4b6ade(0x157)]+_0x4b6ade(0x15f):'-'),setText(accCreated,_0x5c4d6d[_0x4b6ade(0xed)]||'-'),setText(accExpired,_0x5c4d6d[_0x4b6ade(0x156)]||'-'),_0x5c4d6d[_0x4b6ade(0x118)]?(setText(accWsTls,_0x5c4d6d[_0x4b6ade(0x118)]),show(blkWsTls)):hide(blkWsTls),_0x5c4d6d[_0x4b6ade(0x127)]?(setText(accWsNtls,_0x5c4d6d[_0x4b6ade(0x127)]),show(blkWsNtls)):hide(blkWsNtls),_0x5c4d6d[_0x4b6ade(0x189)]?(setText(accGrpc,_0x5c4d6d[_0x4b6ade(0x189)]),show(blkGrpc)):hide(blkGrpc);}else configTextEl&&(show(configTextEl),configTextEl[_0x4b6ade(0x10c)]=_0x3b06a0||_0x4b6ade(0xf5));setupActions(_0x25e6d7);}function buildTextDump(_0x440e00){const _0x5da0a6=_0x158b8c;if(_0x440e00[_0x5da0a6(0x129)]&&_0x440e00[_0x5da0a6(0x129)][_0x5da0a6(0x13f)]){const _0x5edfec=_0x440e00[_0x5da0a6(0x129)],_0x452424=[_0x5da0a6(0x14b),_0x5da0a6(0x106)+(_0x5edfec['username']||''),'UUID\x20\x20\x20\x20\x20:\x20'+(_0x5edfec[_0x5da0a6(0xf4)]||''),'Domain\x20\x20\x20:\x20'+(_0x5edfec['domain']||''),_0x5da0a6(0x163)+(_0x5edfec[_0x5da0a6(0x157)]??'?')+_0x5da0a6(0x15f),_0x5da0a6(0x166)+(_0x5edfec['created']||''),_0x5da0a6(0x17d)+(_0x5edfec[_0x5da0a6(0x156)]||''),'',_0x5edfec[_0x5da0a6(0x118)]?'[WS\x20TLS]\x0a'+_0x5edfec[_0x5da0a6(0x118)]+'\x0a':'',_0x5edfec[_0x5da0a6(0x127)]?_0x5da0a6(0x16b)+_0x5edfec[_0x5da0a6(0x127)]+'\x0a':'',_0x5edfec[_0x5da0a6(0x189)]?_0x5da0a6(0x151)+_0x5edfec[_0x5da0a6(0x189)]+'\x0a':'',_0x5da0a6(0x15b)];return _0x452424['filter'](Boolean)[_0x5da0a6(0x147)]('\x0a');}return(_0x440e00[_0x5da0a6(0x170)]||'')['trim']();}function setupActions(_0xf953cf){const _0xfc9620=_0x158b8c,_0x5f32b2=buildTextDump(_0xf953cf);copyAllBtn&&(copyAllBtn[_0xfc9620(0x160)]=async()=>{const _0x1954e1=_0xfc9620;await navigator['clipboard'][_0x1954e1(0xff)](_0x5f32b2);const _0x1f4bb9=copyAllBtn[_0x1954e1(0x103)];copyAllBtn[_0x1954e1(0x103)]=_0x1954e1(0x17b),setTimeout(()=>copyAllBtn[_0x1954e1(0x103)]=_0x1f4bb9,0x5dc);}),downloadBtn&&(downloadBtn['onclick']=()=>{const _0x5da2ba=_0xfc9620,_0x6d55a7=new Blob([_0x5f32b2],{'type':_0x5da2ba(0x14c)}),_0x55c062=URL[_0x5da2ba(0x125)](_0x6d55a7),_0x3bb93e=document[_0x5da2ba(0x107)]('a');_0x3bb93e[_0x5da2ba(0x171)]=_0x55c062,_0x3bb93e[_0x5da2ba(0x11a)]=(_0xf953cf[_0x5da2ba(0x110)]||_0x5da2ba(0x17a))+_0x5da2ba(0x121),document['body'][_0x5da2ba(0x158)](_0x3bb93e),_0x3bb93e[_0x5da2ba(0x13a)](),document['body'][_0x5da2ba(0x165)](_0x3bb93e),URL[_0x5da2ba(0xde)](_0x55c062);});}function _0x11f6(_0x43fad4,_0x41d057){const _0x476f0a=_0x476f();return _0x11f6=function(_0x11f63f,_0x35c30d){_0x11f63f=_0x11f63f-0xde;let _0x4c7bd4=_0x476f0a[_0x11f63f];return _0x4c7bd4;},_0x11f6(_0x43fad4,_0x41d057);}document[_0x158b8c(0x133)](_0x158b8c(0x155),()=>{const _0x2afebe=_0x158b8c;initializeForm();const _0x16c810=getLastPayment();if(_0x16c810&&_0x16c810[_0x2afebe(0x110)]){setText(orderIdText,_0x16c810[_0x2afebe(0x110)]),statusText[_0x2afebe(0xe4)]=_0x2afebe(0xf6),statusText['className']=_0x2afebe(0x16e);if(_0x16c810['paymentUrl'])payLink[_0x2afebe(0x171)]=_0x16c810[_0x2afebe(0xe2)];show(waitingBox),pollStatus(_0x16c810[_0x2afebe(0x110)]);return;}const _0x2afe65=localStorage['getItem'](LS_LAST_ORDER);_0x2afe65&&(setText(orderIdText,_0x2afe65),statusText['textContent']=_0x2afebe(0x111),statusText[_0x2afebe(0x14d)]='badge\x20bg-info',show(waitingBox),pollStatus(_0x2afe65));}),formEl['addEventListener'](_0x158b8c(0x16d),handleSubmit),variantSel[_0x158b8c(0x133)](_0x158b8c(0x135),onVariantChange),regionSel[_0x158b8c(0x133)](_0x158b8c(0x135),onRegionChange),serverSel[_0x158b8c(0x133)](_0x158b8c(0x135),updatePreview),promoEl[_0x158b8c(0x133)]('input',updatePreview),usernameEl['addEventListener'](_0x158b8c(0x10b),updatePreview),document[_0x158b8c(0x133)](_0x158b8c(0x13a),async _0x2c3528=>{const _0x137ad9=_0x158b8c,_0x3f46f2=_0x2c3528[_0x137ad9(0x18b)][_0x137ad9(0x140)]('.cfg-copy');if(!_0x3f46f2)return;const _0x49648b=_0x3f46f2[_0x137ad9(0x105)]['target'],_0x1b720c=document[_0x137ad9(0x18a)](_0x49648b);if(!_0x1b720c)return;await navigator[_0x137ad9(0x161)]['writeText'](_0x1b720c[_0x137ad9(0xe4)]);const _0x5e5871=_0x3f46f2[_0x137ad9(0x103)];_0x3f46f2[_0x137ad9(0x103)]=_0x137ad9(0x177),setTimeout(()=>_0x3f46f2['innerHTML']=_0x5e5871,0x5dc);});
+const API_BASE = (window.API_BASE || '').replace(/\/+$/, '') || `${location.origin}`;
+const LS_LAST_PAYMENT = 'fdz_last_payment';
+const LS_LAST_ORDER   = 'fdz_last_order';
+let CFG = null;
+let paymentWindow = null;
+let curVariant = 'HP';
+let curRegion  = 'SG';
+let qSearch = '';
+let qSort = 'price-asc';
+(function ensureAssetRotationDefaults(){
+  if (!window.ASSET_BASE || !window.ASSET_MANIFEST) {
+    const ROTATION_BASES = ["assets/backv1","assets/backv2","assets/backv3"];
+    const hourSlot = Math.floor(Date.now() / (60*60*1000)) % ROTATION_BASES.length; // ganti tiap jam
+    const chosenBase = ROTATION_BASES[hourSlot];
+    window.ASSET_BASE = chosenBase;
+    window.ASSET_MANIFEST = `${chosenBase}/manifest.json`;
+  }
+})();
+let ASSET_BASE = window.ASSET_BASE;
+let ASSET_MANIFEST = window.ASSET_MANIFEST;
+let assetImages = [];
+async function loadAssetManifest() {
+  try {
+    const r = await fetch(ASSET_MANIFEST, { headers: { accept: 'application/json' } });
+    const arr = await r.json();
+    if (Array.isArray(arr) && arr.length) {
+      assetImages = arr
+        .map(name => `${ASSET_BASE}/${name}`)
+        .filter((v, i, a) => a.indexOf(v) === i); // unique
+    }
+  } catch (e) {
+    console.error('Gagal load manifest gambar:', e);
+  }
+  if (!assetImages.length) {
+    console.warn('Manifest gambar kosong. Pastikan file ada & path benar:', ASSET_MANIFEST);
+  }
+}
+function pickImageFor(serverId) {
+  if (!assetImages.length) return '';
+  const hourSlot = Math.floor(Date.now() / (60 * 60 * 1000));
+  const hash = String(serverId || '').split('').reduce((a, c) => (a * 33 + c.charCodeAt(0)) >>> 0, 5381);
+  const idx = Math.abs((hash + hourSlot) % assetImages.length);
+  return assetImages[idx];
+}
+const saveLastPayment = (o) => {
+  try { localStorage.setItem(LS_LAST_PAYMENT, JSON.stringify({ ...o, ts: Date.now() })); } catch {}
+};
+const clearLastPayment = () => { try { localStorage.removeItem(LS_LAST_PAYMENT); } catch {} };
+const grid      = document.getElementById('catalogGrid');
+const skeleton  = document.getElementById('skeletonGrid');
+const promoInfo = document.getElementById('promoInfo');
+const searchBox = document.getElementById('searchBox');
+const sortSel   = document.getElementById('sortSel');
+const waitingBox = document.getElementById('waitingBox');
+const orderIdText = document.getElementById('orderIdText');
+const payLink    = document.getElementById('payLink');
+const btnMonitor = document.getElementById('btnMonitor');
+let coModal;
+const co_variant  = document.getElementById('co_variant');
+const co_region   = document.getElementById('co_region');
+const co_serverId = document.getElementById('co_serverId');
+const co_protocol = document.getElementById('co_protocol');
+const co_username = document.getElementById('co_username');
+const co_email    = document.getElementById('co_email');
+const co_promo    = document.getElementById('co_promo');
+const modalPromoMsg    = document.getElementById('modalPromoMsg');
+const modalPromoAmount = document.getElementById('modalPromoAmount');
+const modalPromoHelp   = document.getElementById('modalPromoHelp');
+const btnCheckout      = document.getElementById('btnCheckout');
+const co_usernamePreview = document.getElementById('co_usernamePreview');
+const ch_badgeRegion = document.getElementById('ch_badgeRegion');
+const ch_varian = document.getElementById('ch_varian');
+const ch_server = document.getElementById('ch_server');
+const ch_protocol = document.getElementById('ch_protocol');
+const ch_priceBase = document.getElementById('ch_priceBase');
+const ch_priceFinal = document.getElementById('ch_priceFinal');
+const ch_priceNote = document.getElementById('ch_priceNote');
+const rupiah       = (n) => (Number(n) || 0).toLocaleString('id-ID');
+const sanitizeBase = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9\-]/g, '').slice(0, 20);
+let MOD_SUFFIX = '';
+let MOD_BASE_PRICE = 0;
+let MOD_LABEL = '-';
+const genSuffix = () => {
+  const d = new Date();
+  const suf = String(d.getMinutes()).padStart(2, '0') + String(Math.floor(d.getSeconds()/6)).padStart(2, '0');
+  return suf;
+};
+const usernameFinalWith = (base, suf) => `${sanitizeBase(base || 'user')}-${suf}`.slice(0, 24);
+const setActive = (els, val, key) => els.forEach(b => b.classList.toggle('active', (key === 'variant' ? b.dataset.filterVariant : b.dataset.filterRegion) === val));
+async function loadConfig() {
+  const r = await fetch(`${API_BASE}/config`, { headers: { accept: 'application/json' } });
+  if (!r.ok) throw new Error(`Gagal /config (HTTP ${r.status}).`);
+  const j = await r.json(); CFG = j;
+  const isPromoOn = j?.promo?.status === 'online';
+  promoInfo.textContent = isPromoOn
+    ? `Online • -Rp ${rupiah(j.promo.discount || 0)}`
+    : 'Tidak aktif';
+  const promoPill = document.getElementById('promoPill');
+  if (promoPill) promoPill.dataset.status = isPromoOn ? 'on' : 'off';
+  if (modalPromoMsg && modalPromoAmount && modalPromoHelp) {
+    if (isPromoOn) {
+      modalPromoAmount.textContent = rupiah(j.promo.discount || 0);
+      modalPromoMsg.style.display = '';
+      modalPromoHelp.textContent = 'Promo aktif. Masukkan kode promo yang valid untuk dapat diskon.';
+    } else {
+      modalPromoMsg.style.display = 'none';
+      modalPromoHelp.textContent = 'Masukkan kode promo jika ada.';
+    }
+  }
+}
+const products = (v, r) => {
+  const defQ = v === 'HP' ? 300 : 600;
+  return (CFG?.variants?.[v]?.[r] || []).map(s => ({
+    id: s.id,
+    label: s.label,
+    price: Number(s.price) || 0,
+    quota: s.quotaGB ?? defQ,
+    days: s.expDays ?? 30,
+    variant: v,
+    region: r,
+    img: pickImageFor(s.id) // gambar dari manifest + rotasi jam
+  }));
+};
+function bestValueSet(items){
+  if (!items.length) return new Set();
+  const min = Math.min(...items.map(i => Number(i.price)||0));
+  const threshold = min * 1.05; // ≤5% dari harga termurah
+  return new Set(items.filter(i => (Number(i.price)||0) <= threshold).map(i => i.id));
+}
+const card = (p, isBest = false) => `
+<article class="card-prod">
+  ${isBest ? '<div class="badge-ribbon">Best Value</div>' : ''}
+  <img class="thumb" loading="lazy" src="${p.img}" alt="${p.label}">
+  <div class="body">
+    <h3 class="title">${p.region} ${p.variant} ${p.label}</h3>
+    <div class="meta">Kuota ~${p.quota}GB • ${p.days} hari</div>
+    <div class="feat">
+      <span class="chip">${p.variant}</span>
+      <span class="chip"><i class="bi bi-geo-alt"></i> ${p.region}</span>
+      <span class="chip"><i class="bi bi-shield-check"></i> Otomatis</span>
+    </div>
+    <div class="cta">
+      <div class="price">Rp ${rupiah(p.price)} <span class="text-muted" style="font-size:.8rem">/30 hari</span></div>
+      <button class="btn-buy" data-buy data-variant="${p.variant}" data-region="${p.region}" data-serverid="${p.id}">
+        <i class="bi bi-cart3 me-1"></i> Beli
+      </button>
+    </div>
+  </div>
+</article>`;
+function applySearchSort(items) {
+  let out = [...items];
+  const q = (qSearch || '').trim().toLowerCase();
+  if (q) out = out.filter(p => (`${p.label} ${p.region} ${p.variant}`).toLowerCase().includes(q));
+  switch (qSort) {
+    case 'price-desc': out.sort((a, b) => b.price - a.price); break;
+    case 'quota-desc': out.sort((a, b) => b.quota - a.quota); break;
+    case 'quota-asc':  out.sort((a, b) => a.quota - b.quota); break;
+    case 'label-asc':  out.sort((a, b) => String(a.label).localeCompare(b.label)); break;
+    default:           out.sort((a, b) => a.price - b.price);
+  }
+  return out;
+}
+function render() {
+  const base  = products(curVariant, curRegion);
+  const items = applySearchSort(base);
+  const bestIds = bestValueSet(base); // hitung dari list sebelum sorting
+  if (!assetImages.length) {
+    console.warn('Tidak ada gambar di manifest. Kartu tetap dirender tanpa thumbnail.');
+  }
+  grid.innerHTML = items.length
+    ? items.map(p => card(p, bestIds.has(p.id))).join('')
+    : `<div class="alert alert-warning">Tidak ada item untuk filter ini. Ubah filter atau cek konfigurasi PRICE_${curRegion}_${curVariant}.</div>`;
+}
+function findServerPriceLabel(v, r, sid){
+  const arr = CFG?.variants?.[v]?.[r] || [];
+  const s = arr.find(x => String(x.id) === String(sid));
+  return { price: Number(s?.price) || 0, label: s?.label || '-' };
+}
+function promoApply(base, code){
+  const p = CFG?.promo;
+  if (!p || p.status !== 'online' || !code) return { final: base, applied: false, discount: 0 };
+  const codes = Array.isArray(p.codes) ? p.codes.map(c=>String(c).toLowerCase()) : [];
+  const ok = codes.includes(String(code).toLowerCase());
+  const disc = ok ? Number(p.discount) || 0 : 0;
+  return { final: Math.max(0, base - disc), applied: ok, discount: disc };
+}
+function refreshModalPreview(){
+  // username final preview
+  const base = co_username.value || 'user';
+  const uf = usernameFinalWith(base, MOD_SUFFIX);
+  if (co_usernamePreview) co_usernamePreview.textContent = uf;
+  if (ch_protocol) ch_protocol.textContent = (co_protocol.value || 'VMess').toUpperCase();
+  const code = (co_promo?.value || '').trim();
+  const p = promoApply(MOD_BASE_PRICE, code);
+  if (ch_priceBase)  ch_priceBase.textContent  = rupiah(MOD_BASE_PRICE);
+  if (ch_priceFinal) ch_priceFinal.textContent = rupiah(p.final);
+  if (ch_priceNote)  ch_priceNote.textContent  = p.applied
+      ? `Diskon promo -Rp ${rupiah(p.discount)} diterapkan`
+      : 'Harga 30 hari';
+}
+function openModal(title, v, r, sid) {
+  document.getElementById('checkoutTitle').textContent = title;
+  co_variant.value = v;
+  co_region.value  = r;
+  co_serverId.value= sid;
+  co_protocol.value= 'vmess';
+  co_username.value= '';
+  co_email.value   = '';
+  if (co_promo) co_promo.value = '';
+  MOD_SUFFIX = genSuffix();
+  const { price, label } = findServerPriceLabel(v, r, sid);
+  MOD_BASE_PRICE = price;
+  MOD_LABEL = label;
+  if (ch_badgeRegion) ch_badgeRegion.textContent = r;
+  if (ch_varian)      ch_varian.textContent = v;
+  if (ch_server)      ch_server.textContent = label;
+  refreshModalPreview();
+  if (!coModal) {
+    co_username.addEventListener('input', refreshModalPreview);
+    co_protocol.addEventListener('change', () => {
+      if (ch_protocol) ch_protocol.textContent = (co_protocol.value || 'VMess').toUpperCase();
+    });
+    if (co_promo) co_promo.addEventListener('input', refreshModalPreview);
+  }
+  if (!coModal) coModal = new bootstrap.Modal(document.getElementById('checkoutModal'));
+  coModal.show();
+}
+async function createInvoice(payload) {
+  const r = await fetch(`${API_BASE}/pay/create`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  const j = await r.json().catch(() => null);
+  if (!r.ok || !j) throw new Error(j?.message || `Gagal membuat invoice (HTTP ${r.status})`);
+  return j;
+}
+async function doCheckout() {
+  const variant  = co_variant.value.trim();
+  const region   = co_region.value.trim();
+  const serverId = co_serverId.value.trim();
+  const protocol = co_protocol.value;
+  const username = sanitizeBase(co_username.value || 'user');
+  const email    = (co_email.value || '').trim();
+  const promoCode= (co_promo?.value || '').trim();
+  if (!username) return alert('Username wajib diisi.');
+  if (!email)    return alert('Email wajib diisi.');
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return alert('Format email tidak valid.');
+  const usernameFinal = usernameFinalWith(username, MOD_SUFFIX);
+  try {
+    btnCheckout.disabled = true;
+    btnCheckout.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Memproses...';
+    const res = await createInvoice({ variant, region, serverId, protocol, username, usernameFinal, email, promoCode });
+    const { orderId, paymentUrl, reference } = res;
+    if (!orderId || !paymentUrl) throw new Error('Respon API tidak valid.');
+    try { localStorage.setItem(LS_LAST_ORDER, orderId); } catch {}
+    saveLastPayment({ orderId, paymentUrl, reference, uf: usernameFinal, email });
+    if (!paymentWindow || paymentWindow.closed) {
+      paymentWindow = window.open(paymentUrl, '_blank', 'noopener');
+    } else {
+      paymentWindow.location.href = paymentUrl;
+      paymentWindow.focus();
+    }
+    const q = new URLSearchParams({ orderId, uf: usernameFinal, email });
+    location.href = `order-status.html?${q.toString()}`;
+  } catch (e) {
+    alert(e.message || 'Gagal membuat invoice');
+  } finally {
+    btnCheckout.disabled = false;
+    btnCheckout.innerHTML = '<i class="bi bi-shield-check me-1"></i> Lanjutkan Pembayaran';
+  }
+}
+function restorePaymentBanner() {
+  try {
+    const last = JSON.parse(localStorage.getItem(LS_LAST_PAYMENT) || 'null');
+    if (!last || !last.orderId || !last.paymentUrl) {
+      if (waitingBox) waitingBox.style.display = 'none';
+      return;
+    }
+    if (orderIdText) orderIdText.textContent = last.orderId;
+    if (payLink) {
+      payLink.href = last.paymentUrl;
+      payLink.target = '_blank'; payLink.rel = 'noopener';
+    }
+    if (btnMonitor) {
+      const params = new URLSearchParams({ orderId: last.orderId, uf: last.uf || '', email: last.email || '' }).toString();
+      btnMonitor.href = `order-status.html?${params}`;
+    }
+    if (waitingBox) waitingBox.style.display = '';
+  } catch {
+    if (waitingBox) waitingBox.style.display = 'none';
+  }
+}
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadAssetManifest();
+  try { await loadConfig(); }
+  catch (e) {
+    skeleton.style.display = 'none';
+    grid.innerHTML = `<div class="alert alert-danger">${e.message}</div>`;
+    return;
+  }
+  for (const v of ['HP', 'STB']) {
+    for (const r of ['SG', 'ID']) {
+      if ((CFG?.variants?.[v]?.[r] || []).length) { curVariant = v; curRegion = r; break; }
+    }
+    if ((CFG?.variants?.[curVariant]?.[curRegion] || []).length) break;
+  }
+  skeleton.style.display = 'none';
+  render();
+  restorePaymentBanner();
+  const bv = [...document.querySelectorAll('[data-filter-variant]')];
+  const br = [...document.querySelectorAll('[data-filter-region]')];
+  const setActiveGroup = () => {
+    bv.forEach(b => b.classList.toggle('active', b.dataset.filterVariant === curVariant));
+    br.forEach(b => b.classList.toggle('active', b.dataset.filterRegion === curRegion));
+  };
+  setActiveGroup();
+  bv.forEach(b => b.addEventListener('click', () => { curVariant = b.dataset.filterVariant; setActiveGroup(); render(); }));
+  br.forEach(b => b.addEventListener('click', () => { curRegion  = b.dataset.filterRegion; setActiveGroup(); render(); }));
+  searchBox.addEventListener('input', () => { qSearch = searchBox.value; render(); });
+  sortSel.addEventListener('change', () => { qSort = sortSel.value; render(); });
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-buy]'); if (!btn) return;
+    const v = btn.dataset.variant, r = btn.dataset.region, sid = btn.dataset.serverid;
+    const title = btn.closest('.card-prod')?.querySelector('.title')?.textContent?.trim() || 'Beli Paket';
+    openModal(title, v, r, sid);
+  });
+  btnCheckout.addEventListener('click', doCheckout);
+});
