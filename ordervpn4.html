@@ -28,6 +28,23 @@
     window.ASSET_BASE = chosenBase;
     window.ASSET_MANIFEST = `${chosenBase}/manifest.json`;
   </script>
+  <style>
+    /* Sentuhan kecil agar CTA status server standout rapi */
+    .tip-bar {
+      background: linear-gradient(180deg, rgba(13,110,253,.08), rgba(13,110,253,.03));
+      border: 1px solid rgba(13,110,253,.15);
+      border-radius: 14px;
+    }
+    .tip-bar .bi-activity { color: #0d6efd; }
+    .btn-status {
+      --bs-btn-color: #0d6efd;
+      --bs-btn-border-color: rgba(13,110,253,.35);
+      --bs-btn-hover-bg: rgba(13,110,253,.08);
+      --bs-btn-hover-border-color: rgba(13,110,253,.55);
+      --bs-btn-active-bg: rgba(13,110,253,.12);
+      backdrop-filter: saturate(120%) blur(3px);
+    }
+  </style>
 </head>
 <body>
   <!-- overlay -->
@@ -73,6 +90,17 @@
         <p class="lead text-secondary mx-auto mb-4" style="max-width:650px;">
           Pilih paket sesuai kebutuhan • Bayar via <b>Duitku</b> • Akun aktif instan
         </p>
+
+        <!-- TIP BAR: ajakan cek status server -->
+        <div class="tip-bar px-3 py-2 d-inline-flex align-items-center gap-2">
+          <i class="bi bi-activity"></i>
+          <span class="small text-muted">
+            Tips: sebelum beli, <b>cek status server</b> biar pilih host yang sedang <span class="text-success">UP</span>.
+          </span>
+          <a href="status-server.html" class="btn btn-sm btn-outline-primary btn-status ms-2">
+            <i class="bi bi-graph-up-arrow me-1"></i> Cek Status Server
+          </a>
+        </div>
       </div>
     </section>
 
@@ -120,7 +148,7 @@
           </div>
         </div>
 
-        <!-- metode bayar hint -->
+        <!-- metode bayar hint + CTA status server -->
         <div class="filter-methods px-3 pb-3">
           <div class="d-flex flex-wrap align-items-center gap-2">
             <span class="text-muted small">Metode yang didukung:</span>
@@ -130,9 +158,14 @@
               <span class="pm pm-qris">QRIS</span>
               <span class="pm pm-retail">Retail</span>
             </div>
-            <a href="order-status.html" class="btn btn-outline-secondary ms-auto btn-sm">
-              <i class="bi bi-clipboard2-check me-1"></i> Cek Status Pesanan
-            </a>
+            <div class="ms-auto d-flex gap-2">
+              <a href="status-server.html" class="btn btn-outline-primary btn-sm btn-status">
+                <i class="bi bi-graph-up-arrow me-1"></i> Cek Status Server
+              </a>
+              <a href="order-status.html" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-clipboard2-check me-1"></i> Cek Status Pesanan
+              </a>
+            </div>
           </div>
         </div>
       </div>
@@ -198,11 +231,12 @@
                 </h2>
                 <div id="c0" class="accordion-collapse collapse show" data-bs-parent="#faqAcc" aria-labelledby="f0">
                   <div class="accordion-body">
-                    1) Pilih <b>Varian</b> & <b>Region</b> → klik <b>Beli</b> pada kartu server.<br/>
-                    2) Isi <b>protokol</b>, <b>username</b>, dan <b>email (wajib)</b> di modal checkout.<br/>
-                    3) (Opsional) Masukkan <b>kode promo</b> jika ada, diskon langsung diterapkan.<br/>
-                    4) Bayar via <b>Duitku</b> (Bank Transfer, E-Wallet, QRIS, Retail).<br/>
-                    5) Setelah <i>paid</i>, detail akun tampil otomatis & juga dikirim ke email.
+                    1) <b>Cek status server</b> di halaman <a href="status-server.html">Status Server</a> & pilih yang <span class="text-success">UP</span>.<br/>
+                    2) Pilih <b>Varian</b> & <b>Region</b> → klik <b>Beli</b> pada kartu server.<br/>
+                    3) Isi <b>protokol</b>, <b>username</b>, dan <b>email (wajib)</b> di modal checkout.<br/>
+                    4) (Opsional) Masukkan <b>kode promo</b> jika ada, diskon langsung diterapkan.<br/>
+                    5) Bayar via <b>Duitku</b> (Bank Transfer, E-Wallet, QRIS, Retail).<br/>
+                    6) Setelah <i>paid</i>, detail akun tampil otomatis & juga dikirim ke email.
                   </div>
                 </div>
               </div>
@@ -337,7 +371,8 @@
                 </div>
 
                 <div class="ch-trust small text-muted">
-                  <i class="bi bi-shield-check me-1"></i> Pastikan data pesanan sudah benar sebelum lanjut pembayaran.
+                  <i class="bi bi-shield-check me-1"></i>
+                  Disarankan cek <a href="status-server.html">Status Server</a> terlebih dahulu.
                 </div>
               </form>
             </div>
