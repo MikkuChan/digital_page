@@ -14,37 +14,14 @@
   <link href="css/style.css" rel="stylesheet" />
   <link href="css/ordervpn4.css" rel="stylesheet" />
   <script>
-    /* ===== Konfigurasi API & Rotasi Aset per JAM =====
-       Urutan folder yang dirorasi: backv1 -> backv2 -> backv3 -> (ulang)
-       Slot dihitung dari jam UTC saat ini (gampang & konsisten di semua device).
-    */
+    /* ===== Konfigurasi API & Rotasi Aset per JAM ===== */
     window.API_BASE = "https://call.fadzdigital.store";
-
     const ROTATION_BASES = ["assets/backv1", "assets/backv2", "assets/backv3"];
     const hourSlot = Math.floor(Date.now() / (60 * 60 * 1000)) % ROTATION_BASES.length;
     const chosenBase = ROTATION_BASES[hourSlot];
-
-    // Digunakan ordervpn.js saat load manifest gambar
     window.ASSET_BASE = chosenBase;
     window.ASSET_MANIFEST = `${chosenBase}/manifest.json`;
   </script>
-  <style>
-    /* Sentuhan kecil agar CTA status server standout rapi */
-    .tip-bar {
-      background: linear-gradient(180deg, rgba(13,110,253,.08), rgba(13,110,253,.03));
-      border: 1px solid rgba(13,110,253,.15);
-      border-radius: 14px;
-    }
-    .tip-bar .bi-activity { color: #0d6efd; }
-    .btn-status {
-      --bs-btn-color: #0d6efd;
-      --bs-btn-border-color: rgba(13,110,253,.35);
-      --bs-btn-hover-bg: rgba(13,110,253,.08);
-      --bs-btn-hover-border-color: rgba(13,110,253,.55);
-      --bs-btn-active-bg: rgba(13,110,253,.12);
-      backdrop-filter: saturate(120%) blur(3px);
-    }
-  </style>
 </head>
 <body>
   <!-- overlay -->
@@ -309,7 +286,7 @@
     </section>
   </main>
 
-  <!-- MODAL CHECKOUT (tetap seperti versi sebelumnya) -->
+  <!-- MODAL CHECKOUT -->
   <div class="modal fade" id="checkoutModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
       <div class="modal-content modal-checkout">
