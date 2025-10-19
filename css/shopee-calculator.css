@@ -1,0 +1,73 @@
+/* ==== Card & hero (tetap) ==== */
+.shopee-calc-card{background:#fff;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,.08);border:1px solid #e9ecef;transition:.3s}
+.shopee-calc-card:hover{box-shadow:0 8px 30px rgba(0,0,0,.12);transform:translateY(-2px)}
+.shopee-calc-hero .badge-tools{background:linear-gradient(100deg,#ff7043 60%,#ff5722 120%);color:#fff;border-radius:999px;font-weight:600;box-shadow:0 2px 12px rgba(255,87,34,.15)}
+.summary-box{background:#fafafa;border:1px solid #eee}
+.hidden{display:none!important}
+#sellingPrice{letter-spacing:.2px}
+
+/* ==== FORM STYLING (Improved) ==== */
+.shopee-calc-card form{background:#fff}
+.shopee-calc-card label{color:#1f2937;font-size:.95rem;transition:.2s}
+.shopee-calc-card .form-control,.shopee-calc-card .form-select{background:#f9fafb;border:1.5px solid #e5e7eb;border-radius:10px;padding:10px 14px;color:#1f2937;transition:.3s;font-size:.95rem}
+.shopee-calc-card .form-control:focus,.shopee-calc-card .form-select:focus{background:#fff;border-color:#ff7043;box-shadow:0 0 0 3px rgba(255,112,67,.1);color:#1f2937}
+.shopee-calc-card .form-control::placeholder{color:#9ca3af}
+.shopee-calc-card .row>[class*="col-"]{margin-bottom:2px}
+.shopee-calc-card .form-check{padding:12px 0;border-radius:10px;transition:.2s}
+.shopee-calc-card .form-check:hover{background:#f9fafb}
+.shopee-calc-card .form-check-input{width:20px;height:20px;border:2px solid #d1d5db;border-radius:6px;cursor:pointer;transition:.2s;margin-top:.35rem}
+.shopee-calc-card .form-check-input:checked{background-color:#ff7043;border-color:#ff7043;box-shadow:0 0 0 3px rgba(255,112,67,.1)}
+.shopee-calc-card .form-check-label{cursor:pointer;color:#1f2937;margin-left:8px;user-select:none}
+.go-fields,.promo-fields{transition:.3s;opacity:1}
+.go-fields.hidden,.promo-fields.hidden{opacity:0;height:0;overflow:hidden;margin:0!important;padding:0!important}
+
+/* Tombol */
+.shopee-calc-card .btn-primary{background:linear-gradient(135deg,#ff7043 0,#ff5722 100%);border:none;border-radius:10px;padding:12px 24px;font-weight:700;font-size:1rem;transition:.3s;box-shadow:0 4px 12px rgba(255,87,34,.3)}
+.shopee-calc-card .btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(255,87,34,.4);background:linear-gradient(135deg,#ff6035 0,#ff4413 100%)}
+
+/* Small text */
+.shopee-calc-card small.text-muted{color:#6b7280!important;font-size:.85rem;margin-top:4px;display:block}
+
+/* ==== Artikel / typography (dipersingkat) ==== */
+.shopee-article{line-height:1.72}
+.shopee-article h2,.shopee-article h3{color:#1f2937;font-weight:700}
+.shopee-article .shp-toc{background:linear-gradient(135deg,#f9fafb 0,#f3f4f6 100%);border:1px solid #e5e7eb;border-radius:12px;padding:16px}
+.shopee-article .shp-code{background:#0f172a;color:#e2e8f0;border-radius:10px;padding:16px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.9rem;overflow-x:auto;line-height:1.5;margin:12px 0;border:1px solid #1e293b}
+.table th,.table td{vertical-align:middle;padding:10px 12px;border:1px solid #e5e7eb}
+.callout{border:1px solid #e9ecef;border-left-width:4px;border-radius:12px;padding:14px 16px;background:#fff}
+.callout.info{border-left-color:#0dcaf0;background:#f8feff;border-color:#d1e9f2}
+.callout.success{border-left-color:#20c997;background:#f6fffb;border-color:#c8f2da}
+.callout.danger{border-left-color:#ff4d4f;background:#fff6f6;border-color:#ffccc7}
+.example-box{border:2px dashed #e0e0e0;border-radius:12px;padding:14px;margin-bottom:12px;background:linear-gradient(135deg,#fcfcfc 0,#f9f9f9 100%)}
+
+/* ==== RESULT UI ==== */
+.result-kpi{display:flex;align-items:center;gap:14px;padding:16px;background:linear-gradient(135deg,#f0f7ff 0,#f9faff 100%);border:2px solid #c7d2fe;border-radius:14px;margin-bottom:20px}
+.result-kpi i{font-size:1.8rem;color:#ff7043}
+.result-kpi .kpi-label{font-weight:700;color:#1f2937;font-size:.95rem}
+.result-kpi .kpi-amount{font-size:1.6rem;font-weight:900;color:#ff5722;letter-spacing:.5px}
+
+#result>ul{list-style:none;padding:0;margin:0 0 16px}
+#result>ul li{padding:8px 0;border-bottom:1px solid #f0f0f0;color:#4b5563;display:flex;justify-content:space-between;align-items:center}
+#result>ul li:last-child{border-bottom:none}
+
+.result-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0}
+@media (max-width:768px){.result-grid{grid-template-columns:1fr}}
+
+.result-card{border:1.5px solid #eef2f7;border-radius:14px;padding:16px;background:linear-gradient(135deg,#fafbfc 0,#f5f7f9 100%);box-shadow:0 2px 8px rgba(0,0,0,.04);transition:.2s}
+.result-card:hover{border-color:#d1d5db;box-shadow:0 4px 12px rgba(0,0,0,.08)}
+.result-card .card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid rgba(0,0,0,.05)}
+.result-card .card-title{font-weight:700;color:#1f2937}
+.result-card .card-amount{font-weight:900;color:#ff5722;font-size:1.1rem}
+.fee-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 0}
+.fee-row+.fee-row{border-top:1px dashed #e8eef4;padding-top:10px}
+.fee-row .label{color:#4b5563}
+.fee-row .value{font-variant-numeric:tabular-nums;min-width:110px;text-align:right;color:#1f2937;font-weight:700}
+.total-row{display:flex;justify-content:space-between;gap:12px;padding:12px 0;margin-top:8px;border-top:2.5px solid #ff7043;font-weight:800;color:#ff5722}
+.badge-cap{background:#fff3cd;color:#8a6c03;border:1px solid #ffe69c;border-radius:20px;padding:3px 10px;font-size:.75rem;font-weight:700}
+.badge-infochip{background:linear-gradient(135deg,#eef2ff 0,#faf5ff 100%);color:#3730a3;border:1px solid #c7d2fe;border-radius:20px;padding:4px 10px;font-size:.8rem;font-weight:700}
+.verify-ok{background:linear-gradient(135deg,#eafaf0 0,#f0fff4 100%);border:2px solid #6ee7b7;color:#065f46;border-radius:12px;padding:14px;font-weight:700;margin-top:16px}
+.verify-warn{background:linear-gradient(135deg,#fff8e6 0,#fffbf0 100%);border:2px solid #fbbf24;color:#7a4d00;border-radius:12px;padding:14px;font-weight:700;margin-top:16px}
+
+/* Animasi masuk */
+.fade-in-up{opacity:0;transform:translateY(12px);animation:fadeUp .45s ease forwards}
+@keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
