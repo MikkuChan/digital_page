@@ -5,7 +5,6 @@
   --radius-lg:14px; --radius-md:10px;
   --shadow:0 6px 18px rgba(2,6,23,.06);
 }
-
 /* ---------- Hero ---------- */
 .order-hero{
   background:linear-gradient(180deg,#fff 0%, #f3f7ff 100%);
@@ -16,12 +15,10 @@
   padding:.45rem .9rem;color:var(--primary-600);font-weight:600;
 }
 .text-dark-blue{color:var(--ink)}
-
 /* ---------- Loading overlay ---------- */
 .loading-overlay{position:fixed;inset:0;display:grid;place-items:center;background:#fff;z-index:999;transition:opacity .4s}
 .loading-spinner{width:40px;height:40px;border-radius:50%;border:4px solid #e8efff;border-top-color:var(--primary);animation:spin .9s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-
 /* ---------- Filter Bar ---------- */
 .filter-bar{
   position: relative;
@@ -41,7 +38,6 @@
   opacity:1; pointer-events:none; z-index:1;
 }
 .filter-bar .card-body{ padding:14px 16px; }
-
 /* Segmented buttons */
 .segmented{
   display:flex; gap:6px; padding:4px;
@@ -55,7 +51,6 @@
 }
 .seg-btn:hover{background:#e9edf5}
 .seg-btn.active{background:var(--primary); color:#fff}
-
 /* Search & Sort */
 .flex-1-min{min-width:260px}
 .search-ctrl{min-width:260px;flex:1}
@@ -71,7 +66,6 @@
 .sort-ctrl .form-select:focus{
   box-shadow:0 0 0 3px rgba(13,110,253,.12)
 }
-
 /* Promo pill */
 .promo-pill{
   display:inline-flex;align-items:center;gap:.4rem;
@@ -80,7 +74,6 @@
 }
 .promo-pill[data-status="on"]{color:#0a7a46;background:#eefcf5;border-color:#c8f3dd}
 .promo-pill[data-status="off"]{color:#8a4b10;background:#fff8ed;border-color:#ffe2c1}
-
 /* metode badges */
 .pm-badges{display:flex;flex-wrap:wrap;gap:.5rem}
 .pm{padding:.35rem .6rem;border-radius:999px;font-size:.8rem;font-weight:600;border:1px solid #e5e7eb;background:#fff;color:#334155}
@@ -88,13 +81,10 @@
 .pm-ew{border-color:#ffd6a5;background:#fff7e6}
 .pm-qris{border-color:#ffc2c2;background:#fff0f0}
 .pm-retail{border-color:#cdeccf;background:#f1fff1}
-
 .filter-methods{border-top:1px dashed var(--border);background:#fcfdff}
-
 /* ---------- Restore Payment banner ---------- */
 .pay-restore{border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow)}
 .pay-restore .spinner-border{width:1.35rem;height:1.35rem;border-width:.15rem}
-
 /* ---------- Catalog Grid & Cards ---------- */
 .catalog-grid{
   display:grid; gap:18px;
@@ -102,7 +92,6 @@
 }
 @media(min-width:576px){.catalog-grid{grid-template-columns:repeat(2,1fr)}}
 @media(min-width:992px){.catalog-grid{grid-template-columns:repeat(3,1fr)}}
-
 .card-prod{
   position:relative;
   border:1px solid var(--border);
@@ -122,14 +111,11 @@
   transform:scale(1.0); transition:transform .35s ease;
 }
 .card-prod:hover .thumb{ transform:scale(1.05); }
-
-/* subtle overlay at top for readability */
 .card-prod::after{
   content:""; position:absolute; inset:0 0 auto 0; height:64px;
   background:linear-gradient(180deg,rgba(0,0,0,.18),transparent);
   pointer-events:none;
 }
-
 /* Ribbon */
 .card-prod .badge-ribbon{
   position:absolute; top:12px; left:-6px;
@@ -138,7 +124,6 @@
   border-top-right-radius:10px; border-bottom-right-radius:10px;
   box-shadow:0 6px 14px rgba(255,131,51,.35);
 }
-
 /* Body */
 .card-prod .body{ padding:14px 14px 12px; }
 .card-prod .title{
@@ -154,8 +139,7 @@
   border:1px solid var(--border); background:#f8fafc; color:#334155
 }
 .card-prod .feat .chip i{ opacity:.7; margin-right:4px }
-
-/* CTA area with divider */
+/* CTA */
 .card-prod .cta{
   display:flex; justify-content:space-between; align-items:center; gap:10px;
   padding-top:10px; margin-top:8px; border-top:1px dashed #e7ecf5;
@@ -166,7 +150,6 @@
   -webkit-background-clip:text; background-clip:text; color:transparent;
 }
 .card-prod .price .per{ font-size:.8rem; opacity:.75; background:none; color:inherit }
-
 /* Buy button */
 .card-prod .btn-buy{
   border:0; border-radius:10px; padding:.6rem 1rem; font-weight:800;
@@ -176,7 +159,6 @@
 }
 .card-prod .btn-buy:hover{ transform:translateY(-1px); filter:brightness(1.05) }
 .card-prod .btn-buy:active{ transform:translateY(0); box-shadow:0 6px 14px rgba(13,110,253,.2) }
-
 /* ---------- Skeleton ---------- */
 .skeleton{
   height:292px;border-radius:14px;
@@ -184,7 +166,6 @@
   background-size:400% 100%; animation:shimmer 1.2s infinite
 }
 @keyframes shimmer{0%{background-position:100% 0}100%{background-position:-100% 0}}
-
 /* ---------- Modal Checkout ---------- */
 .modal-checkout{overflow:hidden;border-radius:14px}
 .ch-header{
@@ -194,7 +175,6 @@
 .ch-eyebrow{font-size:.8rem;opacity:.9;margin-bottom:2px}
 .ch-body{background:#fff}
 .ch-footer{background:#f8fafc;border-top:1px solid var(--border)}
-
 .ch-summary{
   border:1px solid var(--border); border-radius:12px; background:#fbfdff;
 }
@@ -211,14 +191,11 @@
   font-size:1.25rem; font-weight:800; color:#0a58ca; line-height:1.2;
 }
 .ch-price .note{min-height:1.2rem}
-
 .ch-methods .pm{margin-right:.25rem;margin-bottom:.25rem}
-
 .ch-trust{
   border:1px dashed var(--border);
   border-radius:10px; padding:.5rem .75rem; background:#fcfdff;
 }
-
 /* ---------- Mobile tweaks ---------- */
 @media (max-width:576px){
   .search-ctrl{min-width:100%}
@@ -227,8 +204,6 @@
   .pay-restore .card-body{gap:.75rem}
   .modal-dialog.modal-lg{margin:0 10px}
 }
-
-/* ===== FAQ Polished ===== */
 .faq-card{
   border:1px solid var(--border);
   border-radius:var(--radius-lg);
@@ -244,7 +219,6 @@
   font-size:.75rem; letter-spacing:.06em; color:#64748b;
 }
 .faq-desc{font-size:.95rem}
-
 .faq-grid{
   display:grid; gap:16px;
   grid-template-columns: 1fr;
@@ -252,8 +226,6 @@
 @media(min-width:992px){
   .faq-grid{ grid-template-columns: 2fr 1fr; }
 }
-
-/* Accordion look */
 .faq-accordion .accordion-item{
   border:1px solid var(--border);
   border-radius:12px;
@@ -283,8 +255,6 @@
   background:#fcfdff; border-top:1px dashed var(--border);
   padding: .9rem 1rem; color:#334155;
 }
-
-/* Icon bubble per item */
 .faq-icon{
   width:30px; height:30px; border-radius:999px;
   display:inline-grid; place-items:center;
@@ -295,8 +265,6 @@
 .bg-purple{background:#8b5cf6;}
 .bg-amber{ background:#f59e0b; }
 .bg-red{   background:#ef4444; }
-
-/* Right tips panel */
 .faq-side{
   border:1px dashed var(--border);
   border-radius:12px; padding:12px;
@@ -307,16 +275,12 @@
   background:#f1f5f9; border:1px solid var(--border); border-radius:10px;
   margin-bottom:.75rem;
 }
-
 /* mobile */
 @media(max-width:576px){
   .faq-accordion .accordion-button{ padding:.8rem .9rem; }
 }
-
-/* FAQ – single column */
+/* FAQ */
 .faq-grid{ grid-template-columns: 1fr !important; }
-
-/* ====== CTA Tip Bar & Button Status (FIX) ====== */
 .tip-bar{
   background: linear-gradient(180deg, rgba(13,110,253,.08), rgba(13,110,253,.03));
   border: 1px solid rgba(13,110,253,.15);
@@ -324,15 +288,11 @@
 }
 .tip-bar .bi-activity{ color:#0d6efd; }
 
-/* buat tombol outline tapi kontras jelas saat hover/active */
 .btn-status{
-  /* hilangkan efek blur supaya tidak pudar */
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
-
   border-width: 1.5px;
   font-weight: 600;
-  /* warna default mengikuti outline-primary */
   color: #0d6efd;
   border-color: rgba(13,110,253,.45);
   background-color: transparent;
@@ -343,8 +303,6 @@
   background-color:#e7f1ff;               /* jelas saat hover */
   border-color:#0b5ed7;
 }
-
-/* saat focus/active: biru solid + teks putih; hindari tampilan “pudar” */
 .btn-status:focus,
 .btn-status:active,
 .btn-status.active,
@@ -355,6 +313,27 @@
   box-shadow:0 0 0 .2rem rgba(13,110,253,.25) !important;
 }
 
-/* kalau tombol berupa <a>, cegah warna visited ungu */
 a.btn-status,
 a.btn-status:visited{ color:inherit; }
+
+/* ==== FIX DESKTOP ==== */
+@media (hover:hover) {
+  .btn.btn-outline-primary.btn-status:hover{
+    background-color:#cfe5ff !important;
+    border-color:#0d6efd !important;
+    color:#0b5ed7 !important;
+  }
+  .btn.btn-outline-primary.btn-status:active{
+    background-color:#0d6efd !important;
+    border-color:#0d6efd !important;
+    color:#fff !important;
+  }
+  .btn.btn-outline-primary.btn-status:focus,
+  .btn.btn-outline-primary.btn-status:focus-visible{
+    background-color:#0d6efd !important;
+    border-color:#0d6efd !important;
+    color:#fff !important;
+    box-shadow:0 0 0 .2rem rgba(13,110,253,.25) !important;
+  }
+}
+
