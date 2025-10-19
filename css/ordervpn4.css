@@ -22,7 +22,7 @@
 .loading-spinner{width:40px;height:40px;border-radius:50%;border:4px solid #e8efff;border-top-color:var(--primary);animation:spin .9s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* ---------- Filter Bar (selalu ada accent bar) ---------- */
+/* ---------- Filter Bar ---------- */
 .filter-bar{
   position: relative;
   border:1px solid var(--border);
@@ -313,6 +313,40 @@
   .faq-accordion .accordion-button{ padding:.8rem .9rem; }
 }
 
-/* FAQ – single column (no side panel) */
+/* FAQ – single column */
 .faq-grid{ grid-template-columns: 1fr !important; }
 
+/* === Fix kontras tombol Cek Status Server === */
+.btn-status {
+  /* base */
+  border-width: 1.5px;
+  font-weight: 600;
+  color: #0d6efd;
+  background: transparent;
+  border-color: rgba(13,110,253,.45);
+  backdrop-filter: none;             /* hilangin efek blur yang bikin terlihat pudar */
+  -webkit-backdrop-filter: none;
+}
+
+.btn-status:hover {
+  color: #0b5ed7;
+  background: #e7f1ff;               /* hover lebih jelas */
+  border-color: #0b5ed7;
+}
+
+/* aktif / pressed / focus: biru solid, teks putih */
+.btn-status:focus,
+.btn-status:active,
+.btn-status.active,
+.show > .btn-status.dropdown-toggle {
+  color: #fff !important;
+  background: #0d6efd !important;
+  border-color: #0d6efd !important;
+  box-shadow: 0 0 0 .2rem rgba(13,110,253,.25) !important;
+}
+
+/* ketika tombol berupa <a> agar tidak kena warna link visited */
+a.btn-status,
+a.btn-status:visited {
+  color: inherit;
+}
