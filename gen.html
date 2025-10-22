@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UID & Password Generator – fadzdigital</title>
+  <meta name="description" content="Generator UID (UUIDv4, NanoID) dan Password kuat dengan opsi lengkap." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root{--bg:#0b1020;--card:#11182a;--muted:#9fb0d0;--accent:#4f8cff;--ring:#6ea8ff}
+    html,body{height:100%}
+    body{font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";background:linear-gradient(120deg,#071225,#0b1222 40%,#0a0f1e), radial-gradient(1000px 600px at 80% -10%, rgba(79,140,255,.13), transparent);color:#e8f0ff}
+    .card{background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.01));backdrop-filter: blur(6px); border:1px solid rgba(255,255,255,.08)}
+    .glass{background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.1)}
+    .input{background:#0e1528;border:1px solid rgba(255,255,255,.08)}
+    .input:focus{outline:none; box-shadow:0 0 0 3px rgba(110,168,255,.35); border-color:var(--ring)}
+    .btn{background:linear-gradient(180deg,#1a2d53,#12213f); border:1px solid rgba(255,255,255,.12)}
+    .btn:hover{filter:brightness(1.08)}
+    .accent{color:#b2c8ff}
+    .mono{font-variant-ligatures:none}
+    .kbd{border:1px solid rgba(255,255,255,.25); background:rgba(255,255,255,.08)}
+  </style>
+</head>
+<body class="min-h-screen">
+  <header class="sticky top-0 z-20 border-b border-white/10 bg-[#0b1020]/70 backdrop-blur">
+    <div class="mx-auto max-w-6xl px-4 py-4">
+      <div class="flex items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div class="size-8 rounded-xl bg-gradient-to-br from-blue-400 to-cyan-400"></div>
+          <h1 class="text-lg font-semibold tracking-tight">UID & Password Generator</h1>
+        </div>
+        <div class="hidden sm:flex items-center gap-3 text-xs text-white/70">
+          <span class="kbd rounded-md px-2 py-1">Ctrl</span>
+          <span>+</span>
+          <span class="kbd rounded-md px-2 py-1">Enter</span>
+          <span class="ml-2">Generate cepat</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-6xl px-4 py-8">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- UID GENERATOR -->
+      <section class="card rounded-2xl p-6">
+        <div class="flex items-start justify-between">
+          <div>
+            <h2 class="text-xl font-semibold">UID Generator</h2>
+            <p class="mt-1 text-sm text-white/70">Buat pengenal unik untuk order, invoice, user, dsb.</p>
+          </div>
+          <div class="text-xs text-white/60">crypto-safe</div>
+        </div>
+
+        <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <label class="glass rounded-xl p-3 flex items-center gap-3 cursor-pointer">
+            <input type="radio" name="uidType" value="uuid" class="accent-blue-400" checked>
+            <div>
+              <div class="font-medium">UUID v4</div>
+              <div class="text-xs text-white/70">36 karakter (xxxxxxxx-xxxx-4xxx-xxxx-xxxxxxxxxxxx)</div>
+            </div>
+          </label>
+          <label class="glass rounded-xl p-3 flex items-center gap-3 cursor-pointer">
+            <input type="radio" name="uidType" value="nanoid" class="accent-blue-400">
+            <div>
+              <div class="font-medium">NanoID</div>
+              <div class="text-xs text-white/70">URL‑friendly, panjang bisa diatur</div>
+            </div>
+          </label>
+        </div>
+
+        <div id="nanoidLenWrap" class="mt-3 hidden">
+          <label class="text-sm text-white/80">Panjang NanoID
+            <span class="text-white/50" id="nanoidLenLabel">21</span>
+          </label>
+          <input id="nanoidLen" type="range" min="8" max="64" value="21" class="w-full"/>
+        </div>
+
+        <div class="mt-4 flex gap-2">
+          <button id="genUid" class="btn rounded-xl px-4 py-2 text-sm">Generate</button>
+          <button id="copyUid" class="btn rounded-xl px-4 py-2 text-sm">Copy</button>
+          <button id="bulkUid" class="btn rounded-xl px-4 py-2 text-sm">Bulk x10</button>
+        </div>
+
+        <div class="mt-4">
+          <textarea id="uidOut" rows="3" class="input mono w-full rounded-xl p-3 text-sm" placeholder="Hasil UID akan muncul di sini" readonly></textarea>
+        </div>
+
+        <p class="mt-2 text-xs text-white/60">Tip: tekan <span class="kbd rounded px-1.5">Ctrl</span>+<span class="kbd rounded px-1.5">Enter</span> untuk generate cepat.</p>
+      </section>
+
+      <!-- PASSWORD GENERATOR -->
+      <section class="card rounded-2xl p-6">
+        <div class="flex items-start justify-between">
+          <div>
+            <h2 class="text-xl font-semibold">Password Generator</h2>
+            <p class="mt-1 text-sm text-white/70">Buat password kuat dengan opsi lengkap.</p>
+          </div>
+          <div class="text-xs text-white/60">entropy‑based</div>
+        </div>
+
+        <div class="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <label class="flex items-center gap-2 text-sm"><input id="optLower" type="checkbox" class="accent-blue-400" checked> huruf kecil</label>
+          <label class="flex items-center gap-2 text-sm"><input id="optUpper" type="checkbox" class="accent-blue-400" checked> huruf besar</label>
+          <label class="flex items-center gap-2 text-sm"><input id="optDigits" type="checkbox" class="accent-blue-400" checked> angka</label>
+          <label class="flex items-center gap-2 text-sm"><input id="optSymbols" type="checkbox" class="accent-blue-400"> simbol</label>
+          <label class="flex items-center gap-2 text-sm"><input id="optNoSimilar" type="checkbox" class="accent-blue-400"> hindari mirip (0/O,1/l)</label>
+          <label class="flex items-center gap-2 text-sm"><input id="optRequireAll" type="checkbox" class="accent-blue-400" checked> wajib tiap tipe</label>
+        </div>
+
+        <div class="mt-3">
+          <label class="text-sm text-white/80">Panjang
+            <span class="text-white/50" id="lenLabel">16</span>
+          </label>
+          <input id="len" type="range" min="6" max="128" value="16" class="w-full"/>
+        </div>
+
+        <div class="mt-4 flex gap-2">
+          <button id="genPass" class="btn rounded-xl px-4 py-2 text-sm">Generate</button>
+          <button id="copyPass" class="btn rounded-xl px-4 py-2 text-sm">Copy</button>
+          <button id="showPass" class="btn rounded-xl px-4 py-2 text-sm">Tampilkan</button>
+        </div>
+
+        <div class="mt-4 grid gap-2">
+          <input id="passOut" type="password" class="input mono w-full rounded-xl p-3 text-sm" placeholder="Password akan muncul di sini" readonly />
+
+          <!-- Strength meter -->
+          <div class="w-full h-2 rounded bg-white/10 overflow-hidden">
+            <div id="strengthBar" class="h-full w-0 bg-blue-400 transition-all"></div>
+          </div>
+          <div id="entropyText" class="text-xs text-white/70">Entropy: 0 bit — <span class="accent">lemah</span></div>
+        </div>
+      </section>
+    </div>
+
+    <!-- FOOTER SHORTCUTS -->
+    <div class="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div class="glass rounded-2xl p-5">
+        <div class="text-sm font-semibold mb-2">Shortcut</div>
+        <ul class="text-sm text-white/70 list-disc pl-5 space-y-1">
+          <li><span class="kbd rounded px-1.5">Ctrl</span>+<span class="kbd rounded px-1.5">Enter</span> → Generate UID</li>
+          <li><span class="kbd rounded px-1.5">Ctrl</span>+<span class="kbd rounded px-1.5">G</span> → Generate Password</li>
+          <li>Klik <em>Bulk x10</em> untuk membuat 10 UID sekaligus</li>
+        </ul>
+      </div>
+      <div class="glass rounded-2xl p-5">
+        <div class="text-sm font-semibold mb-2">Catatan Keamanan</div>
+        <ul class="text-sm text-white/70 list-disc pl-5 space-y-1">
+          <li>Generator memakai <code class="mono">crypto.getRandomValues</code> (CSPRNG) di browser yang mendukung.</li>
+          <li>Hindari menyimpan password di catatan yang tidak terenkripsi.</li>
+          <li>Untuk akun penting, gunakan panjang ≥ 16 dan aktifkan semua tipe karakter.</li>
+        </ul>
+      </div>
+      <div class="glass rounded-2xl p-5">
+        <div class="text-sm font-semibold mb-2">Integrasi Cepat</div>
+        <ul class="text-sm text-white/70 list-disc pl-5 space-y-1">
+          <li>Copy hasil ke clipboard dengan sekali klik.</li>
+          <li>Gunakan Bulk UID untuk seed order/invoice.</li>
+          <li>Entropy dihitung otomatis berdasarkan set karakter dan panjang.</li>
+        </ul>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // ===== Utilities =====
+    const randBytes = (n) => {
+      const a = new Uint8Array(n);
+      (crypto && crypto.getRandomValues) ? crypto.getRandomValues(a) : a.forEach((_, i) => a[i] = Math.floor(Math.random()*256));
+      return a;
+    };
+
+    const toHex = (b) => [...b].map(x => x.toString(16).padStart(2, '0')).join('');
+
+    // UUID v4 (RFC 4122)
+    function uuidv4(){
+      const b = randBytes(16);
+      b[6] = (b[6] & 0x0f) | 0x40; // version 4
+      b[8] = (b[8] & 0x3f) | 0x80; // variant
+      const h = toHex(b);
+      return `${h.substr(0,8)}-${h.substr(8,4)}-${h.substr(12,4)}-${h.substr(16,4)}-${h.substr(20)}`;
+    }
+
+    // NanoID (URL-friendly)
+    const nanoAlphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz-';
+    function nanoid(len=21){
+      const mask = (2 << Math.floor(Math.log2(nanoAlphabet.length - 1))) - 1;
+      const step = Math.ceil(1.6 * mask * len / nanoAlphabet.length);
+      let id = '';
+      while (id.length < len){
+        const bytes = randBytes(step);
+        for (let i=0; i<step; i++){
+          const byte = bytes[i] & mask;
+          if (nanoAlphabet[byte]) id += nanoAlphabet[byte];
+          if (id.length === len) return id;
+        }
+      }
+      return id;
+    }
+
+    // Password Generator
+    const group = {
+      lower: 'abcdefghijkmnopqrstuvwxyz', // exclude l
+      upper: 'ABCDEFGHJKLMNPQRSTUVWXYZ', // exclude O
+      digits: '23456789', // exclude 0,1
+      symbols: '!@#$%^&*()_+[]{}|;:,.<>?~-=\\/'
+    };
+    const groupFull = {
+      lower: 'abcdefghijklmnopqrstuvwxyz',
+      upper: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+      digits: '0123456789',
+      symbols: '!@#$%^&*()_+[]{}|;:,.<>?~-=\\/'
+    };
+
+    function buildCharset(opts){
+      const base = opts.noSimilar ? group : groupFull;
+      let pool = '';
+      let meta = [];
+      if (opts.lower) { pool += base.lower; meta.push(base.lower); }
+      if (opts.upper) { pool += base.upper; meta.push(base.upper); }
+      if (opts.digits){ pool += base.digits; meta.push(base.digits);} 
+      if (opts.symbols){ pool += base.symbols; meta.push(base.symbols);} 
+      return { pool, meta };
+    }
+
+    function randomFrom(pool){
+      const bytes = randBytes(1)[0];
+      return pool[bytes % pool.length];
+    }
+
+    function generatePassword(len, opts){
+      const { pool, meta } = buildCharset(opts);
+      if (!pool) throw new Error('Pilih minimal satu tipe karakter');
+      if (len < meta.length && opts.requireAll) throw new Error('Panjang terlalu pendek untuk memenuhi semua tipe');
+
+      const out = new Array(len);
+      // Pastikan minimal 1 dari tiap tipe jika diminta
+      if (opts.requireAll){
+        for (let i=0; i<meta.length; i++) out[i] = randomFrom(meta[i]);
+      }
+      for (let i=(opts.requireAll?meta.length:0); i<len; i++) out[i] = randomFrom(pool);
+      // Fisher-Yates shuffle
+      for (let i=out.length-1; i>0; i--){
+        const j = randBytes(1)[0] % (i+1); [out[i], out[j]] = [out[j], out[i]];
+      }
+      return out.join('');
+    }
+
+    function calcEntropy(len, poolSize){
+      // Entropy ~ log2(pool^len) = len * log2(pool)
+      const e = len * (Math.log2(poolSize));
+      return e;
+    }
+
+    function classifyEntropy(e){
+      if (e < 40) return ['Lemah', 20];
+      if (e < 60) return ['Cukup', 45];
+      if (e < 80) return ['Kuat', 70];
+      return ['Sangat kuat', 100];
+    }
+
+    // ===== DOM Hooks =====
+    const uidType = () => document.querySelector('input[name="uidType"]:checked').value;
+    const nanoidLen = document.getElementById('nanoidLen');
+    const nanoidLenLabel = document.getElementById('nanoidLenLabel');
+    const nanoidLenWrap = document.getElementById('nanoidLenWrap');
+
+    const uidOut = document.getElementById('uidOut');
+    const genUid = document.getElementById('genUid');
+    const copyUid = document.getElementById('copyUid');
+    const bulkUid = document.getElementById('bulkUid');
+
+    const optLower = document.getElementById('optLower');
+    const optUpper = document.getElementById('optUpper');
+    const optDigits = document.getElementById('optDigits');
+    const optSymbols = document.getElementById('optSymbols');
+    const optNoSimilar = document.getElementById('optNoSimilar');
+    const optRequireAll = document.getElementById('optRequireAll');
+    const len = document.getElementById('len');
+    const lenLabel = document.getElementById('lenLabel');
+
+    const genPass = document.getElementById('genPass');
+    const copyPass = document.getElementById('copyPass');
+    const showPass = document.getElementById('showPass');
+    const passOut = document.getElementById('passOut');
+    const strengthBar = document.getElementById('strengthBar');
+    const entropyText = document.getElementById('entropyText');
+
+    // ===== Events =====
+    document.querySelectorAll('input[name="uidType"]').forEach(r => r.addEventListener('change', () => {
+      nanoidLenWrap.classList.toggle('hidden', uidType() !== 'nanoid');
+    }));
+
+    nanoidLen.addEventListener('input', () => nanoidLenLabel.textContent = nanoidLen.value);
+    len.addEventListener('input', () => lenLabel.textContent = len.value);
+
+    function doGenUID(){
+      const t = uidType();
+      if (t === 'uuid') uidOut.value = uuidv4();
+      else uidOut.value = nanoid(parseInt(nanoidLen.value,10));
+    }
+
+    genUid.addEventListener('click', doGenUID);
+    bulkUid.addEventListener('click', () => {
+      const t = uidType();
+      const list = [];
+      for (let i=0;i<10;i++) list.push(t==='uuid' ? uuidv4() : nanoid(parseInt(nanoidLen.value,10)));
+      uidOut.value = list.join('\n');
+    });
+
+    copyUid.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(uidOut.value || '');
+      toast('UID disalin');
+    });
+
+    function readOpts(){
+      return {
+        lower: optLower.checked,
+        upper: optUpper.checked,
+        digits: optDigits.checked,
+        symbols: optSymbols.checked,
+        noSimilar: optNoSimilar.checked,
+        requireAll: optRequireAll.checked
+      }
+    }
+
+    function updateStrengthPreview(){
+      const opts = readOpts();
+      const { pool } = buildCharset(opts);
+      const L = parseInt(len.value,10);
+      const ent = pool ? calcEntropy(L, pool.length) : 0;
+      const [label, pct] = classifyEntropy(ent);
+      strengthBar.style.width = pct + '%';
+      entropyText.innerHTML = `Entropy: ${ent.toFixed(1)} bit — <span class="accent">${label.toLowerCase()}</span>`;
+    }
+
+    function doGenPass(){
+      try{
+        const p = generatePassword(parseInt(len.value,10), readOpts());
+        passOut.value = p;
+        updateStrengthPreview();
+      }catch(e){ toast(e.message || 'Gagal generate'); }
+    }
+
+    genPass.addEventListener('click', doGenPass);
+    copyPass.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(passOut.value || '');
+      toast('Password disalin');
+    });
+    showPass.addEventListener('click', () => {
+      passOut.type = passOut.type === 'password' ? 'text' : 'password';
+      showPass.textContent = passOut.type === 'password' ? 'Tampilkan' : 'Sembunyikan';
+    });
+
+    // Shortcuts
+    window.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.key === 'Enter'){ e.preventDefault(); doGenUID(); }
+      if (e.ctrlKey && (e.key.toLowerCase() === 'g')){ e.preventDefault(); doGenPass(); }
+    });
+
+    // Init
+    updateStrengthPreview();
+
+    // ===== Tiny toast =====
+    let toastEl = null, toastTimer = null;
+    function toast(msg){
+      if (!toastEl){
+        toastEl = document.createElement('div');
+        toastEl.className = 'fixed bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 rounded-xl bg-white/10 border border-white/20 text-sm backdrop-blur z-50';
+        document.body.appendChild(toastEl);
+      }
+      toastEl.textContent = msg;
+      toastEl.style.opacity = '1';
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(()=> toastEl.style.opacity = '0', 1400);
+    }
+  </script>
+</body>
+</html>
