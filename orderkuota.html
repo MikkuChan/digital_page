@@ -1,181 +1,126 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <title>Order Kuota – fadzdigital</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Login nomor XL via OTP, cek paket aktif, dan order kuota. Pembayaran langsung ke provider (DANA/QRIS/Pulsa)." />
-  <link rel="icon" href="https://raw.githubusercontent.com/fadzdigital/image/main/favicon.ico" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Order Kuota XL — FADZDigital</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/orderkuota.css" />
 </head>
 <body>
   <header class="site-header">
-    <div class="container header-wrap">
+    <div class="wrap">
       <div class="brand">
-        <img src="https://raw.githubusercontent.com/fadzdigital/image/main/logo-fadzdigital.png" alt="fadzdigital" />
-        <span>Order Kuota</span>
+        <span class="logo">FDZ</span>
+        <div class="brand-text">
+          <h1>FADZDigital</h1>
+          <p>Jasa Order Kuota XL (via Duitku)</p>
+        </div>
       </div>
       <nav class="nav">
-        <a href="/" class="nav-link">Home</a>
-        <a href="#" id="btn-open-help" class="nav-link">Bantuan</a>
+        <a href="#" id="navHome" class="active">Beranda</a>
+        <a href="#status" id="navStatus">Status</a>
       </nav>
     </div>
   </header>
 
-  <main class="container main">
-    <!-- Alerts / Toast -->
-    <div id="toast" class="toast hidden"></div>
-
-    <!-- Login / Session -->
-    <section class="card" id="sec-login">
-      <h2 class="card-title">Masuk Nomor XL via OTP</h2>
-      <p class="muted">Masukkan nomor XL (format 08xxxxxxxxxx). Kita kirim OTP, lalu verifikasi.</p>
-
-      <div class="grid grid-2 gap">
-        <div class="form-group">
-          <label for="inp-nohp">Nomor XL</label>
-          <input type="tel" id="inp-nohp" placeholder="08xxxxxxxxxx" inputmode="numeric" />
+  <main class="wrap">
+    <!-- Login OTP -->
+    <section class="card" id="otpSection">
+      <h2>1) Login Nomor XL kamu</h2>
+      <p class="muted">Masukkan nomor XL (format 08xxxx). Kamu akan menerima OTP via SMS dari upstream.</p>
+      <form id="otpForm" class="grid-otp">
+        <div class="input-group">
+          <label for="no_hp">Nomor XL</label>
+          <input type="tel" id="no_hp" name="no_hp" placeholder="08xxxxxxxxxx" autocomplete="tel" required>
         </div>
-        <div class="form-group actions align-end">
-          <button id="btn-otp-request" class="btn btn-primary">Kirim OTP</button>
+        <div class="input-group btn-row">
+          <button type="button" id="btnReqOtp" class="btn">Kirim OTP</button>
+        </div>
+        <div class="input-group">
+          <label for="auth_id">Auth ID</label>
+          <input type="text" id="auth_id" name="auth_id" placeholder="dari respon Kirim OTP" required>
+        </div>
+        <div class="input-group">
+          <label for="kode_otp">Kode OTP</label>
+          <input type="text" id="kode_otp" name="kode_otp" inputmode="numeric" placeholder="6 digit" required>
+        </div>
+        <div class="input-group btn-row">
+          <button type="button" id="btnVerifyOtp" class="btn btn-primary">Verifikasi OTP</button>
+        </div>
+      </form>
+      <div id="otpStatus" class="status"></div>
+      <div id="sessionBadge" class="badge hidden">Nomor sudah login ✔</div>
+    </section>
+
+    <!-- Katalog Paket -->
+    <section class="card" id="catalogSection">
+      <h2>2) Pilih Paket</h2>
+      <div id="catalogGrid" class="grid-cards"></div>
+      <div id="catalogEmpty" class="empty hidden">Katalog kosong.</div>
+    </section>
+
+    <!-- Status & Pembayaran -->
+    <section class="card" id="statusSection">
+      <h2>3) Pembayaran & Status</h2>
+      <div class="status-grid">
+        <div>
+          <label for="status_no_hp">Nomor XL</label>
+          <input type="tel" id="status_no_hp" placeholder="08xxxxxxxxxx">
+        </div>
+        <div>
+          <label for="status_order_id">Order ID</label>
+          <input type="text" id="status_order_id" placeholder="FDZK-...">
+        </div>
+        <div class="btn-row">
+          <button id="btnCheckStatus" class="btn">Cek Status</button>
+          <button id="btnPollStatus" class="btn btn-outline">Auto Poll</button>
         </div>
       </div>
 
-      <div id="otp-area" class="grid grid-2 gap hidden">
-        <div class="form-group">
-          <label for="inp-otp">Kode OTP</label>
-          <input type="text" id="inp-otp" placeholder="6 digit" inputmode="numeric" />
-          <div class="muted small" id="otp-hint"></div>
-        </div>
-        <div class="form-group actions align-end">
-          <button id="btn-otp-verify" class="btn btn-success">Verifikasi</button>
-        </div>
-      </div>
-
-      <div id="session-bar" class="session-bar hidden">
-        <div class="pill pill-ok">Masuk</div>
-        <div><b id="sess-msisdn">-</b></div>
-        <div class="spacer"></div>
-        <button id="btn-check-detail" class="btn btn-ghost">Cek Paket Aktif</button>
-        <button id="btn-logout" class="btn btn-outline">Keluar</button>
+      <div id="payResult" class="pay-result">
+        <!-- Dinamis: ringkasan order jasa, deeplink DANA/QRIS, dll -->
       </div>
     </section>
 
-    <!-- Detail paket aktif -->
-    <section class="card" id="sec-detail" hidden>
-      <div class="card-head">
-        <h2 class="card-title">Paket Aktif</h2>
-        <button id="btn-refresh-detail" class="btn btn-ghost small">Refresh</button>
+    <!-- Detail Paket Aktif -->
+    <section class="card" id="detailSection">
+      <h2>4) Detail Paket Aktif (opsional)</h2>
+      <div class="status-grid">
+        <div>
+          <label for="detail_no_hp">Nomor XL</label>
+          <input type="tel" id="detail_no_hp" placeholder="08xxxxxxxxxx">
+        </div>
+        <div class="btn-row">
+          <button id="btnFetchDetail" class="btn">Cek Paket Aktif</button>
+        </div>
       </div>
-      <div id="detail-content" class="detail-content">
-        <div class="muted">Belum ada data.</div>
-      </div>
+      <div id="detailBox" class="detail-box"></div>
     </section>
-
-    <!-- Katalog paket -->
-    <section class="card" id="sec-katalog" hidden>
-      <div class="card-head">
-        <h2 class="card-title">Katalog Paket Kuota</h2>
-        <div class="filters">
-          <input type="text" id="inp-search" class="search" placeholder="Cari paket / metode..." />
-          <button id="btn-reload-katalog" class="btn btn-ghost small">Muat Ulang</button>
-        </div>
-      </div>
-      <div id="katalog-grid" class="katalog-grid">
-        <!-- kartu paket append di sini -->
-      </div>
-    </section>
-
-    <!-- Modal Order -->
-    <dialog id="modal-order" class="modal">
-      <form method="dialog" class="modal-card">
-        <div class="modal-head">
-          <h3 id="mo-title">Order Paket</h3>
-          <button class="btn-close" aria-label="close">&times;</button>
-        </div>
-        <div class="modal-body">
-          <div id="mo-desc" class="muted"></div>
-          <div class="form-group mt">
-            <label for="mo-nohp">Nomor XL</label>
-            <input type="tel" id="mo-nohp" placeholder="08xxxxxxxxxx" />
-          </div>
-        </div>
-        <div class="modal-foot">
-          <button class="btn btn-ghost" value="cancel">Batal</button>
-          <button id="mo-submit" class="btn btn-primary" value="default">Bayar</button>
-        </div>
-      </form>
-    </dialog>
-
-    <!-- Modal Pembayaran -->
-    <dialog id="modal-pay" class="modal">
-      <form method="dialog" class="modal-card">
-        <div class="modal-head">
-          <h3 id="mp-title">Instruksi Pembayaran</h3>
-          <button class="btn-close" aria-label="close">&times;</button>
-        </div>
-        <div class="modal-body">
-          <div id="mp-summary" class="summary"></div>
-
-          <div id="mp-deeplink" class="deeplink hidden">
-            <p>Tekan tombol di bawah untuk membuka aplikasi pembayaran:</p>
-            <a id="mp-deeplink-btn" href="#" target="_blank" rel="noopener" class="btn btn-success block">Buka DANA</a>
-          </div>
-
-          <div id="mp-qris" class="qris hidden">
-            <p>Scan QRIS ini dari aplikasi e-wallet / m-banking kamu.</p>
-            <div class="qris-box">
-              <textarea id="mp-qris-text" readonly></textarea>
-              <div class="qris-actions">
-                <button type="button" id="mp-copy" class="btn btn-outline small">Salin Payload</button>
-                <button type="button" id="mp-save" class="btn btn-ghost small">Simpan .txt</button>
-              </div>
-            </div>
-            <div class="muted small">* Ini adalah payload string QRIS. Kamu bisa generate QR di aplikasi kasir/ewallet atau tempel ke generator lokalmu.</div>
-            <div id="mp-countdown" class="countdown"></div>
-          </div>
-        </div>
-        <div class="modal-foot">
-          <button class="btn btn-primary" value="default">Tutup</button>
-        </div>
-      </form>
-    </dialog>
-
-    <!-- Bantuan -->
-    <dialog id="modal-help" class="modal">
-      <form method="dialog" class="modal-card">
-        <div class="modal-head">
-          <h3>Panduan Singkat</h3>
-          <button class="btn-close" aria-label="close">&times;</button>
-        </div>
-        <div class="modal-body">
-          <ol class="help-list">
-            <li>Masukkan nomor XL (format 08xxxxxxxxxx), kirim OTP, lalu verifikasi.</li>
-            <li>Cek <b>Paket Aktif</b> untuk melihat kuota yang sudah ada.</li>
-            <li>Pilih paket dari <b>Katalog</b>, klik <b>Order</b>, lalu bayar langsung ke provider (DANA/QRIS/Pulsa).</li>
-            <li>Jika QRIS: salin payload QRIS dan tampilkan sebagai QR di perangkat kasir/aplikasi QRIS kamu.</li>
-          </ol>
-        </div>
-        <div class="modal-foot">
-          <button class="btn btn-primary" value="default">Oke</button>
-        </div>
-      </form>
-    </dialog>
   </main>
 
+  <!-- Modal (Pembayaran Duitku) -->
+  <div id="modal" class="modal hidden">
+    <div class="modal-card">
+      <button class="modal-close" id="modalClose" aria-label="Tutup">✕</button>
+      <h3>Bayar Jasa via Duitku</h3>
+      <p>Buka link pembayaran di tab baru. Setelah bayar, halaman ini akan otomatis memantau status.</p>
+      <div class="modal-actions">
+        <a id="openPayLink" href="#" class="btn btn-primary" target="_blank" rel="noopener">Buka Link Pembayaran</a>
+        <button id="startPolling" class="btn btn-outline">Mulai Auto Poll</button>
+      </div>
+      <div id="modalInfo" class="muted small"></div>
+    </div>
+  </div>
+
   <footer class="site-footer">
-    <div class="container footer-wrap">
-      <div>© <span id="year"></span> fadzdigital. All rights reserved.</div>
-      <div class="muted small">Pembayaran diproses langsung oleh provider upstream (DANA/QRIS/Pulsa).</div>
+    <div class="wrap">
+      <p>© <span id="year"></span> FADZDigital</p>
     </div>
   </footer>
 
-  <script>
-    window.FDZ_BACKEND_BASE = "https://call.fadzdigital.store";
-  </script>
-  <script src="js/orderkuota.js"></script>
+  <script>window.FDZ_BACKEND_BASE="https://call.fadzdigital.store";</script>
+  <script src="js/orderkuota.js" defer></script>
 </body>
 </html>
