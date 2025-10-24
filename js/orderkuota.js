@@ -1,411 +1,404 @@
 (() => {
-  const $ = sel => document.querySelector(sel);
-  const $$ = sel => document.querySelectorAll(sel);
-  const apiBase = (window.FDZ_BACKEND_BASE || '').replace(/\/+$/,'') || 'https://call.fadzdigital.store';
+  const BASE = window.FDZ_BACKEND_BASE || 'https://call.fadzdigital.store';
 
-  const toast = $('#toast');
-  function showToast(msg, type='ok', ms=2500){
-    toast.textContent = msg;
-    toast.className = `toast ${type}`;
-    toast.classList.remove('hidden');
-    setTimeout(()=>toast.classList.add('hidden'), ms);
-  }
+  const $ = (sel, root = document) => root.querySelector(sel);
+  const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
+  const fmt = (x) => new Intl.NumberFormat('id-ID').format(x);
 
-  function toUpstreamNo(input){
-    let s = String(input||'').trim();
-    if (!s) return '';
-    if (s.startsWith('+62')) s = '0' + s.slice(3);
-    else if (s.startsWith('62')) s = '0' + s.slice(2);
-    return s;
-  }
-
-  function saveMsisdn(msisdn){
-    localStorage.setItem('fdz_msisdn', msisdn);
-  }
-  function getMsisdn(){
-    return localStorage.getItem('fdz_msisdn') || '';
-  }
-  function clearMsisdn(){
-    localStorage.removeItem('fdz_msisdn');
-  }
-
-  async function api(path, {method='GET', json=null}={}){
-    const url = `${apiBase}${path}`;
-    const opt = { method, headers:{} };
-    if (json){
-      opt.headers['Content-Type'] = 'application/json';
-      opt.body = JSON.stringify(json);
+  const els = {
+    year: $('#year'),
+    otp: {
+      form: $('#otpForm'),
+      nohp: $('#no_hp'),
+      auth: $('#auth_id'),
+      code: $('#kode_otp'),
+      btnReq: $('#btnReqOtp'),
+      btnVerify: $('#btnVerifyOtp'),
+      status: $('#otpStatus'),
+      badge: $('#sessionBadge')
+    },
+    catalog: {
+      grid: $('#catalogGrid'),
+      empty: $('#catalogEmpty')
+    },
+    pay: {
+      section: $('#statusSection'),
+      nohp: $('#status_no_hp'),
+      order: $('#status_order_id'),
+      btnCheck: $('#btnCheckStatus'),
+      btnPoll: $('#btnPollStatus'),
+      box: $('#payResult')
+    },
+    detail: {
+      nohp: $('#detail_no_hp'),
+      btn: $('#btnFetchDetail'),
+      box: $('#detailBox')
+    },
+    modal: {
+      root: $('#modal'),
+      close: $('#modalClose'),
+      openPay: $('#openPayLink'),
+      startPoll: $('#startPolling'),
+      info: $('#modalInfo')
+    },
+    nav: {
+      home: $('#navHome'),
+      status: $('#navStatus')
     }
-    const r = await fetch(url, opt);
-    const t = await r.text().catch(()=> '');
-    let j = {};
-    try{ j = JSON.parse(t); }catch{ j = { raw:t }; }
-    if (!r.ok) throw new Error(j?.message || `HTTP ${r.status}`);
+  };
+
+  // ---------- Utils ----------
+  function toast(el, msg, ok = true){
+    el.textContent = msg;
+    el.style.color = ok ? '#b8ffe5' : '#ffb3ba';
+  }
+  function show(el){ el.classList.remove('hidden'); }
+  function hide(el){ el.classList.add('hidden'); }
+
+  async function apiGET(path){
+    const r = await fetch(`${BASE}${path}`, { method:'GET', headers:{ 'Accept':'application/json' }});
+    const t = await r.text();
+    const j = JSON.parse(t);
+    if (!r.ok || j?.ok === false) throw new Error(j?.message || `HTTP ${r.status}`);
+    return j;
+  }
+  async function apiPOST(path, data){
+    const r = await fetch(`${BASE}${path}`, {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json', 'Accept':'application/json' },
+      body: JSON.stringify(data || {})
+    });
+    const t = await r.text();
+    const j = JSON.parse(t);
+    if (!r.ok || j?.ok === false || j?.status >= 400) throw new Error(j?.message || `HTTP ${r.status}`);
     return j;
   }
 
-  // Elements
-  const yearEl = $('#year');
-  const secLogin = $('#sec-login');
-  const inpNo = $('#inp-nohp');
-  const btnOtpReq = $('#btn-otp-request');
-  const otpArea = $('#otp-area');
-  const inpOtp = $('#inp-otp');
-  const btnOtpVerify = $('#btn-otp-verify');
-  const otpHint = $('#otp-hint');
-  const sessionBar = $('#session-bar');
-  const sessMsisdn = $('#sess-msisdn');
-  const btnLogout = $('#btn-logout');
-  const btnCheckDetail = $('#btn-check-detail');
-
-  const secDetail = $('#sec-detail');
-  const btnRefreshDetail = $('#btn-refresh-detail');
-  const detailContent = $('#detail-content');
-
-  const secKatalog = $('#sec-katalog');
-  const katalogGrid = $('#katalog-grid');
-  const inpSearch = $('#inp-search');
-  const btnReloadKatalog = $('#btn-reload-katalog');
-
-  const modalOrder = $('#modal-order');
-  const moTitle = $('#mo-title');
-  const moDesc = $('#mo-desc');
-  const moNo = $('#mo-nohp');
-  const moSubmit = $('#mo-submit');
-
-  const modalPay = $('#modal-pay');
-  const mpTitle = $('#mp-title');
-  const mpSummary = $('#mp-summary');
-  const mpDeeplinkBox = $('#mp-deeplink');
-  const mpDeeplinkBtn = $('#mp-deeplink-btn');
-  const mpQrisBox = $('#mp-qris');
-  const mpQrisText = $('#mp-qris-text');
-  const mpCopy = $('#mp-copy');
-  const mpSave = $('#mp-save');
-  const mpCountdown = $('#mp-countdown');
-
-  const helpBtn = $('#btn-open-help');
-  const modalHelp = $('#modal-help');
-
-  // State
-  let lastAuthId = null; // dari /kuota/otp/request
-  let katalog = [];
-  let currentOrder = null;
-  let qrisTimer = null;
-
-  function setLoading(el, on=true){
-    if (!el) return;
-    if (on){
-      el.setAttribute('disabled','disabled');
-      el.dataset._txt = el.textContent;
-      el.textContent = 'Memproses...';
-    } else {
-      el.removeAttribute('disabled');
-      if (el.dataset._txt) el.textContent = el.dataset._txt;
+  function saveMsisdn(no){
+    localStorage.setItem('fdz.msisdn', no);
+    els.otp.nohp.value = no;
+    els.pay.nohp.value = no;
+    els.detail.nohp.value = no;
+  }
+  function loadMsisdn(){
+    const s = localStorage.getItem('fdz.msisdn') || '';
+    if (s) {
+      els.otp.nohp.value = s;
+      els.pay.nohp.value = s;
+      els.detail.nohp.value = s;
     }
+    return s;
+  }
+  function saveOrderId(id){ localStorage.setItem('fdz.orderId', id); els.pay.order.value = id; }
+  function loadOrderId(){ const s = localStorage.getItem('fdz.orderId') || ''; if (s) els.pay.order.value = s; return s; }
+
+  function openModal(payUrl){
+    els.modal.openPay.href = payUrl;
+    show(els.modal.root);
+  }
+  function closeModal(){ hide(els.modal.root); }
+
+  function renderCatalog(items){
+    els.catalog.grid.innerHTML = '';
+    if (!items || !items.length) {
+      show(els.catalog.empty);
+      return;
+    }
+    hide(els.catalog.empty);
+
+    items.forEach(item => {
+      const card = document.createElement('div');
+      card.className = 'pcard';
+      card.innerHTML = `
+        <div class="meta">
+          <span class="pill">${item.payment_method}</span>
+        </div>
+        <h3>${escapeHtml(item.package_named_show)}</h3>
+        <div class="price">Rp ${fmt(item.price_paket_show)}</div>
+        <div class="desc">${escapeHtml(item.desc_package_show)}</div>
+        <div class="actions">
+          <button class="btn btn-primary">Order</button>
+          <button class="btn btn-outline">Salin ID Paket</button>
+        </div>
+      `;
+      const [btnOrder, btnCopy] = card.querySelectorAll('button');
+
+      btnOrder.addEventListener('click', async () => {
+        const msisdn = (els.otp.nohp.value || '').trim();
+        if (!/^(08)\d{8,12}$/.test(msisdn)) {
+          alert('Masukkan nomor 08xxxxxxxxxx yang valid lalu login OTP dulu.');
+          return;
+        }
+        try {
+          btnOrder.disabled = true;
+          btnOrder.textContent = 'Membuat Invoice...';
+          const res = await apiPOST('/kuota/pay/create', { paket_id: item.paket_id, no_hp: msisdn });
+          const { orderId, paymentUrl } = res || {};
+          if (!orderId || !paymentUrl) throw new Error('Gagal membuat invoice');
+          saveOrderId(orderId);
+          saveMsisdn(msisdn);
+          els.modal.info.textContent = `Order ID: ${orderId}`;
+          openModal(paymentUrl);
+          // langsung buka tab baru juga (kalau popup blocker mengizinkan)
+          window.open(paymentUrl, '_blank', 'noopener');
+        } catch (e) {
+          alert(e?.message || e);
+        } finally {
+          btnOrder.disabled = false;
+          btnOrder.textContent = 'Order';
+        }
+      });
+
+      btnCopy.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(item.paket_id);
+          btnCopy.textContent = 'Disalin ✓';
+          setTimeout(()=>btnCopy.textContent='Salin ID Paket', 1200);
+        } catch {}
+      });
+
+      els.catalog.grid.appendChild(card);
+    });
   }
 
-  function formatRupiah(x){
-    const n = Number(x||0);
-    return n.toLocaleString('id-ID');
+  function escapeHtml(s){
+    return String(s||'')
+      .replaceAll('&','&amp;')
+      .replaceAll('<','&lt;')
+      .replaceAll('>','&gt;');
+  }
+
+  function renderStatus(data){
+    // data dari /kuota/pay/status -> { order fields, upstreamResult? }
+    const box = els.pay.box;
+    box.innerHTML = '';
+
+    const kv = document.createElement('div');
+    kv.className = 'kv';
+    const addRow = (k,v) => {
+      const dk = document.createElement('div'); dk.className='key'; dk.textContent = k;
+      const dv = document.createElement('div'); dv.textContent = v;
+      kv.append(dk, dv);
+    };
+
+    addRow('Order ID', data.orderId || '-');
+    addRow('Tipe', data.type || '-');
+    addRow('Status Jasa', data.status || '-');
+    addRow('Nomor', data.msisdn || '-');
+    addRow('Harga Jasa', data.price_sell != null ? `Rp ${fmt(data.price_sell)}` : '-');
+
+    box.appendChild(kv);
+
+    // Upstream result (deeplink/QRIS) kalau sudah ada
+    if (data.upstreamResult && data.upstreamResult.data) {
+      const up = data.upstreamResult.data;
+      const wrap = document.createElement('div');
+      wrap.className = 'card';
+      const title = document.createElement('h3');
+      title.textContent = 'Instruksi Pembayaran ke Provider';
+      wrap.appendChild(title);
+
+      const kv2 = document.createElement('div'); kv2.className = 'kv';
+      const add2 = (k,v) => { const a=document.createElement('div'); a.className='key'; a.textContent=k; const b=document.createElement('div'); b.textContent=v; kv2.append(a,b); };
+      add2('Nama Paket', up.nama_paket || '-');
+      add2('Metode', up.payment_method || '-');
+      add2('Trx ID', up.trx_id || '-');
+      add2('Status', up.status || '-');
+      wrap.appendChild(kv2);
+
+      if (up.payment_method === 'DANA' && up.have_deeplink && up.deeplink) {
+        const act = document.createElement('div'); act.className='btn-row'; act.style.marginTop='10px';
+        const btn = document.createElement('a');
+        btn.href = up.deeplink; btn.target = '_blank'; btn.rel='noopener';
+        btn.className='btn btn-primary'; btn.textContent='Bayar di DANA';
+        act.appendChild(btn);
+        wrap.appendChild(act);
+      }
+
+      if (up.payment_method === 'QRIS' && up.is_qris && up.qris && up.qris.qr_code) {
+        const qrBox = document.createElement('div'); qrBox.className='qrbox'; qrBox.style.marginTop='10px';
+        const emv = encodeURIComponent(up.qris.qr_code);
+        const img = document.createElement('img');
+        // Gunakan generator QR publik sederhana
+        img.src = `https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=${emv}`;
+        img.alt = 'QRIS';
+        qrBox.appendChild(img);
+
+        const meta = document.createElement('div'); meta.className='muted'; meta.style.marginTop='8px';
+        const expAt = up.qris.payment_expired_at ? new Date(up.qris.payment_expired_at*1000) : null;
+        const remain = document.createElement('div'); remain.style.marginTop='6px';
+
+        meta.textContent = expAt ? `Kedaluwarsa: ${expAt.toLocaleString('id-ID')}` : 'QRIS aktif';
+        qrBox.appendChild(meta);
+        qrBox.appendChild(remain);
+
+        // Countdown
+        let left = Number(up.qris.remaining_time||0);
+        function tick(){
+          if (left<=0) { remain.textContent = 'Waktu habis — refresh status untuk QR baru.'; return; }
+          remain.textContent = `Sisa waktu: ${left}s`;
+          left -= 1; setTimeout(tick, 1000);
+        }
+        if (left>0) tick();
+
+        wrap.appendChild(qrBox);
+
+        // Tombol salin EMV
+        const btnRow = document.createElement('div'); btnRow.className='btn-row'; btnRow.style.marginTop='8px';
+        const copyBtn = document.createElement('button'); copyBtn.className='btn btn-outline'; copyBtn.textContent='Salin Kode QR';
+        copyBtn.addEventListener('click', async () => {
+          try { await navigator.clipboard.writeText(up.qris.qr_code); copyBtn.textContent = 'Disalin ✓'; setTimeout(()=>copyBtn.textContent='Salin Kode QR', 1200); } catch {}
+        });
+        btnRow.appendChild(copyBtn);
+        wrap.appendChild(btnRow);
+      }
+
+      box.appendChild(wrap);
+    } else {
+      const wait = document.createElement('div');
+      wait.className = 'muted';
+      wait.textContent = 'Menunggu pembayaran jasa (Duitku) dikonfirmasi dan diteruskan ke provider...';
+      box.appendChild(wait);
+    }
   }
 
   function renderDetail(data){
-    const d = data?.data;
-    const quotas = d?.quotas || [];
-    if (!quotas.length){
-      detailContent.innerHTML = `<div class="muted">Belum ada paket aktif terdeteksi.</div>`;
+    const box = els.detail.box;
+    box.innerHTML = '';
+    if (!data || !data.quotas || !data.quotas.length) {
+      box.textContent = 'Tidak ada paket aktif.';
       return;
     }
-    const items = quotas.map(q => {
-      const ben = (q.benefits || []).map(b => `
-        <div class="quota-row">
-          <span>${b.name}${b.information ? ` (${b.information})` : ''}</span>
-          <span>${b.remaining_quota ?? b.quota}</span>
-        </div>
-      `).join('');
-      return `
-        <div class="quota-item">
-          <div class="quota-name">${q.name}</div>
-          <div class="muted small">Masa aktif: ${q.expired_at || '-'}</div>
-          <div class="quota-benefit">${ben}</div>
-        </div>
-      `;
-    }).join('');
-    detailContent.innerHTML = items;
-  }
-
-  function renderKatalog(list){
-    const keyword = (inpSearch.value || '').toLowerCase();
-    const filtered = list.filter(x =>
-      x.package_named_show.toLowerCase().includes(keyword) ||
-      x.payment_method.toLowerCase().includes(keyword)
-    );
-    if (!filtered.length){
-      katalogGrid.innerHTML = `<div class="muted">Tidak ada paket.</div>`;
-      return;
-    }
-    katalogGrid.innerHTML = filtered.map(x => `
-      <div class="kartu" data-id="${x.paket_id}">
-        <h3>${x.package_named_show}</h3>
-        <div class="meta">
-          <span class="tag">${x.payment_method}</span>
-        </div>
-        <div class="price">Rp ${formatRupiah(x.price_paket_show)}</div>
-        <pre class="muted small" style="white-space:pre-wrap">${x.desc_package_show || '-'}</pre>
-        <div class="actions">
-          <button class="btn btn-primary btn-order" data-id="${x.paket_id}">Order</button>
-        </div>
-      </div>
-    `).join('');
-    $$('.btn-order').forEach(btn => btn.addEventListener('click', openOrderModal));
-  }
-
-  async function loadKatalog(){
-    try{
-      const res = await api('/data/kuota/list', { method:'GET' });
-      katalog = res?.data || [];
-      renderKatalog(katalog);
-      secKatalog.hidden = false;
-    }catch(e){
-      showToast(e.message || 'Gagal memuat katalog', 'err');
-    }
-  }
-
-  function openOrderModal(ev){
-    const id = ev.currentTarget?.dataset?.id;
-    const item = katalog.find(x => x.paket_id === id);
-    if (!item) return;
-    currentOrder = item;
-    moTitle.textContent = `Order: ${item.package_named_show}`;
-    moDesc.textContent = `Metode: ${item.payment_method} • Harga: Rp ${formatRupiah(item.price_paket_show)}`;
-    const last = getMsisdn();
-    moNo.value = last || inpNo.value || '';
-    modalOrder.showModal();
-  }
-
-  // Payment modal helpers
-  function clearCountdown(){
-    if (qrisTimer){
-      clearInterval(qrisTimer);
-      qrisTimer = null;
-    }
-    mpCountdown.textContent = '';
-  }
-
-  function startCountdown(remainSec){
-    clearCountdown();
-    let s = Number(remainSec||0);
-    if (!(s>0)) return;
-    const tick = () => {
-      if (s<=0){ clearCountdown(); mpCountdown.textContent = 'QRIS kadaluarsa.'; return; }
-      const m = Math.floor(s/60);
-      const r = s%60;
-      mpCountdown.textContent = `Sisa waktu pembayaran: ${m}m ${r}s`;
-      s -= 1;
-    };
-    tick();
-    qrisTimer = setInterval(tick, 1000);
-  }
-
-  function downloadText(filename, content){
-    const blob = new Blob([content], {type:'text/plain'});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = filename;
-    a.click();
-    setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
-  }
-
-  // Session state UI
-  async function checkSessionUI(){
-    const msisdn = getMsisdn();
-    if (!msisdn){
-      sessionBar.classList.add('hidden');
-      secDetail.hidden = true;
-      return;
-    }
-    try{
-      const res = await api(`/kuota/session?no_hp=${encodeURIComponent(msisdn)}`);
-      if (res?.loggedIn){
-        sessionBar.classList.remove('hidden');
-        sessMsisdn.textContent = msisdn;
-        secDetail.hidden = false;
-      } else {
-        sessionBar.classList.add('hidden');
-        secDetail.hidden = true;
+    const t = [];
+    t.push(`Nomor: ${data.msisdn || '-'}`);
+    if (data.text) t.push(data.text);
+    t.push('');
+    data.quotas.forEach(q => {
+      t.push(`• ${q.name} (exp: ${q.expired_at || '-'})`);
+      if (Array.isArray(q.benefits)) {
+        q.benefits.forEach(b => {
+          t.push(`   - ${b.name}${b.information ? ` (${b.information})` : ''}: ${b.remaining_quota || b.quota || '-'}`);
+        });
       }
-    }catch{
-      sessionBar.classList.add('hidden');
-      secDetail.hidden = true;
-    }
+      t.push('');
+    });
+    box.textContent = t.join('\n');
   }
 
-  // Events
-  btnOtpReq.addEventListener('click', async () => {
-    const msisdn = toUpstreamNo(inpNo.value);
-    if (!/^08\d{8,12}$/.test(msisdn)){
-      showToast('Nomor tidak valid. Gunakan format 08xxxxxxxxxx.', 'err'); return;
-    }
-    setLoading(btnOtpReq, true);
-    try{
-      const res = await api('/kuota/otp/request', { method:'POST', json:{ no_hp: msisdn } });
-      lastAuthId = res?.data?.auth_id || null;
-      otpArea.classList.remove('hidden');
-      otpHint.textContent = res?.data?.can_resend_in ? `Bisa kirim ulang OTP dalam ${res.data.can_resend_in}s` : '';
+  // ---------- OTP handlers ----------
+  els.otp.btnReq.addEventListener('click', async () => {
+    const msisdn = (els.otp.nohp.value || '').trim();
+    if (!/^(08)\d{8,12}$/.test(msisdn)) { toast(els.otp.status, 'Nomor tidak valid', false); return; }
+    try {
+      els.otp.btnReq.disabled = true;
+      const res = await apiPOST('/kuota/otp/request', { no_hp: msisdn });
       saveMsisdn(msisdn);
-      showToast(res?.message || 'OTP terkirim', 'ok');
-    }catch(e){
-      showToast(e.message || 'Gagal mengirim OTP', 'err');
-    }finally{
-      setLoading(btnOtpReq, false);
+      toast(els.otp.status, `OTP dikirim. auth_id: ${res?.data?.auth_id || '-'}`);
+    } catch (e) {
+      toast(els.otp.status, e?.message || e, false);
+    } finally {
+      els.otp.btnReq.disabled = false;
     }
   });
 
-  btnOtpVerify.addEventListener('click', async () => {
-    const msisdn = toUpstreamNo(inpNo.value || getMsisdn());
-    const otp = (inpOtp.value || '').trim();
-    if (!lastAuthId){
-      showToast('auth_id tidak ditemukan. Klik Kirim OTP lagi.', 'err'); return;
-    }
-    if (!otp){
-      showToast('Masukkan kode OTP.', 'err'); return;
-    }
-    setLoading(btnOtpVerify, true);
-    try{
-      const res = await api('/kuota/otp/verify', { method:'POST', json:{ no_hp: msisdn, auth_id: lastAuthId, kode_otp: otp } });
-      showToast(res?.message || 'Login berhasil', 'ok');
-      otpArea.classList.add('hidden');
-      inpOtp.value = '';
-      await checkSessionUI();
-      await loadKatalog();
-    }catch(e){
-      showToast(e.message || 'Verifikasi gagal', 'err');
-    }finally{
-      setLoading(btnOtpVerify, false);
+  els.otp.btnVerify.addEventListener('click', async () => {
+    const msisdn = (els.otp.nohp.value || '').trim();
+    const auth  = (els.otp.auth.value || '').trim();
+    const code  = (els.otp.code.value || '').trim();
+    if (!msisdn || !auth || !code) { toast(els.otp.status, 'Lengkapi data OTP', false); return; }
+    try {
+      els.otp.btnVerify.disabled = true;
+      const res = await apiPOST('/kuota/otp/verify', { no_hp: msisdn, auth_id: auth, kode_otp: code });
+      toast(els.otp.status, res?.message || 'Login OTP berhasil');
+      show(els.otp.badge);
+      saveMsisdn(msisdn);
+      // refresh katalog di bawah (opsi)
+    } catch (e) {
+      toast(els.otp.status, e?.message || e, false);
+    } finally {
+      els.otp.btnVerify.disabled = false;
     }
   });
 
-  btnCheckDetail.addEventListener('click', async () => {
-    const msisdn = getMsisdn();
-    if (!msisdn) { showToast('Nomor belum diset.', 'err'); return; }
-    btnCheckDetail.setAttribute('disabled','disabled');
-    try{
-      const res = await api(`/kuota/detail?no_hp=${encodeURIComponent(msisdn)}`);
-      renderDetail(res);
-      showToast('Paket aktif diperbarui', 'ok');
-    }catch(e){
-      showToast(e.message || 'Gagal memuat paket aktif', 'err');
-    }finally{
-      btnCheckDetail.removeAttribute('disabled');
+  // ---------- Katalog ----------
+  async function loadCatalog(){
+    try {
+      const res = await apiGET('/data/kuota/list');
+      renderCatalog(res?.data || []);
+    } catch (e) {
+      els.catalog.grid.innerHTML = ''; show(els.catalog.empty);
+    }
+  }
+
+  // ---------- Status (manual & auto poll) ----------
+  async function fetchStatusOnce(){
+    const msisdn = (els.pay.nohp.value || '').trim();
+    const orderId = (els.pay.order.value || '').trim();
+    if (!msisdn || !orderId) { alert('Isi Nomor & Order ID'); return; }
+    const res = await apiGET(`/kuota/pay/status?orderId=${encodeURIComponent(orderId)}&no_hp=${encodeURIComponent(msisdn)}`);
+    if (res?.data) renderStatus(res.data);
+    return res;
+  }
+  let pollTimer = null;
+  function startPoll(){
+    if (pollTimer) return;
+    pollTimer = setInterval(async () => {
+      try {
+        const res = await fetchStatusOnce();
+        const d = res?.data;
+        // stop kalau upstreamResult sudah ada dan status bukan pending
+        if (d?.upstreamResult && d?.status === 'PAID') stopPoll();
+      } catch {}
+    }, 3500);
+    els.pay.btnPoll.textContent = 'Stop Poll';
+  }
+  function stopPoll(){
+    if (pollTimer) clearInterval(pollTimer);
+    pollTimer = null;
+    els.pay.btnPoll.textContent = 'Auto Poll';
+  }
+
+  els.pay.btnCheck.addEventListener('click', fetchStatusOnce);
+  els.pay.btnPoll.addEventListener('click', () => pollTimer ? stopPoll() : startPoll());
+
+  // Modal events
+  els.modal.close.addEventListener('click', closeModal);
+  els.modal.startPoll.addEventListener('click', () => { startPoll(); els.modal.info.textContent = 'Auto poll berjalan...'; });
+  // jika user klik buka link pembayaran
+  $('#openPayLink').addEventListener('click', () => { els.modal.info.textContent = 'Link pembayaran dibuka. Selesaikan pembayaran, lalu sistem otomatis meneruskan ke provider.'; });
+
+  // ---------- Detail Paket Aktif ----------
+  els.detail.btn.addEventListener('click', async () => {
+    const msisdn = (els.detail.nohp.value || '').trim();
+    if (!msisdn) { alert('Isi nomor 08xxxxxxxxxx'); return; }
+    try {
+      const res = await apiGET(`/kuota/detail?no_hp=${encodeURIComponent(msisdn)}`);
+      renderDetail(res?.data || {});
+    } catch (e) {
+      els.detail.box.textContent = e?.message || 'Gagal mengambil detail paket.';
     }
   });
 
-  btnRefreshDetail.addEventListener('click', () => btnCheckDetail.click());
+  // ---------- Session badge ----------
+  async function checkSessionBadge(){
+    const msisdn = (els.otp.nohp.value || '').trim();
+    if (!msisdn) { hide(els.otp.badge); return; }
+    try {
+      const s = await apiGET(`/kuota/session?no_hp=${encodeURIComponent(msisdn)}`);
+      if (s?.loggedIn) show(els.otp.badge); else hide(els.otp.badge);
+    } catch { hide(els.otp.badge); }
+  }
 
-  btnReloadKatalog.addEventListener('click', loadKatalog);
-  inpSearch.addEventListener('input', () => renderKatalog(katalog));
+  // ---------- Navigation small UX ----------
+  els.nav.home.addEventListener('click', (e) => { e.preventDefault(); window.scrollTo({ top:0, behavior:'smooth' }); });
+  els.nav.status.addEventListener('click', (e) => { e.preventDefault(); $('#statusSection').scrollIntoView({ behavior:'smooth' }); });
 
-  // Modal Order handlers
-  modalOrder.addEventListener('close', ()=> { /* reset if needed */ });
-  moSubmit.addEventListener('click', async (ev) => {
-    ev.preventDefault();
-    if (!currentOrder) { modalOrder.close(); return; }
-    const msisdn = toUpstreamNo(moNo.value || getMsisdn());
-    if (!/^08\d{8,12}$/.test(msisdn)){
-      showToast('Nomor tidak valid. Gunakan format 08xxxxxxxxxx.', 'err'); return;
-    }
-    setLoading(moSubmit, true);
-    try{
-      // Pastikan sudah login
-      const sess = await api(`/kuota/session?no_hp=${encodeURIComponent(msisdn)}`);
-      if (!sess?.loggedIn){
-        showToast('Nomor belum login OTP. Silakan login dulu.', 'err');
-        setLoading(moSubmit, false);
-        return;
-      }
-      // Submit order
-      const res = await api('/kuota/order', { method:'POST', json:{ paket_id: currentOrder.paket_id, no_hp: msisdn }});
-      modalOrder.close();
-
-      // Render result
-      const data = res?.data || {};
-      mpTitle.textContent = `Pembayaran: ${data?.nama_paket || currentOrder.package_named_show}`;
-      mpSummary.innerHTML = `
-        <div><b>Nomor:</b> ${data.msisdn || msisdn}</div>
-        <div><b>Metode:</b> ${data.payment_method || currentOrder.payment_method}</div>
-        <div><b>Trx ID:</b> ${data.trx_id || '-'}</div>
-        <div><b>Status:</b> ${data.status || '-'}</div>
-      `;
-
-      // Reset views
-      mpDeeplinkBox.classList.add('hidden');
-      mpQrisBox.classList.add('hidden');
-      clearCountdown();
-
-      if ((data.payment_method || '').toUpperCase() === 'DANA' && data.deeplink){
-        mpDeeplinkBtn.href = data.deeplink;
-        mpDeeplinkBox.classList.remove('hidden');
-      } else if ((data.payment_method || '').toUpperCase() === 'QRIS' && data.is_qris){
-        const q = data?.qris || {};
-        mpQrisText.value = q.qr_code || '';
-        mpQrisBox.classList.remove('hidden');
-        if (q.remaining_time) startCountdown(q.remaining_time);
-      } else {
-        // PULSA / lainnya
-        showToast('Order dibuat. Ikuti instruksi di aplikasi/layanan terkait.', 'ok', 3500);
-      }
-
-      modalPay.showModal();
-    }catch(e){
-      showToast(e.message || 'Order gagal', 'err');
-    }finally{
-      setLoading(moSubmit, false);
-    }
-  });
-
-  // Payment modal actions
-  mpCopy.addEventListener('click', async () => {
-    try{
-      await navigator.clipboard.writeText(mpQrisText.value || '');
-      showToast('Payload QRIS disalin', 'ok');
-    }catch{
-      showToast('Gagal menyalin', 'err');
-    }
-  });
-  mpSave.addEventListener('click', () => {
-    const payload = mpQrisText.value || '';
-    if (!payload){ showToast('Tidak ada payload', 'err'); return; }
-    downloadText(`qris-${Date.now()}.txt`, payload);
-  });
-
-  // Logout
-  btnLogout.addEventListener('click', async ()=>{
-    const msisdn = getMsisdn();
-    if (!msisdn){ clearMsisdn(); await checkSessionUI(); return; }
-    try{
-      await api('/kuota/logout', { method:'POST', json:{ no_hp: msisdn }});
-    }catch{}
-    clearMsisdn();
-    sessionBar.classList.add('hidden');
-    secDetail.hidden = true;
-    showToast('Keluar dari sesi', 'ok');
-  });
-
-  // Help
-  helpBtn.addEventListener('click', (e)=>{ e.preventDefault(); modalHelp.showModal(); });
-
-  // Init
-  yearEl.textContent = new Date().getFullYear();
-
-  // Prefill msisdn
-  const last = getMsisdn();
-  if (last) inpNo.value = last;
-
-  // Boot: cek sesi & katalog
-  (async () => {
-    await checkSessionUI();
-    await loadKatalog();
-    if (!secDetail.hidden) btnCheckDetail.click();
+  // ---------- Init ----------
+  (function init(){
+    els.year.textContent = new Date().getFullYear();
+    loadMsisdn();
+    loadOrderId();
+    checkSessionBadge();
+    loadCatalog();
   })();
 })();
