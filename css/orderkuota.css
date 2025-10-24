@@ -112,3 +112,7 @@ body{ background:var(--ok-bg); font-family:var(--font-primary); }
 @keyframes spin{ to{ transform:rotate(360deg)} }
 
 .btn{ border-radius:12px; font-weight:600; }
+
+/* OTP row spacing */
+#otpRow .form-label { font-weight:600; }
+
