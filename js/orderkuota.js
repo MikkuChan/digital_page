@@ -1,366 +1,505 @@
-// =========================
-// orderkuota.js (FE logic)
-// Backend base:
-const API_BASE = 'https://call.fadzdigital.store';
+/* Order Kuota FE (update)
+   - Katalog: GET /data/kuota/list
+   - Session check: GET /kuota/session (backend auto-cek ke upstream kalau KV kosong)
+   - OTP request: POST /kuota/otp/request (balik auth_id -> disimpan otomatis)
+   - OTP verify: POST /kuota/otp/verify  (cukup no_hp + kode_otp; auth_id diambil dari server-side)
+   - Buat invoice: POST /kuota/pay/create
+   - Poll status:  GET /kuota/pay/status
+*/
 
-// Small helpers
-const $ = (s, p=document) => p.querySelector(s);
-const $$ = (s, p=document) => [...p.querySelectorAll(s)];
-const delay = (ms) => new Promise(r => setTimeout(r, ms));
+(() => {
+  const API_BASE = 'https://call.fadzdigital.store';
 
-function toast(msg, cls='info') {
-  const el = document.createElement('div');
-  el.className = `fdz-toast fdz-toast-${cls}`;
-  el.textContent = msg;
-  document.body.appendChild(el);
-  setTimeout(()=> el.classList.add('show'), 10);
-  setTimeout(()=> {
-    el.classList.remove('show');
-    setTimeout(()=> el.remove(), 300);
-  }, 2500);
-}
+  // ------ Helpers ------
+  const $ = sel => document.querySelector(sel);
+  const $$ = sel => document.querySelectorAll(sel);
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-function normMsisdn(raw) {
-  let s = (raw || '').trim();
-  if (!s) return '';
-  if (s.startsWith('+62')) s = '0' + s.slice(3);
-  else if (s.startsWith('62')) s = '0' + s.slice(2);
-  return s;
-}
-
-// UI state
-const state = {
-  msisdn: '',
-  loggedIn: false,
-  catalog: [],
-  payTimer: null,
-};
-
-// DOM refs
-const inpMsisdn = $('#inpMsisdn');
-const btnCheckSession = $('#btnCheckSession');
-const btnSendOtp = $('#btnSendOtp');
-const inpOtp = $('#inpOtp');
-const btnVerifyOtp = $('#btnVerifyOtp');
-const loginState = $('#loginState');
-const btnRefreshDetail = $('#btnRefreshDetail');
-const detailBody = $('#detailBody');
-const activePackages = $('#activePackages');
-
-const searchBox = $('#searchBox');
-const methodFilter = $('#methodFilter');
-const catalogGrid = $('#catalogGrid');
-
-const payPanel = $('#payPanel');
-const payMethodBadge = $('#payMethodBadge');
-const payInfo = $('#payInfo');
-const deeplinkWrap = $('#deeplinkWrap');
-const deeplinkBtn = $('#deeplinkBtn');
-const qrisWrap = $('#qrisWrap');
-const qrisCanvas = $('#qrisCanvas');
-const countdown = $('#countdown');
-const btnResetPayPanel = $('#btnResetPayPanel');
-
-// ---- Session & OTP ----
-async function checkSession() {
-  const msisdn = normMsisdn(inpMsisdn.value);
-  if (!/^0\d{9,14}$/.test(msisdn)) {
-    toast('Nomor tidak valid', 'warn');
-    return;
+  function showOverlay(flag){
+    const el = $('#loadingOverlay');
+    if (!el) return;
+    el.style.display = 'flex';
+    el.style.opacity = flag ? '1' : '0';
+    if (!flag) setTimeout(()=>{ el.style.display='none'; }, 400);
   }
-  state.msisdn = msisdn;
 
-  try {
-    const r = await fetch(`${API_BASE}/kuota/session?no_hp=${encodeURIComponent(msisdn)}`, { credentials: 'include' });
-    const j = await r.json();
-    state.loggedIn = !!j.loggedIn;
-    updateLoginBadge(j.loggedIn, j.source);
-    if (state.loggedIn) {
-      await loadDetail();
-    } else {
-      activePackages.style.display = 'none';
-    }
-  } catch (e) {
-    toast('Gagal cek sesi', 'error');
+  function toast(msg, type='info'){
+    // minimal toast -> console
+    console.log(`[${type}]`, msg);
   }
-}
 
-function updateLoginBadge(ok, source) {
-  if (ok) {
-    loginState.className = 'badge bg-success';
-    loginState.textContent = `Login (via ${source || 'cache'})`;
-  } else {
-    loginState.className = 'badge bg-secondary';
-    loginState.textContent = 'Belum login';
+  function fmtRp(n){
+    const x = Number(n||0);
+    return x.toLocaleString('id-ID');
   }
-}
 
-async function sendOtp() {
-  const msisdn = normMsisdn(inpMsisdn.value);
-  if (!/^0\d{9,14}$/.test(msisdn)) {
-    toast('Nomor tidak valid', 'warn');
-    return;
+  function normNoHp(v){
+    let s = String(v||'').trim();
+    if (!s) return '';
+    // always to 08xxxxxxxx
+    if (s.startsWith('+62')) s = '0' + s.slice(3);
+    else if (s.startsWith('62')) s = '0' + s.slice(2);
+    return s;
   }
-  try {
-    const r = await fetch(`${API_BASE}/kuota/otp/request`, {
-      method: 'POST',
-      headers: { 'Content-Type':'application/json' },
-      body: JSON.stringify({ no_hp: msisdn })
+
+  function setSessionBadge(state){
+    const badge = $('#sessionBadge');
+    if (!badge) return;
+    const map = {
+      unknown: ['bg-secondary', 'Unknown'],
+      loggedin: ['bg-success', 'Logged In'],
+      loggedout: ['bg-warning text-dark', 'Need Login']
+    };
+    const [cls, txt] = map[state] || map.unknown;
+    badge.className = `badge rounded-pill ${cls}`;
+    badge.textContent = txt;
+  }
+
+  function setTrackerStatus(stateText){
+    const b = $('#trkStatusBadge');
+    if (!b) return;
+    const text = String(stateText||'').toUpperCase();
+    let cls = 'bg-secondary';
+    if (text === 'PAID') cls = 'bg-success';
+    else if (text === 'PENDING' || text === 'INVOICE') cls = 'bg-warning text-dark';
+    else if (text === 'FAILED' || text === 'EXPIRED') cls = 'bg-danger';
+    b.className = `badge rounded-pill ${cls}`;
+    b.textContent = text || 'UNKNOWN';
+  }
+
+  function qrUrl(data){
+    // public QR generator
+    return `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(data)}`;
+  }
+
+  function persistMsisdn(no){
+    localStorage.setItem('fdz.msisdn', no || '');
+  }
+  function getPersistMsisdn(){
+    return localStorage.getItem('fdz.msisdn') || '';
+  }
+
+  // ------ DOM refs ------
+  const inputNoHp = $('#inputNoHp');
+  const btnCheckSession = $('#btnCheckSession');
+  const btnSendOTP = $('#btnSendOTP');
+  const btnLogout = $('#btnLogout');
+  const otpRow = $('#otpRow');
+  const inputAuthId = $('#inputAuthId'); // hidden (auto)
+  const inputKodeOtp = $('#inputKodeOtp');
+  const btnVerifyOtp = $('#btnVerifyOtp');
+  const otpHelp = $('#otpInfoHelp');
+
+  const btnRefreshCatalog = $('#btnRefreshCatalog');
+  const catalogGrid = $('#catalogGrid');
+
+  const btnCekPaketAktif = $('#btnCekPaketAktif');
+  const detailWrap = $('#detailWrap');
+  const detailMsisdn = $('#detailMsisdn');
+  const detailList = $('#detailList');
+  const btnHideDetail = $('#btnHideDetail');
+
+  const orderTracker = $('#orderTracker');
+  const trkOrderId = $('#trkOrderId');
+  const trkNoHp = $('#trkNoHp');
+  const trkStatusBadge = $('#trkStatusBadge');
+  const trkOpenPayment = $('#trkOpenPayment');
+  const trkPollNow = $('#trkPollNow');
+  const trkUpstreamBox = $('#trkUpstreamBox');
+  const trkUpstreamMsg = $('#trkUpstreamMsg');
+  const trkDeepLinkWrap = $('#trkDeepLinkWrap');
+  const trkDeepLink = $('#trkDeepLink');
+  const trkDeepLinkRaw = $('#trkDeepLinkRaw');
+  const trkQrisWrap = $('#trkQrisWrap');
+  const trkQrisImg = $('#trkQrisImg');
+  const trkQrisRaw = $('#trkQrisRaw');
+  const trkRemain = $('#trkRemain');
+  const trkExpire = $('#trkExpire');
+  const trkLog = $('#trkLog');
+  const btnHideTracker = $('#btnHideTracker');
+
+  // ------ API calls ------
+  async function apiGET(path, params={}){
+    const u = new URL(API_BASE + path);
+    Object.entries(params).forEach(([k,v]) => { if (v !== undefined && v !== null) u.searchParams.set(k, v); });
+    const r = await fetch(u.toString(), { method:'GET', headers:{ 'Accept':'application/json' } });
+    return await r.json();
+  }
+  async function apiPOST(path, body){
+    const r = await fetch(API_BASE + path, {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json', 'Accept':'application/json' },
+      body: JSON.stringify(body || {})
     });
-    const j = await r.json();
-    if (j.ok && j.alreadyLoggedIn) {
-      state.loggedIn = true;
-      updateLoginBadge(true, 'kv');
-      await loadDetail();
-      toast('Nomor sudah login', 'success');
+    return await r.json();
+  }
+
+  async function checkSession(nohp){
+    const res = await apiGET('/kuota/session', { no_hp: nohp });
+    return !!res?.loggedIn;
+  }
+
+  async function sendOtp(nohp){
+    return await apiPOST('/kuota/otp/request', { no_hp: nohp });
+  }
+  // VERIFIKASI OTP: cukup no_hp + kode_otp (auth_id di-handle server)
+  async function verifyOtp(nohp, kode){
+    return await apiPOST('/kuota/otp/verify', { no_hp: nohp, kode_otp:kode });
+  }
+
+  async function loadCatalog(){
+    const res = await apiGET('/data/kuota/list');
+    return Array.isArray(res?.data) ? res.data : [];
+  }
+
+  async function cekDetail(nohp){
+    return await apiGET('/kuota/detail', { no_hp: nohp });
+  }
+
+  // Duitku flow (invoice di server kamu)
+  async function createInvoice(nohp, paket_id){
+    return await apiPOST('/kuota/pay/create', { no_hp: nohp, paket_id });
+  }
+
+  async function payStatus(orderId, nohp){
+    return await apiGET('/kuota/pay/status', { orderId, no_hp: nohp });
+  }
+
+  // ------ Render Katalog ------
+  function renderCatalog(list){
+    catalogGrid.innerHTML = '';
+    if (!list.length){
+      catalogGrid.innerHTML = `<div class="col-12"><div class="alert alert-info">Belum ada paket.</div></div>`;
       return;
     }
-    if (j.ok) {
-      toast('OTP terkirim. Cek SMS ya!', 'success');
-    } else {
-      toast(j.message || 'Gagal kirim OTP', 'error');
-    }
-  } catch (e) {
-    toast('Gagal kirim OTP', 'error');
-  }
-}
-
-async function verifyOtp() {
-  const msisdn = normMsisdn(inpMsisdn.value);
-  const kode_otp = (inpOtp.value || '').trim();
-  if (!/^0\d{9,14}$/.test(msisdn)) return toast('Nomor tidak valid', 'warn');
-  if (!kode_otp) return toast('Kode OTP wajib diisi', 'warn');
-
-  try {
-    const r = await fetch(`${API_BASE}/kuota/otp/verify`, {
-      method: 'POST',
-      headers: { 'Content-Type':'application/json' },
-      body: JSON.stringify({ no_hp: msisdn, kode_otp })
+    list.forEach(item => {
+      const col = document.createElement('div');
+      col.className = 'col-md-6';
+      const payColor = item.payment_method === 'DANA' ? 'bg-success'
+                     : item.payment_method === 'QRIS' ? 'bg-dark'
+                     : 'bg-warning text-dark';
+      col.innerHTML = `
+        <div class="ok-pkg-card h-100 d-flex flex-column">
+          <div class="ok-pkg-head">
+            <div class="d-flex align-items-start justify-content-between">
+              <div class="me-2">
+                <div class="fw-bold">${escapeHtml(item.package_named_show)}</div>
+                <div class="small text-muted">Paket ID: <span class="text-monospace">${escapeHtml(item.paket_id)}</span></div>
+              </div>
+              <span class="badge ${payColor} ok-pay-badge">${escapeHtml(item.payment_method)}</span>
+            </div>
+          </div>
+          <div class="ok-pkg-body d-flex flex-column">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <div class="ok-pkg-price">Rp ${fmtRp(item.price_paket_show)}</div>
+            </div>
+            <div class="ok-desc flex-grow-1">${escapeHtml(item.desc_package_show)}</div>
+            <div class="d-grid mt-3">
+              <button class="btn btn-primary btn-beli" data-paket="${encodeURIComponent(item.paket_id)}">
+                <i class="bi bi-cart-plus me-1"></i>Beli Paket Ini
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+      catalogGrid.appendChild(col);
     });
-    const j = await r.json();
-    if (j.ok && j.data?.loggedIn) {
-      state.loggedIn = true;
-      updateLoginBadge(true, 'otp');
-      inpOtp.value = '';
-      await loadDetail();
-      toast('Login berhasil', 'success');
-    } else {
-      toast(j.message || 'Verifikasi gagal', 'error');
-    }
-  } catch (e) {
-    toast('Verifikasi OTP gagal', 'error');
-  }
-}
 
-async function loadDetail() {
-  if (!state.msisdn) return;
-  try {
-    const r = await fetch(`${API_BASE}/kuota/detail?no_hp=${encodeURIComponent(state.msisdn)}`);
-    const j = await r.json();
-    if (!j.ok) {
-      activePackages.style.display = 'none';
+    // attach handlers
+    $$('.btn-beli').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const paket_id = decodeURIComponent(e.currentTarget.getAttribute('data-paket') || '');
+        const msisdn = normNoHp(inputNoHp.value);
+        if (!msisdn || !/^0\d{9,14}$/.test(msisdn)){
+          alert('Isi nomor XL valid (format 08xxxxx) dulu ya');
+          inputNoHp.focus();
+          return;
+        }
+        showOverlay(true);
+        try {
+          const logged = await checkSession(msisdn);
+          if (!logged){
+            showOverlay(false);
+            alert('Nomor belum login OTP. Kirim & verifikasi OTP dahulu!');
+            otpRow.style.display = '';
+            return;
+          }
+          const inv = await createInvoice(msisdn, paket_id);
+          if (!inv?.ok){
+            alert(inv?.message || 'Gagal membuat invoice');
+            return;
+          }
+          openTracker(inv?.orderId, msisdn, inv?.paymentUrl || '');
+        } catch(err){
+          console.error(err);
+          alert('Terjadi kesalahan');
+        } finally {
+          showOverlay(false);
+        }
+      });
+    });
+  }
+
+  // ------ Detail Paket Aktif ------
+  function renderDetail(data, msisdn){
+    detailMsisdn.textContent = msisdn;
+    const d = data?.data || {};
+    const list = Array.isArray(d?.quotas) ? d.quotas : [];
+    if (!list.length){
+      detailList.innerHTML = `<div class="alert alert-info">Tidak ada paket aktif yang terdeteksi saat ini.</div>`;
       return;
     }
-    const d = j.data || {};
-    renderActivePackages(d);
-  } catch {
-    activePackages.style.display = 'none';
-  }
-}
-
-function renderActivePackages(data) {
-  const quotas = Array.isArray(data.quotas) ? data.quotas : [];
-  if (!quotas.length) {
-    detailBody.innerHTML = `<div class="text-muted">Tidak ada paket aktif yang terdeteksi.</div>`;
-  } else {
-    const html = quotas.map(q => {
-      const b = Array.isArray(q.benefits) ? q.benefits : [];
-      const ben = b.map(it => `
-        <div class="d-flex align-items-center justify-content-between border rounded px-2 py-1 mb-1">
-          <div class="small">${it.name}${it.information ? ` <span class="text-muted">(${it.information})</span>` : ''}</div>
-          <div class="small fw-semibold">${it.remaining_quota || it.quota || '-'}</div>
+    const html = list.map(q => {
+      const benefits = Array.isArray(q.benefits) ? q.benefits : [];
+      const rows = benefits.map(b => `
+        <div class="col-md-6">
+          <div class="ok-quota-item mb-2">
+            <div class="d-flex align-items-center justify-content-between">
+              <div class="ok-quota-title">${escapeHtml(b.name || '-')}</div>
+              <span class="badge bg-primary">${escapeHtml(b.remaining_quota || b.quota || '-')}</span>
+            </div>
+            ${b.information ? `<div class="small text-muted mt-1">${escapeHtml(b.information)}</div>`:''}
+          </div>
         </div>
       `).join('');
       return `
-        <div class="fdz-cta bg-white border rounded p-3 mb-2">
-          <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-            <div>
-              <div class="fw-semibold">${q.name || '-'}</div>
-              <div class="small text-muted">Expired: ${q.expired_at || '-'}</div>
-            </div>
+        <div class="mb-3 p-3 border rounded">
+          <div class="d-flex align-items-center justify-content-between">
+            <div class="fw-bold">${escapeHtml(q.name || '-')}</div>
+            <span class="badge bg-success">Expired: ${escapeHtml(q.expired_at || '-')}</span>
           </div>
-          <div class="mt-2">${ben}</div>
+          <div class="row mt-2 g-2">${rows || '<div class="small text-muted">-</div>'}</div>
         </div>
       `;
     }).join('');
-    detailBody.innerHTML = html;
-  }
-  activePackages.style.display = 'block';
-}
-
-// ---- Catalog ----
-async function loadCatalog() {
-  try {
-    const r = await fetch(`${API_BASE}/data/kuota/list`, { credentials: 'include' });
-    const j = await r.json();
-    if (j.ok) {
-      state.catalog = j.data || [];
-      renderCatalog();
-    } else {
-      catalogGrid.innerHTML = `<div class="col-12 text-danger">Gagal memuat katalog.</div>`;
-    }
-  } catch {
-    catalogGrid.innerHTML = `<div class="col-12 text-danger">Gagal memuat katalog.</div>`;
-  }
-}
-
-function renderCatalog() {
-  const q = (searchBox.value || '').toLowerCase();
-  const mf = (methodFilter.value || '').toUpperCase();
-
-  const items = state.catalog.filter(it => {
-    const okText = !q || (it.package_named_show || '').toLowerCase().includes(q);
-    const okMethod = !mf || it.payment_method === mf;
-    return okText && okMethod;
-  });
-
-  if (!items.length) {
-    catalogGrid.innerHTML = `<div class="col-12 text-muted">Paket tidak ditemukan.</div>`;
-    return;
+    detailList.innerHTML = html;
   }
 
-  catalogGrid.innerHTML = items.map(it => `
-    <div class="col-md-6 col-lg-4">
-      <div class="card h-100 fdz-card hoverable">
-        <div class="card-body d-flex flex-column">
-          <div class="d-flex align-items-start justify-content-between gap-2">
-            <h6 class="mb-1">${it.package_named_show}</h6>
-            <span class="badge bg-secondary">${it.payment_method}</span>
-          </div>
-          <div class="text-gradient fs-5 fw-bold mb-2">Rp ${Number(it.price_paket_show || 0).toLocaleString('id-ID')}</div>
-          <div class="desc small flex-grow-1">${(it.desc_package_show || '').replaceAll('\n','<br>')}</div>
-          <button class="btn btn-primary w-100 mt-3" data-pid="${it.paket_id}">
-            <i class="bi bi-cart-plus me-1"></i>Order Paket Ini
-          </button>
-        </div>
-      </div>
-    </div>
-  `).join('');
+  // ------ Tracker (payment + upstream forward) ------
+  let pollTimer = null;
 
-  // Bind buttons
-  $$('#catalogGrid button[data-pid]').forEach(btn => {
-    btn.addEventListener('click', () => startOrder(btn.getAttribute('data-pid')));
-  });
-}
+  function openTracker(orderId, msisdn, paymentUrl){
+    trkOrderId.textContent = orderId || '-';
+    trkNoHp.textContent = msisdn || '-';
+    trkOpenPayment.href = paymentUrl || '#';
+    setTrackerStatus('INVOICE');
+    trkUpstreamBox.style.display = 'none';
+    trkDeepLinkWrap.style.display = 'none';
+    trkQrisWrap.style.display = 'none';
+    trkLog.textContent = '';
+    orderTracker.style.display = '';
 
-// ---- Order & Payment Panel ----
-function resetPayPanel() {
-  if (state.payTimer) {
-    clearInterval(state.payTimer);
-    state.payTimer = null;
-  }
-  payInfo.innerHTML = '';
-  payMethodBadge.textContent = '';
-  deeplinkWrap.style.display = 'none';
-  qrisWrap.style.display = 'none';
-  countdown.textContent = '';
-  payPanel.style.display = 'none';
-}
+    // Buka tab pembayaran (kalau ada)
+    if (paymentUrl) window.open(paymentUrl, '_blank', 'noopener');
 
-async function startOrder(paket_id) {
-  const msisdn = normMsisdn(inpMsisdn.value);
-  if (!/^0\d{9,14}$/.test(msisdn)) return toast('Isi nomor yang valid dulu', 'warn');
-
-  // Require login
-  const sess = await fetch(`${API_BASE}/kuota/session?no_hp=${encodeURIComponent(msisdn)}`).then(r=>r.json()).catch(()=>({}));
-  if (!sess.ok || !sess.loggedIn) {
-    toast('Nomor belum login. Kirim & verifikasi OTP dulu.', 'warn');
-    return;
+    if (pollTimer) clearInterval(pollTimer);
+    pollTimer = setInterval(() => doPoll(orderId, msisdn), 4000);
   }
 
-  // Place order to upstream via backend
-  try {
-    const r = await fetch(`${API_BASE}/kuota/order`, {
-      method: 'POST',
-      headers: { 'Content-Type':'application/json' },
-      body: JSON.stringify({ paket_id, no_hp: msisdn })
-    });
-    const j = await r.json();
-    if (!j.ok) {
-      if (j.need_login) {
-        toast('Nomor belum login. Verifikasi OTP dulu ya.', 'warn');
-      } else {
-        toast(j.message || 'Gagal order', 'error');
+  async function doPoll(orderId, msisdn){
+    try{
+      const res = await payStatus(orderId, msisdn);
+      if (!res?.ok) return;
+      const d = res.data || {};
+      setTrackerStatus(d.status || 'UNKNOWN');
+
+      // Log singkat
+      trkLog.textContent = `[${new Date().toLocaleTimeString()}] status=${d.status}`;
+
+      // Jika upstreamResult tersedia, tampilkan dan hentikan polling
+      if (d.upstreamResult && d.upstreamResult.ok){
+        if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+        fillUpstreamBox(d.upstreamResult);
       }
+    }catch(e){
+      console.warn('poll err', e);
+    }
+  }
+
+  function fillUpstreamBox(up){
+    trkUpstreamBox.style.display = '';
+    trkUpstreamMsg.textContent = up?.message || 'OK';
+
+    const data = up?.data || {};
+    const deeplink = data?.deeplink || '';
+    const isQris = !!data?.is_qris;
+
+    // reset
+    trkDeepLinkWrap.style.display = 'none';
+    trkQrisWrap.style.display = 'none';
+
+    if (deeplink){
+      trkDeepLinkWrap.style.display = '';
+      trkDeepLink.href = deeplink;
+      trkDeepLinkRaw.value = deeplink;
+    }
+    if (isQris && data?.qris?.qr_code){
+      trkQrisWrap.style.display = '';
+      const code = data.qris.qr_code;
+      trkQrisImg.src = qrUrl(code);
+      trkQrisRaw.value = code;
+      trkRemain.textContent = data.qris.remaining_time ?? '-';
+      trkExpire.textContent = data.qris.payment_expired_at ?? '-';
+    }
+  }
+
+  // ------ Events ------
+  btnCheckSession?.addEventListener('click', async () => {
+    const msisdn = normNoHp(inputNoHp.value);
+    if (!msisdn || !/^0\d{9,14}$/.test(msisdn)){
+      alert('Nomor salah. Gunakan format 08xxxxx');
+      inputNoHp.focus();
       return;
     }
-
-    // Show payment panel
-    const d = j.data || {};
-    payPanel.style.display = 'block';
-    payMethodBadge.textContent = d.payment_method || '';
-    payInfo.innerHTML = `
-      <div><b>Nama Paket:</b> ${d.nama_paket || '-'}</div>
-      <div><b>Nomor:</b> ${d.msisdn || '-'}</div>
-      <div><b>Trx ID:</b> ${d.trx_id || '-'}</div>
-      <div class="small text-muted mt-1">Selesaikan pembayaran di bawah ini.</div>
-    `;
-
-    // Deep Link (DANA)
-    if (d.deeplink) {
-      deeplinkWrap.style.display = 'block';
-      deeplinkBtn.href = d.deeplink;
-    } else {
-      deeplinkWrap.style.display = 'none';
+    showOverlay(true);
+    try{
+      const logged = await checkSession(msisdn);
+      persistMsisdn(msisdn);
+      setSessionBadge(logged ? 'loggedin' : 'loggedout');
+      otpRow.style.display = logged ? 'none' : '';
+    }finally{
+      showOverlay(false);
     }
+  });
 
-    // QRIS
-    if (d.is_qris && d.qris?.qr_code) {
-      qrisWrap.style.display = 'block';
-      // Render QR to canvas
-      const canvas = qrisCanvas;
-      canvas.width = 256; canvas.height = 256;
-      await QRCode.toCanvas(canvas, d.qris.qr_code, { margin: 0, width: 256 });
-    } else {
-      qrisWrap.style.display = 'none';
+  btnSendOTP?.addEventListener('click', async () => {
+    const msisdn = normNoHp(inputNoHp.value);
+    if (!msisdn || !/^0\d{9,14}$/.test(msisdn)){
+      alert('Nomor salah. Gunakan format 08xxxxx');
+      inputNoHp.focus();
+      return;
     }
-
-    // Countdown
-    if (d.qris?.remaining_time) {
-      let remain = Number(d.qris.remaining_time) || 0;
-      countdown.textContent = `Sisa waktu: ${remain}s`;
-      if (state.payTimer) clearInterval(state.payTimer);
-      state.payTimer = setInterval(() => {
-        remain--;
-        if (remain <= 0) {
-          clearInterval(state.payTimer);
-          state.payTimer = null;
-          countdown.textContent = 'Waktu habis. Silakan buat order baru.';
-        } else {
-          countdown.textContent = `Sisa waktu: ${remain}s`;
-        }
-      }, 1000);
-    } else {
-      countdown.textContent = '';
+    showOverlay(true);
+    try{
+      const r = await sendOtp(msisdn);
+      if (!r?.ok){
+        alert(r?.message || 'Gagal mengirim OTP');
+        return;
+      }
+      // auth_id otomatis (disimpan di server), FE cukup keep jika mau
+      inputAuthId.value = r?.data?.auth_id || '';
+      otpRow.style.display = '';
+      otpHelp.textContent = r?.message || 'OTP terkirim. Cek SMS lalu isi kodenya.';
+      persistMsisdn(msisdn);
+      setSessionBadge('loggedout');
+    }finally{
+      showOverlay(false);
     }
+  });
 
-    toast('Silakan selesaikan pembayaran.', 'success');
-  } catch (e) {
-    toast('Gagal membuat order', 'error');
+  btnVerifyOtp?.addEventListener('click', async () => {
+    const msisdn = normNoHp(inputNoHp.value);
+    const kode = (inputKodeOtp.value||'').trim();
+    if (!msisdn || !/^0\d{9,14}$/.test(msisdn)) return alert('Nomor tidak valid');
+    if (!/^\d{4,8}$/.test(kode)) return alert('Kode OTP tidak valid');
+
+    showOverlay(true);
+    try{
+      // tidak perlu kirim auth_id
+      const r = await verifyOtp(msisdn, kode);
+      if (!r?.ok){
+        alert(r?.message || 'Verifikasi gagal');
+        return;
+      }
+      setSessionBadge('loggedin');
+      otpRow.style.display = 'none';
+      inputKodeOtp.value = '';
+      toast('Login OTP berhasil', 'success');
+    }finally{
+      showOverlay(false);
+    }
+  });
+
+  btnLogout?.addEventListener('click', async () => {
+    const msisdn = normNoHp(inputNoHp.value);
+    if (!msisdn) return;
+    showOverlay(true);
+    try{
+      await apiPOST('/kuota/logout', { no_hp: msisdn });
+      setSessionBadge('loggedout');
+      otpRow.style.display = '';
+      inputKodeOtp.value = '';
+      inputAuthId.value = '';
+    }finally{
+      showOverlay(false);
+    }
+  });
+
+  btnRefreshCatalog?.addEventListener('click', async () => {
+    await bootstrapCatalog();
+  });
+
+  btnCekPaketAktif?.addEventListener('click', async () => {
+    const msisdn = normNoHp(inputNoHp.value || getPersistMsisdn());
+    if (!msisdn || !/^0\d{9,14}$/.test(msisdn)){
+      alert('Isi nomor valid dulu ya');
+      inputNoHp.focus();
+      return;
+    }
+    showOverlay(true);
+    try{
+      const r = await cekDetail(msisdn);
+      if (!r?.ok){
+        if (r?.need_login) alert('Nomor belum login OTP');
+        else alert(r?.message || 'Gagal cek detail');
+        return;
+      }
+      renderDetail(r, msisdn);
+      detailWrap.style.display = '';
+    }finally{
+      showOverlay(false);
+    }
+  });
+
+  btnHideDetail?.addEventListener('click', () => {
+    detailWrap.style.display = 'none';
+  });
+  btnHideTracker?.addEventListener('click', () => {
+    orderTracker.style.display = 'none';
+    if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+  });
+
+  trkPollNow?.addEventListener('click', async () => {
+    const id = trkOrderId.textContent || '';
+    const ms = trkNoHp.textContent || '';
+    await doPoll(id, ms);
+  });
+
+  // ------ bootstrap ------
+  function escapeHtml(s){
+    return String(s||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');
   }
-}
 
-// ---- Events ----
-btnCheckSession?.addEventListener('click', checkSession);
-btnSendOtp?.addEventListener('click', sendOtp);
-btnVerifyOtp?.addEventListener('click', verifyOtp);
-btnRefreshDetail?.addEventListener('click', loadDetail);
-btnResetPayPanel?.addEventListener('click', resetPayPanel);
+  async function bootstrapCatalog(){
+    showOverlay(true);
+    try{
+      const list = await loadCatalog();
+      renderCatalog(list);
+    }catch(e){
+      console.error(e);
+      catalogGrid.innerHTML = `<div class="col-12"><div class="alert alert-danger">Gagal memuat katalog.</div></div>`;
+    }finally{
+      showOverlay(false);
+    }
+  }
 
-searchBox?.addEventListener('input', renderCatalog);
-methodFilter?.addEventListener('change', renderCatalog);
+  async function bootstrapSession(){
+    const saved = getPersistMsisdn();
+    if (saved){
+      inputNoHp.value = saved;
+      try{
+        const logged = await checkSession(saved);
+        setSessionBadge(logged ? 'loggedin' : 'loggedout');
+        otpRow.style.display = logged ? 'none' : '';
+      }catch{
+        setSessionBadge('unknown');
+      }
+    }else{
+      setSessionBadge('unknown');
+    }
+  }
 
-// Init
-(async function init() {
-  await loadCatalog();
+  // init
+  bootstrapSession();
+  bootstrapCatalog();
 })();
