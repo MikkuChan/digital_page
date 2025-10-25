@@ -1,12 +1,3 @@
-/* Order Kuota FE (update)
-   - Katalog: GET /data/kuota/list
-   - Session check: GET /kuota/session (backend auto-cek ke upstream kalau KV kosong)
-   - OTP request: POST /kuota/otp/request (balik auth_id -> disimpan otomatis)
-   - OTP verify: POST /kuota/otp/verify  (cukup no_hp + kode_otp; auth_id diambil dari server-side)
-   - Buat invoice: POST /kuota/pay/create
-   - Poll status:  GET /kuota/pay/status
-*/
-
 (() => {
   const API_BASE = 'https://call.fadzdigital.store';
 
@@ -106,6 +97,7 @@
 
   const btnRefreshCatalog = $('#btnRefreshCatalog');
   const catalogGrid = $('#catalogGrid');
+  const catalogCount = $('#catalogCount');
 
   const btnCekPaketAktif = $('#btnCekPaketAktif');
   const detailWrap = $('#detailWrap');
@@ -133,85 +125,139 @@
   const btnHideTracker = $('#btnHideTracker');
 
   // ------ API calls ------
-  async function apiGET(path, params={}){
-    const u = new URL(API_BASE + path);
-    Object.entries(params).forEach(([k,v]) => { if (v !== undefined && v !== null) u.searchParams.set(k, v); });
-    const r = await fetch(u.toString(), { method:'GET', headers:{ 'Accept':'application/json' } });
-    return await r.json();
+  async function apiGET(path, params = {}) {
+    try {
+      const u = new URL(API_BASE + path);
+      Object.entries(params).forEach(([k, v]) => { 
+        if (v !== undefined && v !== null && v !== '') u.searchParams.set(k, v); 
+      });
+      
+      console.log(`🔵 GET ${u.toString()}`);
+      const r = await fetch(u.toString(), { 
+        method: 'GET', 
+        headers: { 'Accept': 'application/json' } 
+      });
+      
+      if (!r.ok) {
+        throw new Error(`HTTP ${r.status}`);
+      }
+      
+      const data = await r.json();
+      console.log('📥 Response:', data);
+      return data;
+    } catch (error) {
+      console.error('❌ API GET Error:', error);
+      throw error;
+    }
   }
   
-  async function apiPOST(path, body){
-    const r = await fetch(API_BASE + path, {
-      method:'POST',
-      headers:{ 'Content-Type':'application/json', 'Accept':'application/json' },
-      body: JSON.stringify(body || {})
-    });
-    return await r.json();
+  async function apiPOST(path, body) {
+    try {
+      console.log(`🟡 POST ${API_BASE + path}`, body);
+      const r = await fetch(API_BASE + path, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(body || {})
+      });
+      
+      if (!r.ok) {
+        throw new Error(`HTTP ${r.status}`);
+      }
+      
+      const data = await r.json();
+      console.log('📥 Response:', data);
+      return data;
+    } catch (error) {
+      console.error('❌ API POST Error:', error);
+      throw error;
+    }
   }
 
-  async function checkSession(nohp){
-    const res = await apiGET('/kuota/session', { no_hp: nohp });
-    return !!res?.loggedIn;
+  async function checkSession(nohp) {
+    try {
+      const res = await apiGET('/kuota/session', { no_hp: nohp });
+      return !!res?.loggedIn;
+    } catch (error) {
+      console.error('Session check error:', error);
+      return false;
+    }
   }
 
-  async function sendOtp(nohp){
+  async function sendOtp(nohp) {
     return await apiPOST('/kuota/otp/request', { no_hp: nohp });
   }
   
-  // VERIFIKASI OTP: cukup no_hp + kode_otp (auth_id di-handle server)
-  async function verifyOtp(nohp, kode){
-    return await apiPOST('/kuota/otp/verify', { no_hp: nohp, kode_otp:kode });
+  async function verifyOtp(nohp, kode) {
+    return await apiPOST('/kuota/otp/verify', { no_hp: nohp, kode_otp: kode });
   }
 
-  async function loadCatalog(){
+  async function loadCatalog() {
     const res = await apiGET('/data/kuota/list');
     return Array.isArray(res?.data) ? res.data : [];
   }
 
-  async function cekDetail(nohp){
+  async function cekDetail(nohp) {
     return await apiGET('/kuota/detail', { no_hp: nohp });
   }
 
-  // Duitku flow (invoice di server kamu)
-  async function createInvoice(nohp, paket_id){
+  async function createInvoice(nohp, paket_id) {
     return await apiPOST('/kuota/pay/create', { no_hp: nohp, paket_id });
   }
 
-  async function payStatus(orderId, nohp){
-    return await apiGET('/kuota/pay/status', { orderId, no_hp: nohp });
+  async function payStatus(orderId) {
+    return await apiGET('/kuota/pay/status', { orderId });
   }
 
   // ------ Render Katalog ------
-  function renderCatalog(list){
+  function renderCatalog(list) {
     catalogGrid.innerHTML = '';
-    if (!list.length){
-      catalogGrid.innerHTML = `<div class="col-12"><div class="alert alert-info">Belum ada paket.</div></div>`;
+    
+    if (!list.length) {
+      catalogGrid.innerHTML = `
+        <div class="col-12">
+          <div class="alert alert-info">
+            <i class="bi bi-info-circle me-2"></i>
+            Belum ada paket kuota yang tersedia.
+          </div>
+        </div>
+      `;
+      catalogCount.textContent = '0';
       return;
     }
+
+    catalogCount.textContent = list.length.toString();
+    
     list.forEach(item => {
       const col = document.createElement('div');
       col.className = 'col-md-6 col-lg-4';
+      
       const payColor = item.payment_method === 'DANA' ? 'bg-success'
                      : item.payment_method === 'QRIS' ? 'bg-dark'
-                     : 'bg-warning text-dark';
+                     : item.payment_method === 'PULSA' ? 'bg-warning text-dark'
+                     : 'bg-secondary';
+      
       col.innerHTML = `
         <div class="ok-pkg-card h-100 d-flex flex-column">
           <div class="ok-pkg-head">
             <div class="d-flex align-items-start justify-content-between">
               <div class="me-2">
-                <div class="fw-bold">${escapeHtml(item.package_named_show)}</div>
-                <div class="small text-muted">Paket ID: <span class="text-monospace">${escapeHtml(item.paket_id)}</span></div>
+                <div class="fw-bold text-primary">${escapeHtml(item.package_named_show)}</div>
+                <div class="small text-muted mt-1">
+                  <i class="bi bi-tag me-1"></i>${escapeHtml(item.payment_method)}
+                </div>
               </div>
-              <span class="badge ${payColor} ok-pay-badge">${escapeHtml(item.payment_method)}</span>
+              <span class="badge ${payColor}">${escapeHtml(item.payment_method)}</span>
             </div>
           </div>
           <div class="ok-pkg-body d-flex flex-column">
             <div class="d-flex align-items-center justify-content-between mb-2">
-              <div class="ok-pkg-price">Rp ${fmtRp(item.price_paket_show)}</div>
+              <div class="ok-pkg-price h5 text-success mb-0">Rp ${fmtRp(item.price_paket_show)}</div>
             </div>
-            <div class="ok-desc flex-grow-1">${escapeHtml(item.desc_package_show)}</div>
+            <div class="ok-desc flex-grow-1 small text-muted">
+              ${escapeHtml(item.desc_package_show || 'Paket kuota XL')}
+            </div>
             <div class="d-grid mt-3">
-              <button class="btn btn-primary btn-beli" data-paket="${encodeURIComponent(item.paket_id)}">
+              <button class="btn btn-primary btn-beli" data-paket="${escapeHtml(item.paket_id)}">
                 <i class="bi bi-cart-plus me-1"></i>Beli Paket Ini
               </button>
             </div>
@@ -221,34 +267,42 @@
       catalogGrid.appendChild(col);
     });
 
-    // attach handlers
+    // Attach event handlers untuk tombol beli
     $$('.btn-beli').forEach(btn => {
       btn.addEventListener('click', async (e) => {
-        const paket_id = decodeURIComponent(e.currentTarget.getAttribute('data-paket') || '');
+        const paket_id = e.currentTarget.getAttribute('data-paket');
         const msisdn = normNoHp(inputNoHp.value);
-        if (!msisdn || !/^0\d{9,14}$/.test(msisdn)){
+        
+        if (!msisdn || !/^0\d{9,14}$/.test(msisdn)) {
           toast('Isi nomor XL valid (format 08xxxxx) dulu ya', 'warning');
           inputNoHp.focus();
           return;
         }
+
         showOverlay(true);
         try {
+          // Cek session dulu
           const logged = await checkSession(msisdn);
-          if (!logged){
+          if (!logged) {
             showOverlay(false);
             toast('Nomor belum login OTP. Kirim & verifikasi OTP dahulu!', 'warning');
             otpRow.style.display = '';
             return;
           }
+
+          // Buat invoice
           const inv = await createInvoice(msisdn, paket_id);
-          if (!inv?.ok){
+          if (!inv?.ok) {
             toast(inv?.message || 'Gagal membuat invoice', 'error');
             return;
           }
-          openTracker(inv?.orderId, msisdn, inv?.paymentUrl || '');
+
+          // Buka tracker
+          openTracker(inv.orderId, msisdn, inv.paymentUrl);
           toast('Invoice berhasil dibuat! Silakan lanjutkan pembayaran.', 'success');
-        } catch(err){
-          console.error(err);
+          
+        } catch (err) {
+          console.error('Beli error:', err);
           toast('Terjadi kesalahan saat membuat invoice', 'error');
         } finally {
           showOverlay(false);
@@ -278,7 +332,7 @@
       const benefits = Array.isArray(q.benefits) ? q.benefits : [];
       const rows = benefits.map(b => {
         const remaining = b.remaining_quota || b.quota || '-';
-        const isUsed = remaining === '0 GB' || remaining === '0' ? 'bg-secondary' : 'bg-primary';
+        const isUsed = (remaining === '0 GB' || remaining === '0' || remaining === '0.00 GB') ? 'bg-secondary' : 'bg-success';
         
         return `
           <div class="col-md-6 col-lg-4">
@@ -287,7 +341,7 @@
                 <div class="ok-quota-title small">${escapeHtml(b.name || '-')}</div>
                 <span class="badge ${isUsed}">${escapeHtml(remaining)}</span>
               </div>
-              ${b.information ? `<div class="small text-muted mt-1">${escapeHtml(b.information)}</div>`:''}
+              ${b.information ? `<div class="small text-muted mt-1">${escapeHtml(b.information)}</div>` : ''}
             </div>
           </div>
         `;
@@ -297,11 +351,13 @@
         <div class="mb-3 p-3 border rounded bg-light">
           <div class="d-flex align-items-center justify-content-between mb-2">
             <div class="fw-bold text-primary">${escapeHtml(q.name || `Paket ${index + 1}`)}</div>
-            <span class="badge bg-success">
+            <span class="badge bg-dark">
               <i class="bi bi-clock me-1"></i>${escapeHtml(q.expired_at || '-')}
             </span>
           </div>
-          <div class="row g-2">${rows || '<div class="col-12"><div class="small text-muted">Tidak ada benefit detail</div></div>'}</div>
+          <div class="row g-2">
+            ${rows || '<div class="col-12"><div class="small text-muted">Tidak ada benefit detail</div></div>'}
+          </div>
         </div>
       `;
     }).join('');
@@ -311,135 +367,127 @@
 
   // ------ Tracker (payment + upstream forward) ------
   let pollTimer = null;
+  let qrisCountdown = null;
 
-  function openTracker(orderId, msisdn, paymentUrl){
+  function openTracker(orderId, msisdn, paymentUrl) {
+    // Reset state
     trkOrderId.textContent = orderId || '-';
     trkNoHp.textContent = msisdn || '-';
     trkOpenPayment.href = paymentUrl || '#';
-    setTrackerStatus('INVOICE');
+    setTrackerStatus('PENDING');
     trkUpstreamBox.style.display = 'none';
     trkDeepLinkWrap.style.display = 'none';
     trkQrisWrap.style.display = 'none';
-    trkLog.textContent = '';
+    trkLog.innerHTML = '<div class="text-center"><i class="bi bi-clock-history me-1"></i>Menunggu update status...</div>';
     orderTracker.style.display = 'block';
 
-    // Scroll ke tracker
-    orderTracker.scrollIntoView({ behavior: 'smooth' });
-
-    // Buka tab pembayaran (kalau ada)
-    if (paymentUrl) {
-      window.open(paymentUrl, '_blank', 'noopener');
-    }
-
+    // Clear previous timers
     if (pollTimer) clearInterval(pollTimer);
-    pollTimer = setInterval(() => doPoll(orderId, msisdn), 4000);
+    if (qrisCountdown) clearInterval(qrisCountdown);
+
+    // Start polling
+    pollTimer = setInterval(() => doPoll(orderId), 4000);
     
     // Poll pertama langsung
-    setTimeout(() => doPoll(orderId, msisdn), 1000);
+    setTimeout(() => doPoll(orderId), 1000);
+
+    // Scroll ke tracker
+    setTimeout(() => {
+      orderTracker.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 300);
+
+    // Buka tab pembayaran (kalau ada)
+    if (paymentUrl && paymentUrl !== '#') {
+      window.open(paymentUrl, '_blank', 'noopener,noreferrer');
+    }
   }
 
-  async function doPoll(orderId, msisdn){
-    try{
-      const res = await payStatus(orderId, msisdn);
+  async function doPoll(orderId) {
+    try {
+      const res = await payStatus(orderId);
       if (!res?.ok) return;
       
       const d = res.data || {};
-      setTrackerStatus(d.status || 'UNKNOWN');
+      const status = d.status || 'UNKNOWN';
+      setTrackerStatus(status);
 
       // Update log
       const now = new Date().toLocaleTimeString();
-      trkLog.innerHTML = `<div><small>${now}</small> - Status: <strong>${d.status || 'UNKNOWN'}</strong></div>`;
+      let logHtml = `<div><small>${now}</small> - Status: <strong>${status}</strong></div>`;
 
-      // Jika upstreamResult tersedia, tampilkan dan hentikan polling
+      // Jika ada upstreamResult, proses hasilnya
       if (d.upstreamResult) {
-        if (pollTimer) { 
-          clearInterval(pollTimer); 
-          pollTimer = null; 
-        }
-        fillUpstreamBox(d.upstreamResult, orderId);
+        logHtml += `<div><small>${now}</small> - Forward: <strong>${d.upstreamResult.ok ? 'SUCCESS' : 'FAILED'}</strong></div>`;
         
         if (d.upstreamResult.ok) {
+          // Berhasil forward ke upstream
+          if (pollTimer) { 
+            clearInterval(pollTimer); 
+            pollTimer = null; 
+          }
+          fillUpstreamBox(d.upstreamResult);
           toast('Pembayaran berhasil! Order sedang diproses...', 'success');
         } else {
-          toast('Pembayaran berhasil tapi proses forward gagal: ' + (d.upstreamResult.message || 'Unknown error'), 'warning');
+          // Gagal forward
+          if (pollTimer) { 
+            clearInterval(pollTimer); 
+            pollTimer = null; 
+          }
+          fillUpstreamBox(d.upstreamResult);
+          toast('Pembayaran berhasil tapi proses forward gagal', 'warning');
         }
+      } else if (status === 'PAID') {
+        // Status PAID tapi belum ada upstream result
+        logHtml += `<div><small>${now}</small> - Menunggu proses forward ke upstream...</div>`;
       }
       
-      // Jika status PAID tapi belum ada upstream result, tunggu
-      if (d.status === 'PAID' && !d.upstreamResult) {
-        trkLog.innerHTML += `<div><small>${now}</small> - Menunggu proses forward ke upstream...</div>`;
-      }
+      trkLog.innerHTML = logHtml;
       
-    }catch(e){
+    } catch (e) {
       console.warn('Poll error:', e);
       const now = new Date().toLocaleTimeString();
       trkLog.innerHTML += `<div><small>${now}</small> - Error: ${e.message}</div>`;
     }
   }
 
-  function fillUpstreamBox(up, orderId) {
+  function fillUpstreamBox(up) {
     trkUpstreamBox.style.display = 'block';
     
     if (!up.ok) {
-      trkUpstreamMsg.className = 'alert alert-danger';
+      // Tampilkan error
+      trkUpstreamMsg.className = 'alert alert-danger mb-3';
       trkUpstreamMsg.innerHTML = `
         <i class="bi bi-exclamation-triangle me-2"></i>
         <strong>Gagal forward ke upstream:</strong> ${up.message || 'Unknown error'}
-        <div class="mt-2">
-          <button class="btn btn-warning btn-sm" id="btnRetryForward">
-            <i class="bi bi-arrow-clockwise me-1"></i>Coba Ulang
-          </button>
-        </div>
       `;
       
-      // Attach retry handler
-      setTimeout(() => {
-        $('#btnRetryForward')?.addEventListener('click', async () => {
-          showOverlay(true);
-          try {
-            const result = await apiPOST('/kuota/retry', { orderId });
-            if (result.ok) {
-              toast('Retry berhasil! Silakan tunggu...', 'success');
-              // Restart polling
-              if (pollTimer) clearInterval(pollTimer);
-              pollTimer = setInterval(() => doPoll(orderId, trkNoHp.textContent), 4000);
-              setTimeout(() => doPoll(orderId, trkNoHp.textContent), 1000);
-            } else {
-              toast('Retry gagal: ' + (result.message || 'Unknown error'), 'error');
-            }
-          } catch (e) {
-            toast('Error: ' + e.message, 'error');
-          } finally {
-            showOverlay(false);
-          }
-        });
-      }, 100);
-      
+      trkDeepLinkWrap.style.display = 'none';
+      trkQrisWrap.style.display = 'none';
       return;
     }
     
-    trkUpstreamMsg.className = 'alert alert-success';
+    // Success case
+    trkUpstreamMsg.className = 'alert alert-success mb-3';
     trkUpstreamMsg.innerHTML = `
       <i class="bi bi-check-circle me-2"></i>
-      <strong>Berhasil!</strong> ${up?.message || 'Order berhasil diproses'}
+      <strong>Berhasil!</strong> ${up.message || 'Order berhasil diproses'}
     `;
 
-    const data = up?.data || {};
-    const deeplink = data?.deeplink || '';
-    const isQris = !!data?.is_qris;
-
-    // reset
+    const data = up.data || {};
+    
+    // Reset display
     trkDeepLinkWrap.style.display = 'none';
     trkQrisWrap.style.display = 'none';
 
-    if (deeplink) {
+    // Handle Deeplink (DANA)
+    if (data.have_deeplink && data.deeplink) {
       trkDeepLinkWrap.style.display = 'block';
-      trkDeepLink.href = deeplink;
-      trkDeepLinkRaw.value = deeplink;
+      trkDeepLink.href = data.deeplink;
+      trkDeepLinkRaw.value = data.deeplink;
       
-      // Auto copy deeplink to clipboard
+      // Auto copy deeplink
       setTimeout(() => {
-        navigator.clipboard.writeText(deeplink).then(() => {
+        navigator.clipboard?.writeText(data.deeplink).then(() => {
           toast('Deeplink berhasil disalin ke clipboard!', 'info');
         }).catch(() => {
           // Ignore clipboard errors
@@ -447,25 +495,31 @@
       }, 1000);
     }
     
-    if (isQris && data?.qris?.qr_code) {
+    // Handle QRIS
+    if (data.is_qris && data.qris?.qr_code) {
       trkQrisWrap.style.display = 'block';
-      const code = data.qris.qr_code;
-      trkQrisImg.src = qrUrl(code);
-      trkQrisRaw.value = code;
-      trkRemain.textContent = data.qris.remaining_time ?? '-';
+      const qrData = data.qris;
+      
+      // Set QR Code image
+      trkQrisImg.src = qrUrl(qrData.qr_code);
+      trkQrisRaw.value = qrData.qr_code;
+      
+      // Handle countdown timer
+      if (qrData.remaining_time > 0) {
+        startQrisCountdown(qrData.remaining_time);
+      }
       
       // Format expiry time
-      const expiry = data.qris.payment_expired_at;
-      if (expiry) {
-        const expiryDate = new Date(expiry * 1000);
+      if (qrData.payment_expired_at) {
+        const expiryDate = new Date(qrData.payment_expired_at * 1000);
         trkExpire.textContent = expiryDate.toLocaleString('id-ID');
       } else {
         trkExpire.textContent = '-';
       }
       
-      // Auto copy QRIS code to clipboard
+      // Auto copy QRIS code
       setTimeout(() => {
-        navigator.clipboard.writeText(code).then(() => {
+        navigator.clipboard?.writeText(qrData.qr_code).then(() => {
           toast('Kode QRIS berhasil disalin ke clipboard!', 'info');
         }).catch(() => {
           // Ignore clipboard errors
@@ -475,20 +529,45 @@
     
     // Scroll ke hasil upstream
     setTimeout(() => {
-      trkUpstreamBox.scrollIntoView({ behavior: 'smooth' });
+      trkUpstreamBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 500);
   }
 
-  // ------ Events ------
+  function startQrisCountdown(initialSeconds) {
+    let seconds = initialSeconds;
+    
+    if (qrisCountdown) clearInterval(qrisCountdown);
+    
+    function updateCountdown() {
+      trkRemain.textContent = seconds;
+      
+      if (seconds <= 0) {
+        clearInterval(qrisCountdown);
+        trkRemain.textContent = 'EXPIRED';
+        trkRemain.className = 'text-danger fw-bold';
+      }
+      
+      seconds--;
+    }
+    
+    // Update immediately
+    updateCountdown();
+    
+    // Update every second
+    qrisCountdown = setInterval(updateCountdown, 1000);
+  }
+
+  // ------ Event Handlers ------
   btnCheckSession?.addEventListener('click', async () => {
     const msisdn = normNoHp(inputNoHp.value);
-    if (!msisdn || !/^0\d{9,14}$/.test(msisdn)){
+    if (!msisdn || !/^0\d{9,14}$/.test(msisdn)) {
       toast('Nomor salah. Gunakan format 08xxxxx', 'warning');
       inputNoHp.focus();
       return;
     }
+    
     showOverlay(true);
-    try{
+    try {
       const logged = await checkSession(msisdn);
       persistMsisdn(msisdn);
       setSessionBadge(logged ? 'loggedin' : 'loggedout');
@@ -499,28 +578,30 @@
       } else {
         toast('Nomor belum login, silakan verifikasi OTP', 'info');
       }
-    } catch(e) {
+    } catch (e) {
       toast('Error cek session: ' + e.message, 'error');
-    } finally{
+    } finally {
       showOverlay(false);
     }
   });
 
   btnSendOTP?.addEventListener('click', async () => {
     const msisdn = normNoHp(inputNoHp.value);
-    if (!msisdn || !/^0\d{9,14}$/.test(msisdn)){
+    if (!msisdn || !/^0\d{9,14}$/.test(msisdn)) {
       toast('Nomor salah. Gunakan format 08xxxxx', 'warning');
       inputNoHp.focus();
       return;
     }
+    
     showOverlay(true);
-    try{
+    try {
       const r = await sendOtp(msisdn);
-      if (!r?.ok){
+      if (!r?.ok) {
         toast(r?.message || 'Gagal mengirim OTP', 'error');
         return;
       }
-      // auth_id otomatis (disimpan di server), FE cukup keep jika mau
+      
+      // auth_id otomatis (disimpan di server)
       inputAuthId.value = r?.data?.auth_id || '';
       otpRow.style.display = 'block';
       otpHelp.textContent = r?.message || 'OTP terkirim. Cek SMS lalu isi kodenya.';
@@ -534,20 +615,22 @@
       }, 100);
       
       toast('OTP berhasil dikirim! Cek SMS Anda.', 'success');
-    } catch(e) {
+    } catch (e) {
       toast('Error kirim OTP: ' + e.message, 'error');
-    } finally{
+    } finally {
       showOverlay(false);
     }
   });
 
   btnVerifyOtp?.addEventListener('click', async () => {
     const msisdn = normNoHp(inputNoHp.value);
-    const kode = (inputKodeOtp.value||'').trim();
+    const kode = (inputKodeOtp.value || '').trim();
+    
     if (!msisdn || !/^0\d{9,14}$/.test(msisdn)) {
       toast('Nomor tidak valid', 'warning');
       return;
     }
+    
     if (!/^\d{4,8}$/.test(kode)) {
       toast('Kode OTP harus 4-8 digit angka', 'warning');
       inputKodeOtp.focus();
@@ -555,13 +638,13 @@
     }
 
     showOverlay(true);
-    try{
-      // tidak perlu kirim auth_id
+    try {
       const r = await verifyOtp(msisdn, kode);
-      if (!r?.ok){
+      if (!r?.ok) {
         toast(r?.message || 'Verifikasi gagal', 'error');
         return;
       }
+      
       setSessionBadge('loggedin');
       otpRow.style.display = 'none';
       inputKodeOtp.value = '';
@@ -569,9 +652,9 @@
       otpHelp.className = 'small text-success mt-2';
       
       toast('Login OTP berhasil! Sekarang bisa order paket.', 'success');
-    } catch(e) {
+    } catch (e) {
       toast('Error verifikasi OTP: ' + e.message, 'error');
-    } finally{
+    } finally {
       showOverlay(false);
     }
   });
@@ -589,8 +672,9 @@
       toast('Isi nomor dulu ya', 'warning');
       return;
     }
+    
     showOverlay(true);
-    try{
+    try {
       await apiPOST('/kuota/logout', { no_hp: msisdn });
       setSessionBadge('loggedout');
       otpRow.style.display = 'none';
@@ -600,9 +684,9 @@
       otpHelp.className = 'small text-info mt-2';
       
       toast('Logout berhasil!', 'info');
-    } catch(e) {
+    } catch (e) {
       toast('Error logout: ' + e.message, 'error');
-    } finally{
+    } finally {
       showOverlay(false);
     }
   });
@@ -614,15 +698,16 @@
 
   btnCekPaketAktif?.addEventListener('click', async () => {
     const msisdn = normNoHp(inputNoHp.value || getPersistMsisdn());
-    if (!msisdn || !/^0\d{9,14}$/.test(msisdn)){
+    if (!msisdn || !/^0\d{9,14}$/.test(msisdn)) {
       toast('Isi nomor valid dulu ya', 'warning');
       inputNoHp.focus();
       return;
     }
+    
     showOverlay(true);
-    try{
+    try {
       const r = await cekDetail(msisdn);
-      if (!r?.ok){
+      if (!r?.ok) {
         if (r?.need_login) {
           toast('Nomor belum login OTP', 'warning');
         } else {
@@ -630,18 +715,19 @@
         }
         return;
       }
+      
       renderDetail(r, msisdn);
       detailWrap.style.display = 'block';
       
       // Scroll ke detail
       setTimeout(() => {
-        detailWrap.scrollIntoView({ behavior: 'smooth' });
+        detailWrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 100);
       
       toast('Detail paket berhasil dimuat!', 'success');
-    } catch(e) {
+    } catch (e) {
       toast('Error cek detail: ' + e.message, 'error');
-    } finally{
+    } finally {
       showOverlay(false);
     }
   });
@@ -657,21 +743,25 @@
       clearInterval(pollTimer); 
       pollTimer = null; 
     }
+    if (qrisCountdown) {
+      clearInterval(qrisCountdown);
+      qrisCountdown = null;
+    }
     toast('Tracker ditutup', 'info');
   });
 
   trkPollNow?.addEventListener('click', async () => {
     const id = trkOrderId.textContent || '';
-    const ms = trkNoHp.textContent || '';
     if (!id) {
       toast('Tidak ada order aktif', 'warning');
       return;
     }
+    
     showOverlay(true);
     try {
-      await doPoll(id, ms);
+      await doPoll(id);
       toast('Status diperbarui!', 'info');
-    } catch(e) {
+    } catch (e) {
       toast('Error refresh status: ' + e.message, 'error');
     } finally {
       showOverlay(false);
@@ -684,49 +774,6 @@
       btnCheckSession.click();
     }
   });
-
-  // ------ bootstrap ------
-  function escapeHtml(s){
-    return String(s||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');
-  }
-
-  async function bootstrapCatalog(){
-    showOverlay(true);
-    try{
-      const list = await loadCatalog();
-      renderCatalog(list);
-    }catch(e){
-      console.error(e);
-      catalogGrid.innerHTML = `
-        <div class="col-12">
-          <div class="alert alert-danger">
-            <i class="bi bi-exclamation-triangle me-2"></i>
-            Gagal memuat katalog: ${e.message}
-          </div>
-        </div>
-      `;
-      toast('Gagal memuat katalog', 'error');
-    }finally{
-      showOverlay(false);
-    }
-  }
-
-  async function bootstrapSession(){
-    const saved = getPersistMsisdn();
-    if (saved){
-      inputNoHp.value = saved;
-      try{
-        const logged = await checkSession(saved);
-        setSessionBadge(logged ? 'loggedin' : 'loggedout');
-        otpRow.style.display = logged ? 'none' : '';
-      }catch(e){
-        setSessionBadge('unknown');
-        console.log('Session check error:', e);
-      }
-    }else{
-      setSessionBadge('unknown');
-    }
-  }
 
   // Auto-check session ketika nomor diubah
   inputNoHp?.addEventListener('blur', async () => {
@@ -743,8 +790,56 @@
     }
   });
 
-  // init
+  // ------ Utility Functions ------
+  function escapeHtml(s) {
+    return String(s || '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+  }
+
+  // ------ Bootstrap Functions ------
+  async function bootstrapCatalog() {
+    showOverlay(true);
+    try {
+      const list = await loadCatalog();
+      renderCatalog(list);
+    } catch (e) {
+      console.error('Bootstrap catalog error:', e);
+      catalogGrid.innerHTML = `
+        <div class="col-12">
+          <div class="alert alert-danger">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            Gagal memuat katalog: ${e.message}
+          </div>
+        </div>
+      `;
+      catalogCount.textContent = '0';
+      toast('Gagal memuat katalog', 'error');
+    } finally {
+      showOverlay(false);
+    }
+  }
+
+  async function bootstrapSession() {
+    const saved = getPersistMsisdn();
+    if (saved) {
+      inputNoHp.value = saved;
+      try {
+        const logged = await checkSession(saved);
+        setSessionBadge(logged ? 'loggedin' : 'loggedout');
+        otpRow.style.display = logged ? 'none' : '';
+      } catch (e) {
+        setSessionBadge('unknown');
+        console.log('Session check error:', e);
+      }
+    } else {
+      setSessionBadge('unknown');
+    }
+  }
+
+  // ------ Initialize Application ------
   document.addEventListener('DOMContentLoaded', () => {
+    console.log('🚀 Initializing Order Kuota App...');
+    
+    // Initialize session and catalog
     bootstrapSession();
     bootstrapCatalog();
     
