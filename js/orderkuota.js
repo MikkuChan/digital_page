@@ -1,36 +1,61 @@
+// ==============================================
+//  FDZ • Order Kuota Frontend JS
+//  Flow: OTP Login → Session → Katalog → Invoice → Poll Status → Forward Result → Cek Paket
+// ==============================================
+
 // ======= CONFIG =======
-const API_BASE = "https://call.fadzdigital.store";
+const API_BASE = "https://v1.fadzdigital.store"; // ganti ke domain Worker kamu
 const POLL_MS = 4000; // interval polling status invoice
 
 // ======= UTILS =======
 const $ = (q) => document.querySelector(q);
 const $$ = (q) => document.querySelectorAll(q);
+
 const toast = (msg) => {
-  const t = $("#toast"); t.textContent = msg; t.classList.add("show");
-  setTimeout(()=> t.classList.remove("show"), 2200);
+  const t = $("#toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2200);
 };
 const spin = (on) => $("#spinner").classList.toggle("hidden", !on);
 
-function rupiah(n){ try { return (n||0).toLocaleString("id-ID",{style:"currency", currency:"IDR", maximumFractionDigits:0}); } catch { return `Rp ${n}`; } }
-function normNo(no){
-  let s = String(no||"").trim();
+function rupiah(n) {
+  try {
+    return (n || 0).toLocaleString("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      maximumFractionDigits: 0,
+    });
+  } catch {
+    return `Rp ${n}`;
+  }
+}
+function normNo(no) {
+  let s = String(no || "").trim();
   if (!s) return null;
-  if (s.startsWith("+62")) s = "0"+s.slice(3);
-  else if (s.startsWith("62")) s = "0"+s.slice(2);
+  if (s.startsWith("+62")) s = "0" + s.slice(3);
+  else if (s.startsWith("62")) s = "0" + s.slice(2);
   if (!/^0\d{9,14}$/.test(s)) return null;
   return s;
 }
-function qrisImgUrl(qrText){
-  // pakai layanan umum generator QR; fallback aman jika diblok cukup tampilkan string
+function qrisImgUrl(qrText) {
   const u = "https://api.qrserver.com/v1/create-qr-code/";
-  const p = new URLSearchParams({ data: qrText, size:"220x220", qzone:"2", margin:"0" });
+  const p = new URLSearchParams({ data: qrText, size: "220x220", qzone: "2", margin: "0" });
   return `${u}?${p.toString()}`;
+}
+function esc(s) {
+  return String(s ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
 }
 
 // ======= STATE =======
 let CATALOG = [];
-let SELECTED = null; // { paket_id, package_named_show, payment_method, price_paket_show }
+let SELECTED = null;      // { paket_id, package_named_show, payment_method, price_paket_show }
 let CURRENT_ORDER = null; // { orderId, paymentUrl }
+let LOGGED_IN = false;
 
 // ======= DOM =======
 const elYear = $("#year");
@@ -76,109 +101,151 @@ $("#btnCancelSelection").addEventListener("click", () => {
 $("#btnRefreshStatus").addEventListener("click", onRefreshStatus);
 
 // ======= FUNCTIONS =======
-function ensureNo(){
+function ensureNo() {
   const v = normNo(elNo.value);
-  if (!v) { toast("Nomor tidak valid. Format: 08xxxxxxxxxx"); return null; }
+  if (!v) {
+    toast("Nomor tidak valid. Format: 08xxxxxxxxxx");
+    return null;
+  }
   localStorage.setItem("fdz:no_hp", v);
   return v;
 }
 
-async function onCheckSession(){
-  const no = ensureNo(); if (!no) return;
-  spin(true);
-  try{
-    const r = await fetch(`${API_BASE}/kuota/session?no_hp=${encodeURIComponent(no)}`);
-    const j = await r.json();
-    if (j.ok && j.loggedIn){
-      elSessionInfo.textContent = `Login: YES (source=${j.source})`;
-      elSessionInfo.classList.remove("muted");
-      toast("Nomor sudah login.");
-    }else{
-      elSessionInfo.textContent = `Login: NO`;
-      elSessionInfo.classList.add("muted");
-      toast(j.message || "Belum login.");
-    }
-  }catch(e){ toast("Gagal cek session."); }
-  finally{ spin(false); }
+async function assertSession(no) {
+  const r = await fetch(`${API_BASE}/kuota/session?no_hp=${encodeURIComponent(no)}`);
+  const j = await r.json();
+  LOGGED_IN = !!(j.ok && j.loggedIn);
+  if (LOGGED_IN) {
+    elSessionInfo.textContent = `Login: YES${j.source ? ` (source=${j.source})` : ""}`;
+    elSessionInfo.classList.remove("muted");
+  } else {
+    elSessionInfo.textContent = "Login: NO";
+    elSessionInfo.classList.add("muted");
+  }
+  return LOGGED_IN;
 }
 
-async function onLogout(){
-  const no = ensureNo(); if (!no) return;
+async function onCheckSession() {
+  const no = ensureNo();
+  if (!no) return;
+  spin(true);
+  try {
+    await assertSession(no);
+    toast(LOGGED_IN ? "Nomor sudah login." : "Belum login. Gunakan OTP.");
+  } catch {
+    toast("Gagal cek session.");
+  } finally {
+    spin(false);
+  }
+}
+
+async function onLogout() {
+  const no = ensureNo();
+  if (!no) return;
   if (!confirm("Yakin logout nomor ini? Token akan dihapus.")) return;
   spin(true);
-  try{
+  try {
     const r = await fetch(`${API_BASE}/kuota/logout`, {
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body: JSON.stringify({ no_hp: no })
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ no_hp: no }),
     });
     const j = await r.json();
-    if (j.ok){ elSessionInfo.textContent = "Logout berhasil."; toast("Logout berhasil."); }
-    else toast(j.message || "Logout gagal.");
-  }catch(e){ toast("Logout error."); }
-  finally{ spin(false); }
+    LOGGED_IN = false;
+    if (j.ok) {
+      elSessionInfo.textContent = "Logout berhasil.";
+      elSessionInfo.classList.add("muted");
+      toast("Logout berhasil.");
+    } else {
+      toast(j.message || "Logout gagal.");
+    }
+  } catch {
+    toast("Logout error.");
+  } finally {
+    spin(false);
+  }
 }
 
-async function onRequestOtp(){
-  const no = ensureNo(); if (!no) return;
+async function onRequestOtp() {
+  const no = ensureNo();
+  if (!no) return;
   spin(true);
-  try{
+  try {
     const r = await fetch(`${API_BASE}/kuota/otp/request`, {
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body: JSON.stringify({ no_hp: no })
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ no_hp: no }),
     });
     const j = await r.json();
-    if (j.ok){
-      elOtpInfo.textContent = j.data?.can_resend_in ? `Tunggu ${j.data.can_resend_in}s untuk kirim ulang.` : "OTP terkirim.";
+    if (j.ok) {
+      elOtpInfo.textContent = j.data?.can_resend_in
+        ? `Tunggu ${j.data.can_resend_in}s untuk kirim ulang.`
+        : "OTP terkirim.";
       toast(j.message || "OTP terkirim.");
-    }else{
+    } else {
       toast(j.message || "Gagal kirim OTP.");
     }
-  }catch(e){ toast("OTP request error."); }
-  finally{ spin(false); }
+  } catch {
+    toast("OTP request error.");
+  } finally {
+    spin(false);
+  }
 }
 
-async function onVerifyOtp(){
-  const no = ensureNo(); if (!no) return;
+async function onVerifyOtp() {
+  const no = ensureNo();
+  if (!no) return;
   const kode = $("#kode_otp").value.trim();
-  if (!/^\d{4,8}$/.test(kode)){ toast("Kode OTP tidak valid."); return; }
+  if (!/^\d{4,8}$/.test(kode)) {
+    toast("Kode OTP tidak valid.");
+    return;
+  }
   spin(true);
-  try{
+  try {
     const r = await fetch(`${API_BASE}/kuota/otp/verify`, {
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body: JSON.stringify({ no_hp: no, kode_otp: kode })
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ no_hp: no, kode_otp: kode }),
     });
     const j = await r.json();
-    if (j.ok){
-      elSessionInfo.textContent = `Login: YES`;
+    if (j.ok) {
+      LOGGED_IN = true;
+      elSessionInfo.textContent = "Login: YES";
       elSessionInfo.classList.remove("muted");
       toast("Login OTP berhasil.");
-    }else{
+    } else {
+      LOGGED_IN = false;
       toast(j.message || "Verifikasi OTP gagal.");
     }
-  }catch(e){ toast("OTP verify error."); }
-  finally{ spin(false); }
+  } catch {
+    toast("OTP verify error.");
+  } finally {
+    spin(false);
+  }
 }
 
-async function loadCatalog(){
+async function loadCatalog() {
   spin(true);
-  try{
+  try {
     const r = await fetch(`${API_BASE}/data/kuota/list`);
     const j = await r.json();
     if (!j.ok) throw new Error(j.message || "Gagal load katalog");
     CATALOG = j.data || [];
     renderCatalog();
-  }catch(e){
+  } catch (e) {
     elCatalog.innerHTML = `<div class="package">Gagal memuat katalog 😢</div>`;
-  }finally{ spin(false); }
+  } finally {
+    spin(false);
+  }
 }
 
-function renderCatalog(){
-  if (!CATALOG.length){ elCatalog.innerHTML = `<div class="package">Katalog kosong</div>`; return; }
+function renderCatalog() {
+  if (!CATALOG.length) {
+    elCatalog.innerHTML = `<div class="package">Katalog kosong</div>`;
+    return;
+  }
   elCatalog.innerHTML = "";
-  CATALOG.forEach(item => {
+  CATALOG.forEach((item) => {
     const card = document.createElement("div");
     card.className = "package";
     card.innerHTML = `
@@ -188,7 +255,7 @@ function renderCatalog(){
         <span class="price">${rupiah(item.price_paket_show)}</span>
         <span class="badge">paket_id: ${esc(item.paket_id)}</span>
       </div>
-      <div class="desc">${esc(item.desc_package_show).replaceAll("\\n","\n")}</div>
+      <div class="desc">${esc(item.desc_package_show).replaceAll("\\n", "\n")}</div>
       <div class="inline" style="margin-top:.5rem">
         <button class="btn btn-buy">Pilih</button>
       </div>
@@ -198,7 +265,7 @@ function renderCatalog(){
   });
 }
 
-function selectPackage(item){
+function selectPackage(item) {
   SELECTED = { ...item };
   elSumPaket.textContent = item.package_named_show;
   elSumMetode.textContent = item.payment_method;
@@ -209,66 +276,93 @@ function selectPackage(item){
   CURRENT_ORDER = null;
 }
 
-async function onCreateInvoice(){
-  if (!SELECTED){ toast("Pilih paket dulu."); return; }
-  const no = ensureNo(); if (!no) return;
+async function onCreateInvoice() {
+  if (!SELECTED) {
+    toast("Pilih paket dulu.");
+    return;
+  }
+  const no = ensureNo();
+  if (!no) return;
 
   spin(true);
-  try{
+  try {
+    // pastikan sudah login (backend juga cek; ini untuk UX)
+    const ok = await assertSession(no);
+    if (!ok) {
+      spin(false);
+      toast("Belum login. Kirim & verifikasi OTP dulu.");
+      return;
+    }
+
     const r = await fetch(`${API_BASE}/kuota/pay/create`, {
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body: JSON.stringify({ no_hp: no, paket_id: SELECTED.paket_id })
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ no_hp: no, paket_id: SELECTED.paket_id }),
     });
     const j = await r.json();
     if (!j.ok) throw new Error(j.message || "Gagal membuat invoice");
     CURRENT_ORDER = { orderId: j.orderId, paymentUrl: j.paymentUrl };
+
     elPaymentUrl.href = j.paymentUrl;
     elPaymentUrl.textContent = j.paymentUrl;
     elInvoicePanel.classList.remove("hidden");
     elStatusText.textContent = "PENDING";
-    toast("Invoice berhasil dibuat. Silakan lakukan pembayaran.");
-    // Mulai poll otomatis sebentar:
+    toast("Invoice dibuat. Silakan bayar.");
+
+    // Opsional: buka tab pembayaran otomatis
+    try {
+      window.open(j.paymentUrl, "_blank", "noopener");
+    } catch {}
+
     startPollingStatus();
-  }catch(e){
+  } catch (e) {
     toast(e.message || "Create invoice error");
-  }finally{
+  } finally {
     spin(false);
   }
 }
 
 let pollTimer = null;
-function startPollingStatus(){
+function startPollingStatus() {
   stopPolling();
   pollTimer = setInterval(onRefreshStatus, POLL_MS);
 }
-function stopPolling(){
-  if (pollTimer){ clearInterval(pollTimer); pollTimer = null; }
+function stopPolling() {
+  if (pollTimer) {
+    clearInterval(pollTimer);
+    pollTimer = null;
+  }
 }
 
-async function onRefreshStatus(){
-  if (!CURRENT_ORDER){ toast("Belum ada invoice."); return; }
-  try{
-    const r = await fetch(`${API_BASE}/kuota/pay/status?orderId=${encodeURIComponent(CURRENT_ORDER.orderId)}`);
+async function onRefreshStatus() {
+  if (!CURRENT_ORDER) {
+    toast("Belum ada invoice.");
+    return;
+  }
+  try {
+    const r = await fetch(
+      `${API_BASE}/kuota/pay/status?orderId=${encodeURIComponent(CURRENT_ORDER.orderId)}`
+    );
     const j = await r.json();
     if (!j.ok) throw new Error(j.message || "Gagal cek status");
     const st = (j.data?.status || "PENDING").toUpperCase();
     elStatusText.textContent = st;
 
-    if (st === "PAID"){
-      // tampilkan upstream result jika ada
+    if (st === "PAID") {
       const up = j.data?.upstreamResult || null;
-      if (up && up.ok){
-        renderUpstreamResult(up);
-      }else{
-        // mungkin masih diproses: keep polling sebentar
-      }
+      if (up && up.ok) renderUpstreamResult(up);
+      // kalau belum ada result-nya, keep polling sampai backend selesai forward
     }
-    if (st === "FAILED"){ stopPolling(); toast("Pembayaran gagal."); }
-  }catch(e){ /* diamkan, nanti coba lagi next tick */ }
+    if (st === "FAILED") {
+      stopPolling();
+      toast("Pembayaran gagal.");
+    }
+  } catch {
+    // diamkan, akan retry di tick berikutnya
+  }
 }
 
-function renderUpstreamResult(up){
+function renderUpstreamResult(up) {
   stopPolling();
   elResultPanel.classList.remove("hidden");
 
@@ -276,47 +370,61 @@ function renderUpstreamResult(up){
   const isQris = !!up.data?.is_qris;
 
   // Deeplink
-  if (haveDeeplink){
+  if (haveDeeplink) {
     elDeeplinkUrl.href = up.data.deeplink;
     elDeeplinkUrl.textContent = up.data.deeplink;
     elDeeplinkWrap.classList.remove("hidden");
-  }else{
+  } else {
     elDeeplinkWrap.classList.add("hidden");
   }
 
   // QRIS
-  if (isQris && up.data?.qris?.qr_code){
+  if (isQris && up.data?.qris?.qr_code) {
     const qr = up.data.qris.qr_code;
     elQrisImg.src = qrisImgUrl(qr);
     elQrisText.textContent = qr;
     elQrisWrap.classList.remove("hidden");
-  }else{
+  } else {
     elQrisWrap.classList.add("hidden");
   }
 
   toast(up.message || "Forward selesai.");
 }
 
-async function onCekPaketAktif(){
-  const no = ensureNo(); if (!no) return;
+async function onCekPaketAktif() {
+  const no = ensureNo();
+  if (!no) return;
   spin(true);
-  try{
+  try {
     const r = await fetch(`${API_BASE}/kuota/detail?no_hp=${encodeURIComponent(no)}`);
     const j = await r.json();
-    if (!j.ok){ throw new Error(j.message || "Gagal mengambil paket aktif"); }
+
+    if (r.status === 401 || j.need_login) {
+      LOGGED_IN = false;
+      elSessionInfo.textContent = "Login: NO";
+      elSessionInfo.classList.add("muted");
+      elActivePackages.innerHTML = `<div class="empty">Belum login. Kirim & verifikasi OTP dulu.</div>`;
+      toast("Session kedaluwarsa. Silakan OTP lagi.");
+      return;
+    }
+
+    if (!j.ok) throw new Error(j.message || "Gagal mengambil paket aktif");
     renderActivePackages(j.data);
-  }catch(e){
+  } catch {
     elActivePackages.innerHTML = `<div class="empty">Gagal mengambil paket aktif.</div>`;
-  }finally{
+  } finally {
     spin(false);
   }
 }
 
-function renderActivePackages(data){
+function renderActivePackages(data) {
   const qs = Array.isArray(data?.quotas) ? data.quotas : [];
-  if (!qs.length){ elActivePackages.innerHTML = `<div class="empty">Tidak ada paket aktif / tunggu 1 menit dan cek ulang.</div>`; return; }
+  if (!qs.length) {
+    elActivePackages.innerHTML = `<div class="empty">Tidak ada paket aktif / tunggu 1 menit dan cek ulang.</div>`;
+    return;
+  }
   elActivePackages.innerHTML = "";
-  qs.forEach(q => {
+  qs.forEach((q) => {
     const div = document.createElement("div");
     div.className = "pkg";
     const benefits = Array.isArray(q.benefits) ? q.benefits : [];
@@ -328,7 +436,7 @@ function renderActivePackages(data){
       <div class="benefits"></div>
     `;
     const benWrap = div.querySelector(".benefits");
-    benefits.forEach(b => {
+    benefits.forEach((b) => {
       const row = document.createElement("div");
       row.className = "benefit";
       row.innerHTML = `
@@ -339,13 +447,4 @@ function renderActivePackages(data){
     });
     elActivePackages.appendChild(div);
   });
-}
-
-// ======= helpers =======
-function esc(s){
-  return String(s ?? "")
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;");
 }
