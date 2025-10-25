@@ -20,11 +20,54 @@
   <link href="css/style.css" rel="stylesheet">
   <!-- Page CSS (khusus konten order kuota) -->
   <link href="css/orderkuota.css" rel="stylesheet">
+  
+  <style>
+    /* Additional inline styles for better UX */
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    
+    .fade-in {
+      animation: fadeIn 0.5s ease-in;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+    
+    .status-paid {
+      background: linear-gradient(45deg, #10b981, #059669) !important;
+      color: white !important;
+    }
+    
+    .status-pending {
+      background: linear-gradient(45deg, #f59e0b, #d97706) !important;
+      color: white !important;
+    }
+    
+    .status-failed {
+      background: linear-gradient(45deg, #ef4444, #dc2626) !important;
+      color: white !important;
+    }
+  </style>
 </head>
 <body>
   <!-- Loading Overlay Global -->
   <div class="loading-overlay" id="loadingOverlay">
     <div class="loading-spinner"></div>
+    <div class="mt-3 text-primary fw-semibold">Memuat...</div>
   </div>
 
   <!-- Navbar (konsisten) -->
@@ -47,8 +90,12 @@
           <li class="nav-item"><a class="nav-link" href="index.html#contact">Kontak</a></li>
         </ul>
         <div class="d-flex align-items-center gap-3">
-          <a href="https://wa.me/6285727035336" class="btn btn-success d-none d-lg-inline-flex">WhatsApp</a>
-          <a href="https://t.me/fadzdigital" class="btn btn-primary">Telegram</a>
+          <a href="https://wa.me/6285727035336" class="btn btn-success d-none d-lg-inline-flex">
+            <i class="bi bi-whatsapp me-2"></i>WhatsApp
+          </a>
+          <a href="https://t.me/fadzdigital" class="btn btn-primary">
+            <i class="bi bi-telegram me-2"></i>Telegram
+          </a>
         </div>
       </div>
     </div>
@@ -59,7 +106,7 @@
     <section class="ok-hero text-center font-display py-5">
       <div class="container">
         <span class="badge-hero mb-3 px-4 py-2 d-inline-flex align-items-center">
-          <i class="bi bi-bag-check me-2"></i>Order Kuota XL via Jasa fadzdigital
+          <i class="bi bi-lightning-charge me-2"></i>Order Kuota XL via Jasa fadzdigital
         </span>
         <h1 class="display-5 fw-bold mb-3" style="letter-spacing:-1px;color:#333;">
           Beli <span class="text-gradient">Paket Kuota</span> — Bayar ke Kami, Kami Teruskan ke Upstream
@@ -67,32 +114,71 @@
         <p class="lead mx-auto" style="max-width:720px;color:#5f6b7a;">
           Masukkan nomor XL, login OTP sekali, pilih paket, bayar via <b>Duitku</b>. Setelah <b>PAID</b>, sistem kami otomatis teruskan ke upstream (Hesda).
         </p>
+        
+        <!-- Quick Stats -->
+        <div class="row justify-content-center mt-4">
+          <div class="col-auto">
+            <div class="d-flex align-items-center gap-3 text-muted small">
+              <span class="d-flex align-items-center gap-1">
+                <i class="bi bi-shield-check text-success"></i>
+                <span>AMAN</span>
+              </span>
+              <span class="d-flex align-items-center gap-1">
+                <i class="bi bi-arrow-repeat text-primary"></i>
+                <span>OTOMATIS</span>
+              </span>
+              <span class="d-flex align-items-center gap-1">
+                <i class="bi bi-lightning text-warning"></i>
+                <span>INSTAN</span>
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
     <!-- STEP 1: Nomor & OTP -->
-    <section class="container pb-3">
+    <section class="container pb-3 fade-in">
       <div class="row justify-content-center">
         <div class="col-lg-9">
           <div class="ok-card p-4 mb-4">
+            <div class="d-flex align-items-center gap-2 mb-3">
+              <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                <span class="text-white fw-bold">1</span>
+              </div>
+              <h2 class="h5 fw-bold m-0 font-display">Login Nomor XL</h2>
+            </div>
+            
             <div class="d-flex align-items-start justify-content-between flex-wrap gap-3">
               <div class="flex-grow-1">
-                <label class="form-label fw-semibold font-display">Nomor XL</label>
+                <label class="form-label fw-semibold font-display">
+                  <i class="bi bi-phone me-1"></i>Nomor XL
+                </label>
                 <div class="input-group">
-                  <span class="input-group-text"><i class="bi bi-phone"></i></span>
+                  <span class="input-group-text bg-light">
+                    <i class="bi bi-telephone text-primary"></i>
+                  </span>
                   <input type="tel" class="form-control" id="inputNoHp" placeholder="08xxxxxxxxxx" autocomplete="off">
-                  <button class="btn btn-outline-primary" id="btnCheckSession"><i class="bi bi-shield-check me-1"></i>Cek Sesi</button>
+                  <button class="btn btn-primary" id="btnCheckSession">
+                    <i class="bi bi-shield-check me-1"></i>Cek Sesi
+                  </button>
                 </div>
                 <div class="form-text small">
-                  Format: 08xx… (bukan +62). Sesi login disimpan agar tidak sering OTP.
+                  <i class="bi bi-info-circle me-1"></i>Format: 08xx… (bukan +62). Sesi login disimpan agar tidak sering OTP.
                 </div>
               </div>
               <div class="ok-session-state text-center px-3">
-                <div class="small text-muted mb-1">Status Login</div>
+                <div class="small text-muted mb-1">
+                  <i class="bi bi-person-check me-1"></i>Status Login
+                </div>
                 <div id="sessionBadge" class="badge rounded-pill bg-secondary">Unknown</div>
-                <div class="mt-2">
-                  <button class="btn btn-outline-success btn-sm me-2" id="btnSendOTP"><i class="bi bi-envelope-paper me-1"></i>Kirim OTP</button>
-                  <button class="btn btn-outline-dark btn-sm" id="btnLogout"><i class="bi bi-box-arrow-right me-1"></i>Logout</button>
+                <div class="mt-2 d-flex gap-1">
+                  <button class="btn btn-success btn-sm" id="btnSendOTP">
+                    <i class="bi bi-envelope-paper me-1"></i>OTP
+                  </button>
+                  <button class="btn btn-outline-dark btn-sm" id="btnLogout">
+                    <i class="bi bi-box-arrow-right"></i>
+                  </button>
                 </div>
               </div>
             </div>
@@ -102,14 +188,20 @@
               <input type="hidden" id="inputAuthId" />
               <div class="row g-2 align-items-end">
                 <div class="col-md-5">
-                  <label class="form-label">Kode OTP</label>
-                  <input type="text" class="form-control" id="inputKodeOtp" placeholder="6 digit" maxlength="6" autocomplete="one-time-code" inputmode="numeric">
+                  <label class="form-label">
+                    <i class="bi bi-key me-1"></i>Kode OTP
+                  </label>
+                  <input type="text" class="form-control" id="inputKodeOtp" placeholder="6 digit dari SMS" maxlength="6" autocomplete="one-time-code" inputmode="numeric">
                 </div>
                 <div class="col-md-3 d-grid">
-                  <button class="btn btn-primary" id="btnVerifyOtp"><i class="bi bi-unlock me-1"></i>Verifikasi</button>
+                  <button class="btn btn-primary" id="btnVerifyOtp">
+                    <i class="bi bi-unlock me-1"></i>Verifikasi
+                  </button>
                 </div>
               </div>
-              <div class="small text-muted mt-2" id="otpInfoHelp">Masukkan kode OTP dari SMS. <em>auth_id</em> otomatis—kamu tidak perlu mengisi.</div>
+              <div class="small text-muted mt-2" id="otpInfoHelp">
+                <i class="bi bi-info-circle me-1"></i>Masukkan kode OTP dari SMS. <em>auth_id</em> otomatis—kamu tidak perlu mengisi.
+              </div>
             </div>
           </div>
         </div>
@@ -117,71 +209,211 @@
     </section>
 
     <!-- STEP 2: Katalog Paket -->
-    <section class="container pb-5">
+    <section class="container pb-5 fade-in">
       <div class="row justify-content-center">
         <div class="col-lg-9">
           <div class="ok-card p-4">
+            <div class="d-flex align-items-center gap-2 mb-3">
+              <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                <span class="text-white fw-bold">2</span>
+              </div>
+              <h2 class="h5 fw-bold m-0 font-display">Pilih Paket Kuota</h2>
+            </div>
+            
             <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
-              <h2 class="h4 fw-bold m-0 font-display">Katalog Paket</h2>
               <div class="d-flex align-items-center gap-2">
-                <button class="btn btn-outline-secondary btn-sm" id="btnRefreshCatalog"><i class="bi bi-arrow-clockwise me-1"></i>Refresh</button>
-                <button class="btn btn-outline-info btn-sm" id="btnCekPaketAktif"><i class="bi bi-list-check me-1"></i>Cek Paket Aktif</button>
+                <button class="btn btn-outline-primary btn-sm" id="btnRefreshCatalog">
+                  <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+                </button>
+                <button class="btn btn-outline-info btn-sm" id="btnCekPaketAktif">
+                  <i class="bi bi-list-check me-1"></i>Cek Paket Aktif
+                </button>
+              </div>
+              <div class="text-muted small">
+                <i class="bi bi-grid me-1"></i>
+                <span id="catalogCount">0</span> paket tersedia
               </div>
             </div>
+            
             <div id="catalogGrid" class="row g-3">
               <!-- cards injected here -->
+              <div class="col-12">
+                <div class="text-center py-4">
+                  <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Memuat katalog...</span>
+                  </div>
+                  <p class="text-muted mt-2">Memuat katalog paket...</p>
+                </div>
+              </div>
             </div>
 
             <!-- Hasil cek paket aktif -->
             <div class="ok-detail-wrap mt-4" id="detailWrap" style="display:none;">
-              <div class="d-flex align-items-center justify-content-between">
-                <h3 class="h5 fw-semibold">Paket Aktif Nomor</h3>
-                <button class="btn btn-sm btn-outline-dark" id="btnHideDetail"><i class="bi bi-x-lg me-1"></i>Tutup</button>
+              <div class="d-flex align-items-center justify-content-between mb-3">
+                <h3 class="h5 fw-semibold text-primary">
+                  <i class="bi bi-diagram-3 me-2"></i>Paket Aktif Nomor
+                </h3>
+                <button class="btn btn-sm btn-outline-dark" id="btnHideDetail">
+                  <i class="bi bi-x-lg me-1"></i>Tutup
+                </button>
               </div>
-              <div class="small text-muted">Nomor: <span id="detailMsisdn"></span></div>
-              <div id="detailList" class="mt-3"></div>
+              <div class="small text-muted mb-3">
+                <i class="bi bi-telephone me-1"></i>Nomor: <span id="detailMsisdn" class="fw-semibold"></span>
+              </div>
+              <div id="detailList" class="mt-3">
+                <!-- Detail paket akan diisi oleh JavaScript -->
+              </div>
             </div>
 
             <!-- Order Tracker -->
             <div class="ok-order-tracker mt-4" id="orderTracker" style="display:none;">
-              <div class="d-flex align-items-center justify-content-between">
-                <h3 class="h5 fw-semibold"><i class="bi bi-activity me-1"></i>Status Pembayaran & Forward</h3>
-                <button class="btn btn-sm btn-outline-dark" id="btnHideTracker"><i class="bi bi-x-lg me-1"></i>Tutup</button>
+              <div class="d-flex align-items-center justify-content-between mb-3">
+                <h3 class="h5 fw-semibold text-primary">
+                  <i class="bi bi-activity me-2"></i>Status Pembayaran & Forward
+                </h3>
+                <button class="btn btn-sm btn-outline-dark" id="btnHideTracker">
+                  <i class="bi bi-x-lg me-1"></i>Tutup
+                </button>
               </div>
-              <div class="small">Order ID: <b id="trkOrderId"></b> — Nomor: <b id="trkNoHp"></b></div>
-              <div class="ok-status-line mt-2">
-                <span class="badge rounded-pill bg-secondary" id="trkStatusBadge">INVOICE</span>
-              </div>
-              <div class="mt-3" id="trkPayActions">
-                <a class="btn btn-primary" id="trkOpenPayment" target="_blank" rel="noopener">
-                  <i class="bi bi-box-arrow-up-right me-1"></i>Buka Halaman Pembayaran
-                </a>
-                <button class="btn btn-outline-secondary" id="trkPollNow"><i class="bi bi-arrow-repeat me-1"></i>Cek Status</button>
-              </div>
-              <div class="ok-upstream-result mt-3" id="trkUpstreamBox" style="display:none;">
-                <div class="alert alert-success mb-3" id="trkUpstreamMsg">Berhasil diteruskan ke upstream.</div>
-                <div id="trkDeepLinkWrap" style="display:none;">
-                  <a id="trkDeepLink" class="btn btn-success btn-lg" target="_blank" rel="noopener"><i class="bi bi-wallet2 me-1"></i>Buka DANA</a>
-                  <div class="small text-muted mt-2">Jika tombol tidak berfungsi, salin tautan di bawah ini:</div>
-                  <textarea class="form-control mt-2" id="trkDeepLinkRaw" rows="2" readonly></textarea>
+              
+              <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                  <div class="small text-muted">Order ID</div>
+                  <div class="fw-bold text-truncate" id="trkOrderId">-</div>
                 </div>
+                <div class="col-md-6">
+                  <div class="small text-muted">Nomor XL</div>
+                  <div class="fw-bold" id="trkNoHp">-</div>
+                </div>
+              </div>
+              
+              <div class="ok-status-line mb-3">
+                <span class="badge rounded-pill bg-secondary fs-6 px-3 py-2" id="trkStatusBadge">
+                  <i class="bi bi-clock me-1"></i>INVOICE
+                </span>
+              </div>
+              
+              <div class="mt-3" id="trkPayActions">
+                <div class="d-flex gap-2 flex-wrap">
+                  <a class="btn btn-primary" id="trkOpenPayment" target="_blank" rel="noopener">
+                    <i class="bi bi-box-arrow-up-right me-1"></i>Buka Halaman Pembayaran
+                  </a>
+                  <button class="btn btn-outline-secondary" id="trkPollNow">
+                    <i class="bi bi-arrow-repeat me-1"></i>Cek Status
+                  </button>
+                </div>
+              </div>
+              
+              <div class="ok-upstream-result mt-4" id="trkUpstreamBox" style="display:none;">
+                <div class="alert alert-success mb-3" id="trkUpstreamMsg">
+                  <i class="bi bi-check-circle me-2"></i>Berhasil diteruskan ke upstream.
+                </div>
+                
+                <!-- Deeplink untuk DANA -->
+                <div id="trkDeepLinkWrap" style="display:none;">
+                  <div class="d-grid">
+                    <a id="trkDeepLink" class="btn btn-success btn-lg pulse" target="_blank" rel="noopener">
+                      <i class="bi bi-wallet2 me-2"></i>Buka Aplikasi DANA
+                    </a>
+                  </div>
+                  <div class="small text-muted mt-2">
+                    <i class="bi bi-info-circle me-1"></i>Jika tombol tidak berfungsi, salin tautan di bawah ini:
+                  </div>
+                  <textarea class="form-control mt-2 small" id="trkDeepLinkRaw" rows="2" readonly style="font-family: 'Courier New', monospace; font-size: 0.8rem;"></textarea>
+                </div>
+                
+                <!-- QRIS -->
                 <div id="trkQrisWrap" style="display:none;">
                   <div class="row g-3 align-items-center">
-                    <div class="col-sm-auto">
-                      <img id="trkQrisImg" alt="QRIS" class="ok-qr-img" />
+                    <div class="col-sm-auto text-center">
+                      <div class="mb-2 small text-muted">Scan QR Code</div>
+                      <img id="trkQrisImg" alt="QRIS" class="ok-qr-img shadow-sm" />
                     </div>
                     <div class="col">
-                      <div class="small text-muted">Scan QR ini di e-wallet/mbanking kamu.</div>
-                      <div class="mt-2">
-                        <span class="badge bg-dark me-2">Sisa waktu: <span id="trkRemain"></span>s</span>
-                        <span class="badge bg-secondary">Expired at: <span id="trkExpire"></span></span>
+                      <div class="small text-muted mb-2">
+                        <i class="bi bi-qr-code-scan me-1"></i>Scan QR ini di e-wallet/mbanking kamu.
                       </div>
-                      <textarea class="form-control mt-3" id="trkQrisRaw" rows="3" readonly></textarea>
+                      <div class="mt-3">
+                        <span class="badge bg-dark me-2">
+                          <i class="bi bi-clock me-1"></i>Sisa waktu: <span id="trkRemain"></span>s
+                        </span>
+                        <span class="badge bg-secondary">
+                          <i class="bi bi-calendar me-1"></i>Expired: <span id="trkExpire"></span>
+                        </span>
+                      </div>
+                      <div class="mt-3">
+                        <div class="small text-muted mb-1">Kode QRIS (copy manual):</div>
+                        <textarea class="form-control small" id="trkQrisRaw" rows="3" readonly style="font-family: 'Courier New', monospace; font-size: 0.8rem;"></textarea>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-              <div class="ok-log small text-muted mt-3" id="trkLog"></div>
+              
+              <div class="ok-log small text-muted mt-3 p-3 bg-light rounded" id="trkLog">
+                <div class="text-center">
+                  <i class="bi bi-clock-history me-1"></i>Menunggu update status...
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="container pb-5 fade-in">
+      <div class="row justify-content-center">
+        <div class="col-lg-9">
+          <div class="ok-card p-4">
+            <h3 class="h5 fw-bold mb-4 font-display text-center">
+              <i class="bi bi-question-circle me-2"></i>Pertanyaan Umum
+            </h3>
+            
+            <div class="accordion" id="faqAccordion">
+              <div class="accordion-item">
+                <h2 class="accordion-header">
+                  <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                    <i class="bi bi-clock me-2 text-primary"></i>Berapa lama prosesnya?
+                  </button>
+                </h2>
+                <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                  <div class="accordion-body">
+                    Setelah pembayaran <strong>sukses (PAID)</strong>, sistem akan otomatis meneruskan ke upstream dalam <strong>1-2 menit</strong>. Proses di upstream biasanya instant.
+                  </div>
+                </div>
+              </div>
+              
+              <div class="accordion-item">
+                <h2 class="accordion-header">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                    <i class="bi bi-shield-check me-2 text-success"></i>Apakah aman?
+                  </button>
+                </h2>
+                <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                  <div class="accordion-body">
+                    <strong>Sangat aman!</strong> Kami menggunakan payment gateway <strong>Duitku</strong> yang terpercaya. Token OTP hanya disimpan sementara dan tidak dibagikan ke pihak lain.
+                  </div>
+                </div>
+              </div>
+              
+              <div class="accordion-item">
+                <h2 class="accordion-header">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                    <i class="bi bi-arrow-left-right me-2 text-info"></i>Bagaimana cara kerjanya?
+                  </button>
+                </h2>
+                <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                  <div class="accordion-body">
+                    <ol class="mb-0">
+                      <li>Login OTP sekali untuk akses token</li>
+                      <li>Pilih paket dan bayar via Duitku</li>
+                      <li>Setelah PAID, sistem forward ke upstream</li>
+                      <li>Dapatkan deeplink/QRIS untuk pembayaran akhir</li>
+                    </ol>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -197,14 +429,24 @@
       </div>
       <div class="mb-2 small">
         &copy; 2025 fadzdigital. All rights reserved.<br />
-        Made with 💙 in Indonesia
+        Made with <i class="bi bi-heart-fill text-danger"></i> in Indonesia
       </div>
-      <div>
-        <a href="index.html" class="text-primary small text-decoration-none mx-2">Beranda</a>
-        <a href="ordervpn.html" class="text-primary small text-decoration-none mx-2">Order VPN</a>
-        <a href="tutorial.html" class="text-primary small text-decoration-none mx-2">Tutorial</a>
-        <a href="tools.html" class="text-primary small text-decoration-none mx-2">Tools</a>
-        <a href="index.html#contact" class="text-primary small text-decoration-none mx-2">Kontak</a>
+      <div class="d-flex justify-content-center gap-3 flex-wrap">
+        <a href="index.html" class="text-primary small text-decoration-none">
+          <i class="bi bi-house me-1"></i>Beranda
+        </a>
+        <a href="ordervpn.html" class="text-primary small text-decoration-none">
+          <i class="bi bi-shield-check me-1"></i>Order VPN
+        </a>
+        <a href="tutorial.html" class="text-primary small text-decoration-none">
+          <i class="bi bi-book me-1"></i>Tutorial
+        </a>
+        <a href="tools.html" class="text-primary small text-decoration-none">
+          <i class="bi bi-tools me-1"></i>Tools
+        </a>
+        <a href="index.html#contact" class="text-primary small text-decoration-none">
+          <i class="bi bi-envelope me-1"></i>Kontak
+        </a>
       </div>
     </div>
   </footer>
@@ -212,16 +454,93 @@
   <!-- JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="js/orderkuota.js"></script>
+  
   <script>
-    // Matikan overlay setelah page ready
+    // Enhanced loading overlay handler
     window.addEventListener('load', () => {
       setTimeout(() => {
         const el = document.getElementById('loadingOverlay');
         if (!el) return;
+        
+        // Add fade out animation
+        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
         el.style.opacity = '0';
-        setTimeout(() => { el.style.display = 'none'; }, 600);
-      }, 400);
+        el.style.transform = 'scale(0.95)';
+        
+        setTimeout(() => { 
+          el.style.display = 'none'; 
+        }, 600);
+      }, 800);
     });
+
+    // Add some interactive effects
+    document.addEventListener('DOMContentLoaded', function() {
+      // Add hover effects to cards
+      const cards = document.querySelectorAll('.ok-pkg-card');
+      cards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+          this.style.transform = 'translateY(-5px)';
+          this.style.transition = 'all 0.3s ease';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+          this.style.transform = 'translateY(0)';
+        });
+      });
+
+      // Add click effects to buttons
+      const buttons = document.querySelectorAll('.btn');
+      buttons.forEach(btn => {
+        btn.addEventListener('mousedown', function() {
+          this.style.transform = 'scale(0.98)';
+        });
+        
+        btn.addEventListener('mouseup', function() {
+          this.style.transform = 'scale(1)';
+        });
+        
+        btn.addEventListener('mouseleave', function() {
+          this.style.transform = 'scale(1)';
+        });
+      });
+
+      // Add scroll animations
+      const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.style.opacity = '1';
+            entry.target.style.transform = 'translateY(0)';
+          }
+        });
+      }, observerOptions);
+
+      // Observe all fade-in elements
+      const fadeElements = document.querySelectorAll('.fade-in');
+      fadeElements.forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(20px)';
+        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        observer.observe(el);
+      });
+    });
+
+    // Service worker registration for better performance (optional)
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/sw.js')
+          .then(function(registration) {
+            console.log('ServiceWorker registration successful');
+          })
+          .catch(function(err) {
+            console.log('ServiceWorker registration failed: ', err);
+          });
+      });
+    }
   </script>
 </body>
 </html>
