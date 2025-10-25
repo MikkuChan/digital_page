@@ -6,6 +6,9 @@
   const $$ = sel => document.querySelectorAll(sel);
   const sleep = ms => new Promise(r => setTimeout(r, ms));
 
+  let currentFilter = 'all';
+  let otpCountdownTimer = null;
+
   function showOverlay(flag){
     const el = $('#loadingOverlay');
     if (!el) return;
@@ -14,23 +17,38 @@
     if (!flag) setTimeout(()=>{ el.style.display='none'; }, 400);
   }
 
-  function toast(msg, type='info'){
-    // Buat toast sederhana
-    const toastEl = document.createElement('div');
-    toastEl.className = `alert alert-${type === 'error' ? 'danger' : type} alert-dismissible fade show position-fixed`;
-    toastEl.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
-    toastEl.innerHTML = `
-      ${msg}
-      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    `;
-    document.body.appendChild(toastEl);
+  function showToast(message, type = 'info') {
+    const toastContainer = $('#toastContainer');
+    if (!toastContainer) return;
     
-    // Auto remove setelah 5 detik
-    setTimeout(() => {
-      if (toastEl.parentNode) {
-        toastEl.remove();
-      }
-    }, 5000);
+    const toastId = 'toast-' + Date.now();
+    const bgColor = type === 'success' ? 'bg-success' : 
+                   type === 'error' ? 'bg-danger' : 
+                   type === 'warning' ? 'bg-warning' : 'bg-info';
+    
+    const toastEl = document.createElement('div');
+    toastEl.className = `toast ${bgColor} text-white`;
+    toastEl.setAttribute('role', 'alert');
+    toastEl.innerHTML = `
+      <div class="toast-body">
+        <div class="d-flex align-items-center">
+          <i class="bi ${type === 'success' ? 'bi-check-circle' : 
+                       type === 'error' ? 'bi-exclamation-circle' : 
+                       type === 'warning' ? 'bi-exclamation-triangle' : 'bi-info-circle'} 
+            me-2"></i>
+          <div class="flex-grow-1">${escapeHtml(message)}</div>
+          <button type="button" class="btn-close btn-close-white ms-2" data-bs-dismiss="toast"></button>
+        </div>
+      </div>
+    `;
+    
+    toastContainer.appendChild(toastEl);
+    const bsToast = new bootstrap.Toast(toastEl, { delay: 4000 });
+    bsToast.show();
+    
+    toastEl.addEventListener('hidden.bs.toast', () => {
+      toastEl.remove();
+    });
   }
 
   function fmtRp(n){
@@ -41,7 +59,6 @@
   function normNoHp(v){
     let s = String(v||'').trim();
     if (!s) return '';
-    // always to 08xxxxxxxx
     if (s.startsWith('+62')) s = '0' + s.slice(3);
     else if (s.startsWith('62')) s = '0' + s.slice(2);
     return s;
@@ -53,7 +70,8 @@
     const map = {
       unknown: ['bg-secondary', 'Unknown'],
       loggedin: ['bg-success', 'Logged In'],
-      loggedout: ['bg-warning text-dark', 'Need Login']
+      loggedout: ['bg-warning text-dark', 'Need Login'],
+      checking: ['bg-info', 'Checking...']
     };
     const [cls, txt] = map[state] || map.unknown;
     badge.className = `badge rounded-pill ${cls}`;
@@ -73,104 +91,73 @@
   }
 
   function qrUrl(data){
-    // public QR generator
     return `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(data)}`;
   }
 
   function persistMsisdn(no){
     localStorage.setItem('fdz.msisdn', no || '');
   }
+  
   function getPersistMsisdn(){
     return localStorage.getItem('fdz.msisdn') || '';
   }
 
-  // ------ DOM refs ------
-  const inputNoHp = $('#inputNoHp');
-  const btnCheckSession = $('#btnCheckSession');
-  const btnSendOTP = $('#btnSendOTP');
-  const btnLogout = $('#btnLogout');
-  const otpRow = $('#otpRow');
-  const inputAuthId = $('#inputAuthId'); // hidden (auto)
-  const inputKodeOtp = $('#inputKodeOtp');
-  const btnVerifyOtp = $('#btnVerifyOtp');
-  const otpHelp = $('#otpInfoHelp');
-
-  const btnRefreshCatalog = $('#btnRefreshCatalog');
-  const catalogGrid = $('#catalogGrid');
-  const catalogCount = $('#catalogCount');
-
-  const btnCekPaketAktif = $('#btnCekPaketAktif');
-  const detailWrap = $('#detailWrap');
-  const detailMsisdn = $('#detailMsisdn');
-  const detailList = $('#detailList');
-  const btnHideDetail = $('#btnHideDetail');
-
-  const orderTracker = $('#orderTracker');
-  const trkOrderId = $('#trkOrderId');
-  const trkNoHp = $('#trkNoHp');
-  const trkStatusBadge = $('#trkStatusBadge');
-  const trkOpenPayment = $('#trkOpenPayment');
-  const trkPollNow = $('#trkPollNow');
-  const trkUpstreamBox = $('#trkUpstreamBox');
-  const trkUpstreamMsg = $('#trkUpstreamMsg');
-  const trkDeepLinkWrap = $('#trkDeepLinkWrap');
-  const trkDeepLink = $('#trkDeepLink');
-  const trkDeepLinkRaw = $('#trkDeepLinkRaw');
-  const trkQrisWrap = $('#trkQrisWrap');
-  const trkQrisImg = $('#trkQrisImg');
-  const trkQrisRaw = $('#trkQrisRaw');
-  const trkRemain = $('#trkRemain');
-  const trkExpire = $('#trkExpire');
-  const trkLog = $('#trkLog');
-  const btnHideTracker = $('#btnHideTracker');
+  function startOtpCountdown(seconds = 60) {
+    const countdownEl = $('#otpCountdown');
+    if (!countdownEl) return;
+    
+    let timeLeft = seconds;
+    
+    if (otpCountdownTimer) clearInterval(otpCountdownTimer);
+    
+    const updateCountdown = () => {
+      if (timeLeft <= 0) {
+        countdownEl.textContent = 'OTP expired';
+        countdownEl.className = 'small text-danger';
+        clearInterval(otpCountdownTimer);
+        return;
+      }
+      
+      countdownEl.textContent = `Dapat mengirim ulang dalam ${timeLeft}s`;
+      countdownEl.className = 'small text-warning';
+      timeLeft--;
+    };
+    
+    updateCountdown();
+    otpCountdownTimer = setInterval(updateCountdown, 1000);
+  }
 
   // ------ API calls ------
   async function apiGET(path, params = {}) {
-    try {
-      const u = new URL(API_BASE + path);
-      Object.entries(params).forEach(([k, v]) => { 
-        if (v !== undefined && v !== null && v !== '') u.searchParams.set(k, v); 
-      });
-      
-      console.log(`🔵 GET ${u.toString()}`);
-      const r = await fetch(u.toString(), { 
-        method: 'GET', 
-        headers: { 'Accept': 'application/json' } 
-      });
-      
-      if (!r.ok) {
-        throw new Error(`HTTP ${r.status}`);
-      }
-      
-      const data = await r.json();
-      console.log('📥 Response:', data);
-      return data;
-    } catch (error) {
-      console.error('❌ API GET Error:', error);
-      throw error;
+    const u = new URL(API_BASE + path);
+    Object.entries(params).forEach(([k, v]) => { 
+      if (v !== undefined && v !== null) u.searchParams.set(k, v); 
+    });
+    
+    const r = await fetch(u.toString(), { 
+      method: 'GET', 
+      headers: { 'Accept': 'application/json' } 
+    });
+    
+    if (!r.ok) {
+      throw new Error(`HTTP ${r.status}`);
     }
+    
+    return await r.json();
   }
-  
+
   async function apiPOST(path, body) {
-    try {
-      console.log(`🟡 POST ${API_BASE + path}`, body);
-      const r = await fetch(API_BASE + path, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify(body || {})
-      });
-      
-      if (!r.ok) {
-        throw new Error(`HTTP ${r.status}`);
-      }
-      
-      const data = await r.json();
-      console.log('📥 Response:', data);
-      return data;
-    } catch (error) {
-      console.error('❌ API POST Error:', error);
-      throw error;
+    const r = await fetch(API_BASE + path, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(body || {})
+    });
+    
+    if (!r.ok) {
+      throw new Error(`HTTP ${r.status}`);
     }
+    
+    return await r.json();
   }
 
   async function checkSession(nohp) {
@@ -179,14 +166,14 @@
       return !!res?.loggedIn;
     } catch (error) {
       console.error('Session check error:', error);
-      return false;
+      throw error;
     }
   }
 
   async function sendOtp(nohp) {
     return await apiPOST('/kuota/otp/request', { no_hp: nohp });
   }
-  
+
   async function verifyOtp(nohp, kode) {
     return await apiPOST('/kuota/otp/verify', { no_hp: nohp, kode_otp: kode });
   }
@@ -210,54 +197,77 @@
 
   // ------ Render Katalog ------
   function renderCatalog(list) {
+    const catalogGrid = $('#catalogGrid');
+    const catalogLoading = $('#catalogLoading');
+    
+    if (!catalogGrid) return;
+    
+    // Hide loading
+    if (catalogLoading) catalogLoading.style.display = 'none';
+    
     catalogGrid.innerHTML = '';
     
     if (!list.length) {
       catalogGrid.innerHTML = `
         <div class="col-12">
-          <div class="alert alert-info">
-            <i class="bi bi-info-circle me-2"></i>
-            Belum ada paket kuota yang tersedia.
+          <div class="alert alert-info text-center">
+            <i class="bi bi-info-circle me-2"></i>Belum ada paket yang tersedia.
           </div>
         </div>
       `;
-      catalogCount.textContent = '0';
       return;
     }
 
-    catalogCount.textContent = list.length.toString();
-    
-    list.forEach(item => {
+    // Filter packages based on current filter
+    const filteredList = currentFilter === 'all' 
+      ? list 
+      : list.filter(item => item.payment_method === currentFilter);
+
+    if (!filteredList.length) {
+      catalogGrid.innerHTML = `
+        <div class="col-12">
+          <div class="alert alert-warning text-center">
+            <i class="bi bi-filter me-2"></i>Tidak ada paket dengan metode pembayaran ${currentFilter}.
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    filteredList.forEach(item => {
       const col = document.createElement('div');
       col.className = 'col-md-6 col-lg-4';
       
-      const payColor = item.payment_method === 'DANA' ? 'bg-success'
-                     : item.payment_method === 'QRIS' ? 'bg-dark'
-                     : item.payment_method === 'PULSA' ? 'bg-warning text-dark'
-                     : 'bg-secondary';
+      const payColor = item.payment_method === 'DANA' ? 'bg-success' :
+                     item.payment_method === 'QRIS' ? 'bg-dark' :
+                     'bg-warning text-dark';
+                     
+      const payIcon = item.payment_method === 'DANA' ? 'bi-wallet2' :
+                    item.payment_method === 'QRIS' ? 'bi-qr-code' :
+                    'bi-phone';
       
       col.innerHTML = `
         <div class="ok-pkg-card h-100 d-flex flex-column">
           <div class="ok-pkg-head">
             <div class="d-flex align-items-start justify-content-between">
               <div class="me-2">
-                <div class="fw-bold text-primary">${escapeHtml(item.package_named_show)}</div>
-                <div class="small text-muted mt-1">
-                  <i class="bi bi-tag me-1"></i>${escapeHtml(item.payment_method)}
+                <div class="fw-bold text-truncate" title="${escapeHtml(item.package_named_show)}">
+                  ${escapeHtml(item.package_named_show)}
                 </div>
+                <div class="small text-muted">Paket ID: <span class="font-monospace">${escapeHtml(item.paket_id)}</span></div>
               </div>
-              <span class="badge ${payColor}">${escapeHtml(item.payment_method)}</span>
+              <span class="badge ${payColor} ok-pay-badge d-flex align-items-center">
+                <i class="bi ${payIcon} me-1"></i>${escapeHtml(item.payment_method)}
+              </span>
             </div>
           </div>
           <div class="ok-pkg-body d-flex flex-column">
             <div class="d-flex align-items-center justify-content-between mb-2">
-              <div class="ok-pkg-price h5 text-success mb-0">Rp ${fmtRp(item.price_paket_show)}</div>
+              <div class="ok-pkg-price">Rp ${fmtRp(item.price_paket_show)}</div>
             </div>
-            <div class="ok-desc flex-grow-1 small text-muted">
-              ${escapeHtml(item.desc_package_show || 'Paket kuota XL')}
-            </div>
+            <div class="ok-desc flex-grow-1">${escapeHtml(item.desc_package_show)}</div>
             <div class="d-grid mt-3">
-              <button class="btn btn-primary btn-beli" data-paket="${escapeHtml(item.paket_id)}">
+              <button class="btn btn-primary btn-beli" data-paket="${encodeURIComponent(item.paket_id)}">
                 <i class="bi bi-cart-plus me-1"></i>Beli Paket Ini
               </button>
             </div>
@@ -267,43 +277,40 @@
       catalogGrid.appendChild(col);
     });
 
-    // Attach event handlers untuk tombol beli
+    // Attach event handlers to buy buttons
     $$('.btn-beli').forEach(btn => {
       btn.addEventListener('click', async (e) => {
-        const paket_id = e.currentTarget.getAttribute('data-paket');
+        const paket_id = decodeURIComponent(e.currentTarget.getAttribute('data-paket') || '');
         const msisdn = normNoHp(inputNoHp.value);
         
         if (!msisdn || !/^0\d{9,14}$/.test(msisdn)) {
-          toast('Isi nomor XL valid (format 08xxxxx) dulu ya', 'warning');
+          showToast('Isi nomor XL valid (format 08xxxxx) dulu ya', 'warning');
           inputNoHp.focus();
           return;
         }
-
+        
         showOverlay(true);
         try {
-          // Cek session dulu
           const logged = await checkSession(msisdn);
           if (!logged) {
             showOverlay(false);
-            toast('Nomor belum login OTP. Kirim & verifikasi OTP dahulu!', 'warning');
+            showToast('Nomor belum login OTP. Kirim & verifikasi OTP dahulu!', 'warning');
             otpRow.style.display = '';
             return;
           }
-
-          // Buat invoice
+          
           const inv = await createInvoice(msisdn, paket_id);
           if (!inv?.ok) {
-            toast(inv?.message || 'Gagal membuat invoice', 'error');
+            showToast(inv?.message || 'Gagal membuat invoice', 'error');
             return;
           }
-
-          // Buka tracker
-          openTracker(inv.orderId, msisdn, inv.paymentUrl);
-          toast('Invoice berhasil dibuat! Silakan lanjutkan pembayaran.', 'success');
+          
+          openTracker(inv?.orderId, msisdn, inv?.paymentUrl || '');
+          showToast('Invoice berhasil dibuat! Silakan lanjutkan pembayaran.', 'success');
           
         } catch (err) {
-          console.error('Beli error:', err);
-          toast('Terjadi kesalahan saat membuat invoice', 'error');
+          console.error('Create invoice error:', err);
+          showToast('Terjadi kesalahan saat membuat invoice', 'error');
         } finally {
           showOverlay(false);
         }
@@ -313,6 +320,11 @@
 
   // ------ Detail Paket Aktif ------
   function renderDetail(data, msisdn) {
+    const detailMsisdn = $('#detailMsisdn');
+    const detailList = $('#detailList');
+    
+    if (!detailMsisdn || !detailList) return;
+    
     detailMsisdn.textContent = msisdn;
     const d = data?.data || {};
     const list = Array.isArray(d?.quotas) ? d.quotas : [];
@@ -320,9 +332,7 @@
     if (!list.length) {
       detailList.innerHTML = `
         <div class="alert alert-info">
-          <i class="bi bi-info-circle me-2"></i>
-          Tidak ada paket aktif yang terdeteksi saat ini.
-          ${d?.text ? `<div class="mt-2 small">${escapeHtml(d.text)}</div>` : ''}
+          <i class="bi bi-info-circle me-2"></i>Tidak ada paket aktif yang terdeteksi saat ini.
         </div>
       `;
       return;
@@ -330,34 +340,25 @@
     
     const html = list.map((q, index) => {
       const benefits = Array.isArray(q.benefits) ? q.benefits : [];
-      const rows = benefits.map(b => {
-        const remaining = b.remaining_quota || b.quota || '-';
-        const isUsed = (remaining === '0 GB' || remaining === '0' || remaining === '0.00 GB') ? 'bg-secondary' : 'bg-success';
-        
-        return `
-          <div class="col-md-6 col-lg-4">
-            <div class="ok-quota-item mb-2">
-              <div class="d-flex align-items-center justify-content-between">
-                <div class="ok-quota-title small">${escapeHtml(b.name || '-')}</div>
-                <span class="badge ${isUsed}">${escapeHtml(remaining)}</span>
-              </div>
-              ${b.information ? `<div class="small text-muted mt-1">${escapeHtml(b.information)}</div>` : ''}
+      const rows = benefits.map(b => `
+        <div class="col-md-6">
+          <div class="ok-quota-item mb-2">
+            <div class="d-flex align-items-center justify-content-between">
+              <div class="ok-quota-title">${escapeHtml(b.name || '-')}</div>
+              <span class="badge bg-primary">${escapeHtml(b.remaining_quota || b.quota || '-')}</span>
             </div>
+            ${b.information ? `<div class="small text-muted mt-1">${escapeHtml(b.information)}</div>` : ''}
           </div>
-        `;
-      }).join('');
+        </div>
+      `).join('');
       
       return `
-        <div class="mb-3 p-3 border rounded bg-light">
+        <div class="mb-3 p-3 border rounded">
           <div class="d-flex align-items-center justify-content-between mb-2">
-            <div class="fw-bold text-primary">${escapeHtml(q.name || `Paket ${index + 1}`)}</div>
-            <span class="badge bg-dark">
-              <i class="bi bi-clock me-1"></i>${escapeHtml(q.expired_at || '-')}
-            </span>
+            <div class="fw-bold">${escapeHtml(q.name || `Paket ${index + 1}`)}</div>
+            <span class="badge bg-success">Expired: ${escapeHtml(q.expired_at || '-')}</span>
           </div>
-          <div class="row g-2">
-            ${rows || '<div class="col-12"><div class="small text-muted">Tidak ada benefit detail</div></div>'}
-          </div>
+          <div class="row mt-2 g-2">${rows || '<div class="col-12"><div class="small text-muted">Tidak ada benefit terdeteksi</div></div>'}</div>
         </div>
       `;
     }).join('');
@@ -367,39 +368,36 @@
 
   // ------ Tracker (payment + upstream forward) ------
   let pollTimer = null;
-  let qrisCountdown = null;
 
   function openTracker(orderId, msisdn, paymentUrl) {
-    // Reset state
+    const orderTracker = $('#orderTracker');
+    const detailWrap = $('#detailWrap');
+    
+    if (detailWrap) detailWrap.style.display = 'none';
+    if (orderTracker) orderTracker.style.display = '';
+    
     trkOrderId.textContent = orderId || '-';
     trkNoHp.textContent = msisdn || '-';
     trkOpenPayment.href = paymentUrl || '#';
-    setTrackerStatus('PENDING');
+    setTrackerStatus('INVOICE');
     trkUpstreamBox.style.display = 'none';
     trkDeepLinkWrap.style.display = 'none';
     trkQrisWrap.style.display = 'none';
-    trkLog.innerHTML = '<div class="text-center"><i class="bi bi-clock-history me-1"></i>Menunggu update status...</div>';
-    orderTracker.style.display = 'block';
+    trkLog.textContent = '';
 
-    // Clear previous timers
-    if (pollTimer) clearInterval(pollTimer);
-    if (qrisCountdown) clearInterval(qrisCountdown);
-
-    // Start polling
-    pollTimer = setInterval(() => doPoll(orderId), 4000);
-    
-    // Poll pertama langsung
-    setTimeout(() => doPoll(orderId), 1000);
-
-    // Scroll ke tracker
-    setTimeout(() => {
-      orderTracker.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 300);
+    // Scroll to tracker
+    orderTracker.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
     // Buka tab pembayaran (kalau ada)
-    if (paymentUrl && paymentUrl !== '#') {
-      window.open(paymentUrl, '_blank', 'noopener,noreferrer');
+    if (paymentUrl) {
+      window.open(paymentUrl, '_blank', 'noopener');
     }
+
+    if (pollTimer) clearInterval(pollTimer);
+    pollTimer = setInterval(() => doPoll(orderId), 4000);
+    
+    // Initial poll
+    doPoll(orderId);
   }
 
   async function doPoll(orderId) {
@@ -408,413 +406,352 @@
       if (!res?.ok) return;
       
       const d = res.data || {};
-      const status = d.status || 'UNKNOWN';
-      setTrackerStatus(status);
+      setTrackerStatus(d.status || 'UNKNOWN');
 
       // Update log
       const now = new Date().toLocaleTimeString();
-      let logHtml = `<div><small>${now}</small> - Status: <strong>${status}</strong></div>`;
+      trkLog.textContent = `[${now}] status=${d.status}`;
 
-      // Jika ada upstreamResult, proses hasilnya
+      // Jika upstreamResult tersedia, tampilkan dan hentikan polling
       if (d.upstreamResult) {
-        logHtml += `<div><small>${now}</small> - Forward: <strong>${d.upstreamResult.ok ? 'SUCCESS' : 'FAILED'}</strong></div>`;
+        if (pollTimer) {
+          clearInterval(pollTimer);
+          pollTimer = null;
+        }
+        fillUpstreamBox(d.upstreamResult);
         
         if (d.upstreamResult.ok) {
-          // Berhasil forward ke upstream
-          if (pollTimer) { 
-            clearInterval(pollTimer); 
-            pollTimer = null; 
-          }
-          fillUpstreamBox(d.upstreamResult);
-          toast('Pembayaran berhasil! Order sedang diproses...', 'success');
+          showToast('Pembayaran berhasil! Order sedang diproses upstream.', 'success');
         } else {
-          // Gagal forward
-          if (pollTimer) { 
-            clearInterval(pollTimer); 
-            pollTimer = null; 
-          }
-          fillUpstreamBox(d.upstreamResult);
-          toast('Pembayaran berhasil tapi proses forward gagal', 'warning');
+          showToast(`Pembayaran berhasil tapi gagal diproses: ${d.upstreamResult.message}`, 'warning');
         }
-      } else if (status === 'PAID') {
-        // Status PAID tapi belum ada upstream result
-        logHtml += `<div><small>${now}</small> - Menunggu proses forward ke upstream...</div>`;
       }
       
-      trkLog.innerHTML = logHtml;
+      // Jika status FAILED/EXPIRED, stop polling
+      if (['FAILED', 'EXPIRED'].includes(d.status)) {
+        if (pollTimer) {
+          clearInterval(pollTimer);
+          pollTimer = null;
+        }
+        showToast(`Pembayaran ${d.status.toLowerCase()}`, 'error');
+      }
       
     } catch (e) {
       console.warn('Poll error:', e);
-      const now = new Date().toLocaleTimeString();
-      trkLog.innerHTML += `<div><small>${now}</small> - Error: ${e.message}</div>`;
+      trkLog.textContent += ` [ERROR: ${e.message}]`;
     }
   }
 
   function fillUpstreamBox(up) {
-    trkUpstreamBox.style.display = 'block';
-    
-    if (!up.ok) {
-      // Tampilkan error
-      trkUpstreamMsg.className = 'alert alert-danger mb-3';
-      trkUpstreamMsg.innerHTML = `
-        <i class="bi bi-exclamation-triangle me-2"></i>
-        <strong>Gagal forward ke upstream:</strong> ${up.message || 'Unknown error'}
-      `;
-      
-      trkDeepLinkWrap.style.display = 'none';
-      trkQrisWrap.style.display = 'none';
-      return;
-    }
-    
-    // Success case
-    trkUpstreamMsg.className = 'alert alert-success mb-3';
-    trkUpstreamMsg.innerHTML = `
-      <i class="bi bi-check-circle me-2"></i>
-      <strong>Berhasil!</strong> ${up.message || 'Order berhasil diproses'}
-    `;
+    trkUpstreamBox.style.display = '';
+    trkUpstreamMsg.textContent = up?.message || 'OK';
 
-    const data = up.data || {};
-    
-    // Reset display
+    const data = up?.data || {};
+    const deeplink = data?.deeplink || '';
+    const isQris = !!data?.is_qris;
+
+    // Reset displays
     trkDeepLinkWrap.style.display = 'none';
     trkQrisWrap.style.display = 'none';
 
-    // Handle Deeplink (DANA)
-    if (data.have_deeplink && data.deeplink) {
-      trkDeepLinkWrap.style.display = 'block';
-      trkDeepLink.href = data.deeplink;
-      trkDeepLinkRaw.value = data.deeplink;
-      
-      // Auto copy deeplink
-      setTimeout(() => {
-        navigator.clipboard?.writeText(data.deeplink).then(() => {
-          toast('Deeplink berhasil disalin ke clipboard!', 'info');
-        }).catch(() => {
-          // Ignore clipboard errors
-        });
-      }, 1000);
+    if (deeplink) {
+      trkDeepLinkWrap.style.display = '';
+      trkDeepLink.href = deeplink;
+      trkDeepLinkRaw.value = deeplink;
     }
     
-    // Handle QRIS
-    if (data.is_qris && data.qris?.qr_code) {
-      trkQrisWrap.style.display = 'block';
-      const qrData = data.qris;
-      
-      // Set QR Code image
-      trkQrisImg.src = qrUrl(qrData.qr_code);
-      trkQrisRaw.value = qrData.qr_code;
-      
-      // Handle countdown timer
-      if (qrData.remaining_time > 0) {
-        startQrisCountdown(qrData.remaining_time);
-      }
-      
-      // Format expiry time
-      if (qrData.payment_expired_at) {
-        const expiryDate = new Date(qrData.payment_expired_at * 1000);
-        trkExpire.textContent = expiryDate.toLocaleString('id-ID');
-      } else {
-        trkExpire.textContent = '-';
-      }
-      
-      // Auto copy QRIS code
-      setTimeout(() => {
-        navigator.clipboard?.writeText(qrData.qr_code).then(() => {
-          toast('Kode QRIS berhasil disalin ke clipboard!', 'info');
-        }).catch(() => {
-          // Ignore clipboard errors
-        });
-      }, 1000);
+    if (isQris && data?.qris?.qr_code) {
+      trkQrisWrap.style.display = '';
+      const code = data.qris.qr_code;
+      trkQrisImg.src = qrUrl(code);
+      trkQrisRaw.value = code;
+      trkRemain.textContent = data.qris.remaining_time ?? '-';
+      trkExpire.textContent = data.qris.payment_expired_at ?? '-';
     }
-    
-    // Scroll ke hasil upstream
-    setTimeout(() => {
-      trkUpstreamBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 500);
-  }
-
-  function startQrisCountdown(initialSeconds) {
-    let seconds = initialSeconds;
-    
-    if (qrisCountdown) clearInterval(qrisCountdown);
-    
-    function updateCountdown() {
-      trkRemain.textContent = seconds;
-      
-      if (seconds <= 0) {
-        clearInterval(qrisCountdown);
-        trkRemain.textContent = 'EXPIRED';
-        trkRemain.className = 'text-danger fw-bold';
-      }
-      
-      seconds--;
-    }
-    
-    // Update immediately
-    updateCountdown();
-    
-    // Update every second
-    qrisCountdown = setInterval(updateCountdown, 1000);
   }
 
   // ------ Event Handlers ------
-  btnCheckSession?.addEventListener('click', async () => {
-    const msisdn = normNoHp(inputNoHp.value);
-    if (!msisdn || !/^0\d{9,14}$/.test(msisdn)) {
-      toast('Nomor salah. Gunakan format 08xxxxx', 'warning');
-      inputNoHp.focus();
-      return;
-    }
-    
-    showOverlay(true);
-    try {
-      const logged = await checkSession(msisdn);
-      persistMsisdn(msisdn);
-      setSessionBadge(logged ? 'loggedin' : 'loggedout');
-      otpRow.style.display = logged ? 'none' : '';
-      
-      if (logged) {
-        toast('Nomor sudah login, siap untuk order!', 'success');
-      } else {
-        toast('Nomor belum login, silakan verifikasi OTP', 'info');
-      }
-    } catch (e) {
-      toast('Error cek session: ' + e.message, 'error');
-    } finally {
-      showOverlay(false);
-    }
-  });
-
-  btnSendOTP?.addEventListener('click', async () => {
-    const msisdn = normNoHp(inputNoHp.value);
-    if (!msisdn || !/^0\d{9,14}$/.test(msisdn)) {
-      toast('Nomor salah. Gunakan format 08xxxxx', 'warning');
-      inputNoHp.focus();
-      return;
-    }
-    
-    showOverlay(true);
-    try {
-      const r = await sendOtp(msisdn);
-      if (!r?.ok) {
-        toast(r?.message || 'Gagal mengirim OTP', 'error');
+  function attachEventHandlers() {
+    // Check Session
+    btnCheckSession?.addEventListener('click', async () => {
+      const msisdn = normNoHp(inputNoHp.value);
+      if (!msisdn || !/^0\d{9,14}$/.test(msisdn)) {
+        showToast('Nomor salah. Gunakan format 08xxxxx', 'warning');
+        inputNoHp.focus();
         return;
       }
       
-      // auth_id otomatis (disimpan di server)
-      inputAuthId.value = r?.data?.auth_id || '';
-      otpRow.style.display = 'block';
-      otpHelp.textContent = r?.message || 'OTP terkirim. Cek SMS lalu isi kodenya.';
-      otpHelp.className = 'small text-success mt-2';
-      persistMsisdn(msisdn);
-      setSessionBadge('loggedout');
+      showOverlay(true);
+      setSessionBadge('checking');
       
-      // Focus ke input OTP
-      setTimeout(() => {
-        inputKodeOtp.focus();
-      }, 100);
-      
-      toast('OTP berhasil dikirim! Cek SMS Anda.', 'success');
-    } catch (e) {
-      toast('Error kirim OTP: ' + e.message, 'error');
-    } finally {
-      showOverlay(false);
-    }
-  });
-
-  btnVerifyOtp?.addEventListener('click', async () => {
-    const msisdn = normNoHp(inputNoHp.value);
-    const kode = (inputKodeOtp.value || '').trim();
-    
-    if (!msisdn || !/^0\d{9,14}$/.test(msisdn)) {
-      toast('Nomor tidak valid', 'warning');
-      return;
-    }
-    
-    if (!/^\d{4,8}$/.test(kode)) {
-      toast('Kode OTP harus 4-8 digit angka', 'warning');
-      inputKodeOtp.focus();
-      return;
-    }
-
-    showOverlay(true);
-    try {
-      const r = await verifyOtp(msisdn, kode);
-      if (!r?.ok) {
-        toast(r?.message || 'Verifikasi gagal', 'error');
-        return;
-      }
-      
-      setSessionBadge('loggedin');
-      otpRow.style.display = 'none';
-      inputKodeOtp.value = '';
-      otpHelp.textContent = 'Login OTP berhasil!';
-      otpHelp.className = 'small text-success mt-2';
-      
-      toast('Login OTP berhasil! Sekarang bisa order paket.', 'success');
-    } catch (e) {
-      toast('Error verifikasi OTP: ' + e.message, 'error');
-    } finally {
-      showOverlay(false);
-    }
-  });
-
-  // Handle Enter key di input OTP
-  inputKodeOtp?.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-      btnVerifyOtp.click();
-    }
-  });
-
-  btnLogout?.addEventListener('click', async () => {
-    const msisdn = normNoHp(inputNoHp.value);
-    if (!msisdn) {
-      toast('Isi nomor dulu ya', 'warning');
-      return;
-    }
-    
-    showOverlay(true);
-    try {
-      await apiPOST('/kuota/logout', { no_hp: msisdn });
-      setSessionBadge('loggedout');
-      otpRow.style.display = 'none';
-      inputKodeOtp.value = '';
-      inputAuthId.value = '';
-      otpHelp.textContent = 'Logout berhasil. Silakan login lagi jika ingin order.';
-      otpHelp.className = 'small text-info mt-2';
-      
-      toast('Logout berhasil!', 'info');
-    } catch (e) {
-      toast('Error logout: ' + e.message, 'error');
-    } finally {
-      showOverlay(false);
-    }
-  });
-
-  btnRefreshCatalog?.addEventListener('click', async () => {
-    await bootstrapCatalog();
-    toast('Katalog diperbarui!', 'info');
-  });
-
-  btnCekPaketAktif?.addEventListener('click', async () => {
-    const msisdn = normNoHp(inputNoHp.value || getPersistMsisdn());
-    if (!msisdn || !/^0\d{9,14}$/.test(msisdn)) {
-      toast('Isi nomor valid dulu ya', 'warning');
-      inputNoHp.focus();
-      return;
-    }
-    
-    showOverlay(true);
-    try {
-      const r = await cekDetail(msisdn);
-      if (!r?.ok) {
-        if (r?.need_login) {
-          toast('Nomor belum login OTP', 'warning');
-        } else {
-          toast(r?.message || 'Gagal cek detail paket', 'error');
-        }
-        return;
-      }
-      
-      renderDetail(r, msisdn);
-      detailWrap.style.display = 'block';
-      
-      // Scroll ke detail
-      setTimeout(() => {
-        detailWrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 100);
-      
-      toast('Detail paket berhasil dimuat!', 'success');
-    } catch (e) {
-      toast('Error cek detail: ' + e.message, 'error');
-    } finally {
-      showOverlay(false);
-    }
-  });
-
-  btnHideDetail?.addEventListener('click', () => {
-    detailWrap.style.display = 'none';
-    toast('Detail paket ditutup', 'info');
-  });
-  
-  btnHideTracker?.addEventListener('click', () => {
-    orderTracker.style.display = 'none';
-    if (pollTimer) { 
-      clearInterval(pollTimer); 
-      pollTimer = null; 
-    }
-    if (qrisCountdown) {
-      clearInterval(qrisCountdown);
-      qrisCountdown = null;
-    }
-    toast('Tracker ditutup', 'info');
-  });
-
-  trkPollNow?.addEventListener('click', async () => {
-    const id = trkOrderId.textContent || '';
-    if (!id) {
-      toast('Tidak ada order aktif', 'warning');
-      return;
-    }
-    
-    showOverlay(true);
-    try {
-      await doPoll(id);
-      toast('Status diperbarui!', 'info');
-    } catch (e) {
-      toast('Error refresh status: ' + e.message, 'error');
-    } finally {
-      showOverlay(false);
-    }
-  });
-
-  // Handle Enter key di input nomor HP
-  inputNoHp?.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-      btnCheckSession.click();
-    }
-  });
-
-  // Auto-check session ketika nomor diubah
-  inputNoHp?.addEventListener('blur', async () => {
-    const msisdn = normNoHp(inputNoHp.value);
-    if (msisdn && /^0\d{9,14}$/.test(msisdn)) {
       try {
         const logged = await checkSession(msisdn);
+        persistMsisdn(msisdn);
         setSessionBadge(logged ? 'loggedin' : 'loggedout');
         otpRow.style.display = logged ? 'none' : '';
-        persistMsisdn(msisdn);
-      } catch (e) {
-        // Silent fail untuk auto-check
+        
+        if (logged) {
+          showToast('Session aktif ditemukan!', 'success');
+        } else {
+          showToast('Session tidak ditemukan, silakan login OTP', 'info');
+        }
+      } catch (error) {
+        console.error('Session check error:', error);
+        setSessionBadge('unknown');
+        showToast('Gagal memeriksa session', 'error');
+      } finally {
+        showOverlay(false);
       }
-    }
-  });
+    });
 
-  // ------ Utility Functions ------
+    // Send OTP
+    btnSendOTP?.addEventListener('click', async () => {
+      const msisdn = normNoHp(inputNoHp.value);
+      if (!msisdn || !/^0\d{9,14}$/.test(msisdn)) {
+        showToast('Nomor salah. Gunakan format 08xxxxx', 'warning');
+        inputNoHp.focus();
+        return;
+      }
+      
+      showOverlay(true);
+      try {
+        const r = await sendOtp(msisdn);
+        if (!r?.ok) {
+          showToast(r?.message || 'Gagal mengirim OTP', 'error');
+          return;
+        }
+        
+        // Start countdown
+        startOtpCountdown(r?.data?.can_resend_in || 60);
+        
+        otpRow.style.display = '';
+        showToast('OTP berhasil dikirim! Cek SMS Anda.', 'success');
+        persistMsisdn(msisdn);
+        setSessionBadge('loggedout');
+        
+        // Auto focus OTP input
+        setTimeout(() => {
+          const otpInput = $('#inputKodeOtp');
+          if (otpInput) otpInput.focus();
+        }, 500);
+        
+      } catch (error) {
+        console.error('Send OTP error:', error);
+        showToast('Gagal mengirim OTP', 'error');
+      } finally {
+        showOverlay(false);
+      }
+    });
+
+    // Verify OTP
+    btnVerifyOtp?.addEventListener('click', async () => {
+      const msisdn = normNoHp(inputNoHp.value);
+      const kode = (inputKodeOtp.value || '').trim();
+      
+      if (!msisdn || !/^0\d{9,14}$/.test(msisdn)) {
+        showToast('Nomor tidak valid', 'warning');
+        return;
+      }
+      
+      if (!/^\d{4,8}$/.test(kode)) {
+        showToast('Kode OTP tidak valid (4-8 digit)', 'warning');
+        inputKodeOtp.focus();
+        return;
+      }
+
+      showOverlay(true);
+      try {
+        const r = await verifyOtp(msisdn, kode);
+        if (!r?.ok) {
+          showToast(r?.message || 'Verifikasi gagal', 'error');
+          return;
+        }
+        
+        setSessionBadge('loggedin');
+        otpRow.style.display = 'none';
+        inputKodeOtp.value = '';
+        
+        if (otpCountdownTimer) {
+          clearInterval(otpCountdownTimer);
+          otpCountdownTimer = null;
+        }
+        
+        const countdownEl = $('#otpCountdown');
+        if (countdownEl) {
+          countdownEl.textContent = '';
+          countdownEl.className = 'small text-muted';
+        }
+        
+        showToast('Login OTP berhasil!', 'success');
+        
+      } catch (error) {
+        console.error('Verify OTP error:', error);
+        showToast('Gagal verifikasi OTP', 'error');
+      } finally {
+        showOverlay(false);
+      }
+    });
+
+    // Logout
+    btnLogout?.addEventListener('click', async () => {
+      const msisdn = normNoHp(inputNoHp.value);
+      if (!msisdn) {
+        showToast('Isi nomor terlebih dahulu', 'warning');
+        return;
+      }
+      
+      showOverlay(true);
+      try {
+        await apiPOST('/kuota/logout', { no_hp: msisdn });
+        setSessionBadge('loggedout');
+        otpRow.style.display = '';
+        inputKodeOtp.value = '';
+        inputAuthId.value = '';
+        showToast('Logout berhasil', 'success');
+      } catch (error) {
+        console.error('Logout error:', error);
+        showToast('Gagal logout', 'error');
+      } finally {
+        showOverlay(false);
+      }
+    });
+
+    // Refresh Catalog
+    btnRefreshCatalog?.addEventListener('click', async () => {
+      await bootstrapCatalog();
+    });
+
+    // Check Active Packages
+    btnCekPaketAktif?.addEventListener('click', async () => {
+      const msisdn = normNoHp(inputNoHp.value || getPersistMsisdn());
+      if (!msisdn || !/^0\d{9,14}$/.test(msisdn)) {
+        showToast('Isi nomor valid dulu ya', 'warning');
+        inputNoHp.focus();
+        return;
+      }
+      
+      showOverlay(true);
+      try {
+        const logged = await checkSession(msisdn);
+        if (!logged) {
+          showToast('Nomor belum login OTP', 'warning');
+          showOverlay(false);
+          return;
+        }
+        
+        const r = await cekDetail(msisdn);
+        if (!r?.ok) {
+          if (r?.need_login) {
+            showToast('Nomor belum login OTP', 'warning');
+          } else {
+            showToast(r?.message || 'Gagal cek detail', 'error');
+          }
+          return;
+        }
+        
+        renderDetail(r, msisdn);
+        detailWrap.style.display = '';
+        showToast('Detail paket berhasil dimuat', 'success');
+        
+      } catch (error) {
+        console.error('Check package error:', error);
+        showToast('Gagal memuat detail paket', 'error');
+      } finally {
+        showOverlay(false);
+      }
+    });
+
+    // Filter buttons
+    $$('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const filter = e.currentTarget.getAttribute('data-filter');
+        
+        // Update active state
+        $$('.filter-btn').forEach(b => b.classList.remove('active'));
+        e.currentTarget.classList.add('active');
+        
+        currentFilter = filter;
+        bootstrapCatalog(); // Re-render with new filter
+      });
+    });
+
+    // Hide Detail
+    btnHideDetail?.addEventListener('click', () => {
+      detailWrap.style.display = 'none';
+    });
+
+    // Hide Tracker
+    btnHideTracker?.addEventListener('click', () => {
+      orderTracker.style.display = 'none';
+      if (pollTimer) {
+        clearInterval(pollTimer);
+        pollTimer = null;
+      }
+    });
+
+    // Manual Poll
+    trkPollNow?.addEventListener('click', async () => {
+      const id = trkOrderId.textContent || '';
+      if (!id) return;
+      
+      showOverlay(true);
+      try {
+        await doPoll(id);
+      } finally {
+        showOverlay(false);
+      }
+    });
+
+    // Enter key in OTP field
+    inputKodeOtp?.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        btnVerifyOtp.click();
+      }
+    });
+
+    // Enter key in phone field
+    inputNoHp?.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        btnCheckSession.click();
+      }
+    });
+  }
+
+  // ------ Utilities ------
   function escapeHtml(s) {
-    return String(s || '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+    if (typeof s !== 'string') return '';
+    return s.replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;')
+            .replaceAll("'", '&#039;');
   }
 
   // ------ Bootstrap Functions ------
   async function bootstrapCatalog() {
-    showOverlay(true);
+    const catalogGrid = $('#catalogGrid');
+    const catalogLoading = $('#catalogLoading');
+    
+    if (catalogGrid) catalogGrid.innerHTML = '';
+    if (catalogLoading) catalogLoading.style.display = '';
+    
     try {
       const list = await loadCatalog();
       renderCatalog(list);
     } catch (e) {
-      console.error('Bootstrap catalog error:', e);
-      catalogGrid.innerHTML = `
-        <div class="col-12">
-          <div class="alert alert-danger">
-            <i class="bi bi-exclamation-triangle me-2"></i>
-            Gagal memuat katalog: ${e.message}
+      console.error('Catalog load error:', e);
+      if (catalogGrid) {
+        catalogGrid.innerHTML = `
+          <div class="col-12">
+            <div class="alert alert-danger">
+              <i class="bi bi-exclamation-triangle me-2"></i>Gagal memuat katalog. Silakan refresh halaman.
+            </div>
           </div>
-        </div>
-      `;
-      catalogCount.textContent = '0';
-      toast('Gagal memuat katalog', 'error');
+        `;
+      }
+      showToast('Gagal memuat katalog', 'error');
     } finally {
-      showOverlay(false);
+      if (catalogLoading) catalogLoading.style.display = 'none';
     }
   }
 
@@ -823,29 +760,35 @@
     if (saved) {
       inputNoHp.value = saved;
       try {
+        setSessionBadge('checking');
         const logged = await checkSession(saved);
         setSessionBadge(logged ? 'loggedin' : 'loggedout');
         otpRow.style.display = logged ? 'none' : '';
-      } catch (e) {
+      } catch (error) {
+        console.error('Initial session check error:', error);
         setSessionBadge('unknown');
-        console.log('Session check error:', e);
       }
     } else {
       setSessionBadge('unknown');
     }
   }
 
-  // ------ Initialize Application ------
-  document.addEventListener('DOMContentLoaded', () => {
-    console.log('🚀 Initializing Order Kuota App...');
-    
-    // Initialize session and catalog
+  // ------ Initialize ------
+  function init() {
+    attachEventHandlers();
     bootstrapSession();
     bootstrapCatalog();
     
-    // Focus ke input nomor HP
+    // Show welcome message
     setTimeout(() => {
-      inputNoHp?.focus();
-    }, 500);
-  });
+      showToast('Selamat datang! Silakan masukkan nomor XL Anda untuk mulai berbelanja.', 'info');
+    }, 1000);
+  }
+
+  // Start the application when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
 })();
