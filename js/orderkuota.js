@@ -1,5 +1,5 @@
 // ======= CONFIG =======
-const API_BASE = "https://call.fadzdigital.store"; // ganti ke domain Worker kamu
+const API_BASE = "https://call.fadzdigital.store";
 const POLL_MS = 4000; // interval polling status invoice
 
 // ======= UTILS =======
