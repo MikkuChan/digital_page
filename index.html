@@ -134,229 +134,115 @@
         </div>
 
 <!-- HERO ILLUSTRATION -->
-                    <div class="col-lg-6">
-                    <div class="position-relative">
-                        <!-- Hero Illustration -->
-                        <div class="floating" style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(16, 185, 129, 0.1)); border-radius: 2rem; padding: 3rem; backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1);">
-                            <svg width="100%" height="450" viewBox="0 0 450 350" fill="none">
-                                <!-- Animated Background Particles -->
-                                <circle cx="80" cy="60" r="3" fill="url(#particle1)">
-                                    <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite"/>
-                                    <animate attributeName="cx" values="80;120;80" dur="4s" repeatCount="indefinite"/>
-                                </circle>
-                                <circle cx="370" cy="80" r="4" fill="url(#particle2)">
-                                    <animate attributeName="opacity" values="0.5;1;0.5" dur="3s" repeatCount="indefinite"/>
-                                    <animate attributeName="cy" values="80;40;80" dur="5s" repeatCount="indefinite"/>
-                                </circle>
-                                <circle cx="50" cy="200" r="5" fill="url(#particle3)">
-                                    <animate attributeName="opacity" values="0.4;1;0.4" dur="2.5s" repeatCount="indefinite"/>
-                                    <animate attributeName="r" values="5;8;5" dur="3s" repeatCount="indefinite"/>
-                                </circle>
-                                <circle cx="400" cy="250" r="6" fill="url(#particle4)">
-                                    <animate attributeName="opacity" values="0.6;1;0.6" dur="1.8s" repeatCount="indefinite"/>
-                                    <animate attributeName="cx" values="400;360;400" dur="6s" repeatCount="indefinite"/>
-                                </circle>
-                                
-                                <!-- Floating geometric shapes -->
-                                <polygon points="60,120 80,100 100,120 80,140" fill="url(#geometric1)" opacity="0.7">
-                                    <animateTransform attributeName="transform" type="rotate" values="0 80 120;360 80 120" dur="20s" repeatCount="indefinite"/>
-                                </polygon>
-                                <polygon points="350,180 370,160 390,180 370,200" fill="url(#geometric2)" opacity="0.6">
-                                    <animateTransform attributeName="transform" type="rotate" values="0 370 180;-360 370 180" dur="15s" repeatCount="indefinite"/>
-                                </polygon>
-                                
-                                <!-- Main Device with shadow -->
-                                <g filter="url(#deviceShadow)">
-                                    <rect x="100" y="80" width="250" height="170" rx="25" fill="url(#deviceGradient)" stroke="url(#deviceBorder)" stroke-width="2"/>
-                                </g>
-                                
-                                <!-- Animated Screen -->
-                                <rect x="120" y="105" width="210" height="120" rx="12" fill="#111827">
-                                    <animate attributeName="fill" values="#111827;#1f2937;#111827" dur="4s" repeatCount="indefinite"/>
-                                </rect>
-                                
-                                <!-- Screen Content with typing animation -->
-                                <rect x="140" y="125" width="70" height="8" rx="4" fill="url(#accent1)">
-                                    <animate attributeName="width" values="0;70;70" dur="2s" repeatCount="indefinite"/>
-                                </rect>
-                                <rect x="140" y="145" width="170" height="4" rx="2" fill="#4b5563">
-                                    <animate attributeName="width" values="0;170;170" dur="2.5s" begin="0.5s" repeatCount="indefinite"/>
-                                </rect>
-                                <rect x="140" y="155" width="130" height="4" rx="2" fill="#4b5563">
-                                    <animate attributeName="width" values="0;130;130" dur="2.2s" begin="1s" repeatCount="indefinite"/>
-                                </rect>
-                                <rect x="140" y="165" width="150" height="4" rx="2" fill="#4b5563">
-                                    <animate attributeName="width" values="0;150;150" dur="2.8s" begin="1.5s" repeatCount="indefinite"/>
-                                </rect>
-                                
-                                <!-- VPN Connection Visualization -->
-                                <g transform="translate(225, 180)">
-                                    <circle r="15" fill="none" stroke="url(#connectionRing)" stroke-width="3">
-                                        <animate attributeName="stroke-dasharray" values="0,100;75,100;0,100" dur="3s" repeatCount="indefinite"/>
-                                    </circle>
-                                    <circle r="8" fill="url(#centerDot)">
-                                        <animate attributeName="r" values="8;12;8" dur="2s" repeatCount="indefinite"/>
-                                    </circle>
-                                </g>
-                                
-                                <!-- Animated Connection Lines -->
-                                <path d="M225 40 Q225 15 200 15 Q175 15 175 40" stroke="url(#connectionLine1)" stroke-width="4" fill="none" opacity="0.8">
-                                    <animate attributeName="stroke-dasharray" values="0,200;100,200;200,200" dur="4s" repeatCount="indefinite"/>
-                                </path>
-                                <path d="M225 300 Q225 325 250 325 Q275 325 275 300" stroke="url(#connectionLine2)" stroke-width="4" fill="none" opacity="0.8">
-                                    <animate attributeName="stroke-dasharray" values="0,200;100,200;200,200" dur="4s" begin="2s" repeatCount="indefinite"/>
-                                </path>
-                                
-                                <!-- Floating Security Icons -->
-                                <g transform="translate(80, 50)">
-                                    <circle r="25" fill="url(#iconBg1)" opacity="0.9">
-                                        <animate attributeName="r" values="25;30;25" dur="3s" repeatCount="indefinite"/>
-                                    </circle>
-                                    <path d="M-10 -8 L10 -8 L10 8 L-10 8 Z M-8 -6 L8 -6 M-8 -2 L8 -2 M-8 2 L8 2" stroke="white" stroke-width="2" fill="none"/>
-                                    <animateTransform attributeName="transform" type="translate" values="80,50;80,30;80,50" dur="4s" repeatCount="indefinite"/>
-                                </g>
-                                
-                                <g transform="translate(370, 140)">
-                                    <circle r="22" fill="url(#iconBg2)" opacity="0.8">
-                                        <animate attributeName="r" values="22;27;22" dur="2.5s" repeatCount="indefinite"/>
-                                    </circle>
-                                    <path d="M-8 -8 L8 8 M8 -8 L-8 8" stroke="white" stroke-width="2.5"/>
-                                    <animateTransform attributeName="transform" type="translate" values="370,140;370,120;370,140" dur="5s" repeatCount="indefinite"/>
-                                </g>
-                                
-                                <g transform="translate(60, 280)">
-                                    <circle r="20" fill="url(#iconBg3)" opacity="0.7">
-                                        <animate attributeName="r" values="20;25;20" dur="2.8s" repeatCount="indefinite"/>
-                                    </circle>
-                                    <path d="M-6 -6 L6 -6 L6 6 L-6 6 Z M-4 -4 L4 -4 M-4 0 L4 0 M-4 4 L4 4" stroke="white" stroke-width="1.5" fill="none"/>
-                                    <animateTransform attributeName="transform" type="translate" values="60,280;60,260;60,280" dur="3.5s" repeatCount="indefinite"/>
-                                </g>
-                                
-                                <g transform="translate(390, 300)">
-                                    <circle r="18" fill="url(#iconBg4)" opacity="0.6">
-                                        <animate attributeName="r" values="18;23;18" dur="2.2s" repeatCount="indefinite"/>
-                                    </circle>
-                                    <path d="M-6 -6 L6 6 M6 -6 L-6 6" stroke="white" stroke-width="2"/>
-                                    <animateTransform attributeName="transform" type="translate" values="390,300;390,280;390,300" dur="4.5s" repeatCount="indefinite"/>
-                                </g>
-                                
-                                <!-- Network nodes -->
-                                <g id="networkNodes">
-                                    <circle cx="150" cy="50" r="8" fill="url(#nodeGrad1)">
-                                        <animate attributeName="opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite"/>
-                                    </circle>
-                                    <circle cx="300" cy="60" r="6" fill="url(#nodeGrad2)">
-                                        <animate attributeName="opacity" values="0.7;1;0.7" dur="2.5s" repeatCount="indefinite"/>
-                                    </circle>
-                                    <circle cx="120" cy="320" r="7" fill="url(#nodeGrad3)">
-                                        <animate attributeName="opacity" values="0.6;1;0.6" dur="1.8s" repeatCount="indefinite"/>
-                                    </circle>
-                                    <circle cx="330" cy="310" r="9" fill="url(#nodeGrad4)">
-                                        <animate attributeName="opacity" values="0.8;1;0.8" dur="2.2s" repeatCount="indefinite"/>
-                                    </circle>
-                                </g>
-                                
-                                <!-- Definitions -->
-                                <defs>
-                                    <!-- Filters -->
-                                    <filter id="deviceShadow" x="-50%" y="-50%" width="200%" height="200%">
-                                        <feDropShadow dx="0" dy="10" stdDeviation="20" flood-color="rgba(59, 130, 246, 0.3)"/>
-                                    </filter>
-                                    
-                                    <!-- Gradients -->
-                                    <linearGradient id="particle1" x1="0%" y1="0%" x2="100%" y2="100%">
-                                        <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1"/>
-                                        <stop offset="100%" style="stop-color:#1d4ed8;stop-opacity:0.8"/>
-                                    </linearGradient>
-                                    <linearGradient id="particle2" x1="0%" y1="0%" x2="100%" y2="100%">
-                                        <stop offset="0%" style="stop-color:#10b981;stop-opacity:1"/>
-                                        <stop offset="100%" style="stop-color:#059669;stop-opacity:0.8"/>
-                                    </linearGradient>
-                                    <linearGradient id="particle3" x1="0%" y1="0%" x2="100%" y2="100%">
-                                        <stop offset="0%" style="stop-color:#f59e0b;stop-opacity:1"/>
-                                        <stop offset="100%" style="stop-color:#d97706;stop-opacity:0.8"/>
-                                    </linearGradient>
-                                    <linearGradient id="particle4" x1="0%" y1="0%" x2="100%" y2="100%">
-                                        <stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:1"/>
-                                        <stop offset="100%" style="stop-color:#7c3aed;stop-opacity:0.8"/>
-                                    </linearGradient>
-                                    
-                                    <linearGradient id="geometric1" x1="0%" y1="0%" x2="100%" y2="100%">
-                                        <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:0.8"/>
-                                        <stop offset="100%" style="stop-color:#1d4ed8;stop-opacity:0.6"/>
-                                    </linearGradient>
-                                    <linearGradient id="geometric2" x1="0%" y1="0%" x2="100%" y2="100%">
-                                        <stop offset="0%" style="stop-color:#10b981;stop-opacity:0.8"/>
-                                        <stop offset="100%" style="stop-color:#059669;stop-opacity:0.6"/>
-                                    </linearGradient>
-                                    
-                                    <linearGradient id="deviceGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                        <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.15"/>
-                                        <stop offset="100%" style="stop-color:#f3f4f6;stop-opacity:0.05"/>
-                                    </linearGradient>
-                                    <linearGradient id="deviceBorder" x1="0%" y1="0%" x2="100%" y2="100%">
-                                        <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:0.5"/>
-                                        <stop offset="100%" style="stop-color:#10b981;stop-opacity:0.3"/>
-                                    </linearGradient>
-                                    
-                                    <linearGradient id="accent1" x1="0%" y1="0%" x2="100%" y2="100%">
-                                        <stop offset="0%" style="stop-color:#3b82f6"/>
-                                        <stop offset="100%" style="stop-color:#1d4ed8"/>
-                                    </linearGradient>
-                                    
-                                    <linearGradient id="connectionRing" x1="0%" y1="0%" x2="100%" y2="100%">
-                                        <stop offset="0%" style="stop-color:#10b981"/>
-                                        <stop offset="100%" style="stop-color:#059669"/>
-                                    </linearGradient>
-                                    <radialGradient id="centerDot">
-                                        <stop offset="0%" style="stop-color:#10b981"/>
-                                        <stop offset="100%" style="stop-color:#059669"/>
-                                    </radialGradient>
-                                    
-                                    <linearGradient id="connectionLine1" x1="0%" y1="0%" x2="100%" y2="100%">
-                                        <stop offset="0%" style="stop-color:#3b82f6"/>
-                                        <stop offset="100%" style="stop-color:#10b981"/>
-                                    </linearGradient>
-                                    <linearGradient id="connectionLine2" x1="0%" y1="0%" x2="100%" y2="100%">
-                                        <stop offset="0%" style="stop-color:#f59e0b"/>
-                                        <stop offset="100%" style="stop-color:#10b981"/>
-                                    </linearGradient>
-                                    
-                                    <radialGradient id="iconBg1">
-                                        <stop offset="0%" style="stop-color:#3b82f6"/>
-                                        <stop offset="100%" style="stop-color:#1d4ed8"/>
-                                    </radialGradient>
-                                    <radialGradient id="iconBg2">
-                                        <stop offset="0%" style="stop-color:#10b981"/>
-                                        <stop offset="100%" style="stop-color:#059669"/>
-                                    </radialGradient>
-                                    <radialGradient id="iconBg3">
-                                        <stop offset="0%" style="stop-color:#f59e0b"/>
-                                        <stop offset="100%" style="stop-color:#d97706"/>
-                                    </radialGradient>
-                                    <radialGradient id="iconBg4">
-                                        <stop offset="0%" style="stop-color:#8b5cf6"/>
-                                        <stop offset="100%" style="stop-color:#7c3aed"/>
-                                    </radialGradient>
-                                    
-                                    <radialGradient id="nodeGrad1">
-                                        <stop offset="0%" style="stop-color:#3b82f6"/>
-                                        <stop offset="100%" style="stop-color:#1d4ed8"/>
-                                    </radialGradient>
-                                    <radialGradient id="nodeGrad2">
-                                        <stop offset="0%" style="stop-color:#10b981"/>
-                                        <stop offset="100%" style="stop-color:#059669"/>
-                                    </radialGradient>
-                                    <radialGradient id="nodeGrad3">
-                                        <stop offset="0%" style="stop-color:#f59e0b"/>
-                                        <stop offset="100%" style="stop-color:#d97706"/>
-                                    </radialGradient>
-                                    <radialGradient id="nodeGrad4">
-                                        <stop offset="0%" style="stop-color:#8b5cf6"/>
-                                        <stop offset="100%" style="stop-color:#7c3aed"/>
-                                    </radialGradient>
-                                </defs>
-                            </svg>
+                    <!-- HERO ILLUSTRATION (THEMED & REFINED) -->
+<svg viewBox="0 0 960 640" width="100%" height="420" role="img" aria-labelledby="heroTitle heroDesc" xmlns="http://www.w3.org/2000/svg">
+  <title id="heroTitle">Ilustrasi koneksi aman FadzDigital</title>
+  <desc id="heroDesc">Kartu perangkat dengan indikator koneksi aman dan elemen melayang bernuansa biru-hijau.</desc>
+
+  <defs>
+    <!-- Palet selaras Bootstrap -->
+    <linearGradient id="gPrimary" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0d6efd"/>
+      <stop offset="1" stop-color="#43a3ff"/>
+    </linearGradient>
+    <linearGradient id="gSuccess" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#198754"/>
+      <stop offset="1" stop-color="#27b36f"/>
+    </linearGradient>
+    <linearGradient id="gAccent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6f42c1"/>
+      <stop offset="1" stop-color="#8d6be0"/>
+    </linearGradient>
+    <linearGradient id="gCard" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="rgba(255,255,255,.18)"/>
+      <stop offset="1" stop-color="rgba(255,255,255,.07)"/>
+    </linearGradient>
+    <filter id="shadow24" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="14" stdDeviation="22" flood-color="rgba(2,6,23,.25)"/>
+    </filter>
+
+    <!-- CSS-in-SVG -->
+    <style>
+      .blob { filter: blur(42px); opacity:.45 }
+      .dash { stroke-dasharray: 8 10; animation: dash 7s linear infinite; }
+      .float { animation: float 6.5s ease-in-out infinite; }
+      .float2 { animation: float2 8s ease-in-out infinite; }
+      .pulse { animation: pulse 3.6s ease-in-out infinite; }
+      .muted { opacity:.7 }
+
+      @keyframes dash { to { stroke-dashoffset:-240 } }
+      @keyframes float { 0%,100% { transform:translateY(0) } 50% { transform:translateY(-12px) } }
+      @keyframes float2{ 0%,100% { transform:translateY(0) } 50% { transform:translateY(-18px) } }
+      @keyframes pulse { 0%,100% { opacity:.85; r:14 } 50% { opacity:1; r:18 } }
+
+      /* Reduce motion */
+      @media (prefers-reduced-motion: reduce) {
+        .dash,.float,.float2,.pulse{ animation:none !important }
+      }
+    </style>
+  </defs>
+
+  <!-- BACKDROP soft blobs -->
+  <g class="blob">
+    <ellipse cx="790" cy="160" rx="190" ry="86" fill="url(#gPrimary)"/>
+    <ellipse cx="860" cy="340" rx="210" ry="120" fill="url(#gSuccess)"/>
+    <ellipse cx="720" cy="500" rx="170" ry="90" fill="url(#gAccent)"/>
+  </g>
+
+  <!-- Garis koneksi (lebih tipis & kalem) -->
+  <g class="muted">
+    <path d="M520 210 C640 150, 760 170, 830 210" fill="none" stroke="url(#gPrimary)" stroke-width="3" class="dash"/>
+    <path d="M520 325 C640 325, 760 305, 860 360" fill="none" stroke="url(#gSuccess)" stroke-width="3" class="dash"/>
+    <path d="M540 430 C660 470, 770 450, 860 500" fill="none" stroke="url(#gAccent)" stroke-width="3" class="dash"/>
+  </g>
+
+  <!-- Kartu perangkat -->
+  <g filter="url(#shadow24)">
+    <rect x="150" y="120" rx="28" ry="28" width="420" height="320" fill="url(#gCard)" stroke="rgba(13,110,253,.25)" />
+    <!-- layar -->
+    <rect x="182" y="168" rx="16" ry="16" width="356" height="196" fill="#0f172a" />
+    <!-- header bar -->
+    <rect x="202" y="190" rx="6" ry="6" width="190" height="14" fill="url(#gPrimary)"/>
+    <rect x="402" y="190" rx="6" ry="6" width="116" height="14" fill="#1f2937"/>
+    <!-- konten bar -->
+    <rect x="202" y="218" rx="4" ry="4" width="300" height="8" fill="#334155"/>
+    <rect x="202" y="236" rx="4" ry="4" width="248" height="8" fill="#334155"/>
+    <rect x="202" y="254" rx="4" ry="4" width="318" height="8" fill="#334155"/>
+    <rect x="202" y="272" rx="4" ry="4" width="224" height="8" fill="#334155"/>
+
+    <!-- Badge “Connected / Secure” -->
+    <g transform="translate(462 300)">
+      <circle r="28" fill="url(#gSuccess)" opacity=".14"/>
+      <circle r="18" fill="none" stroke="url(#gSuccess)" stroke-width="3" class="pulse"/>
+      <!-- centang -->
+      <path d="M-10 2 l8 8 16 -18" fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"/>
+      <!-- shield garis -->
+      <path d="M-22 -18 q22 -12 44 0 v12 q0 14 -22 24 q-22 -10 -22 -24z" fill="none" stroke="url(#gSuccess)" stroke-width="2"/>
+    </g>
+  </g>
+
+  <!-- Badges melayang (ikon sederhana, selaras warna tema) -->
+  <g>
+    <!-- dokumen -->
+    <g class="float" transform="translate(710 205)">
+      <circle r="18" fill="url(#gPrimary)"/>
+      <path d="M-6 -6 h8 v10 h-12 v-10 z M-6 -6 v-4 l4 4" fill="white" opacity=".95"/>
+    </g>
+    <!-- kecepatan -->
+    <g class="float2" transform="translate(820 285)">
+      <circle r="16" fill="url(#gSuccess)"/>
+      <path d="M-6 0 h12" stroke="white" stroke-width="3" stroke-linecap="round"/>
+      <path d="M-10 -6 h8" stroke="white" stroke-width="3" stroke-linecap="round" opacity=".7"/>
+      <path d="M-10 6 h5" stroke="white" stroke-width="3" stroke-linecap="round" opacity=".7"/>
+    </g>
+    <!-- padlock -->
+    <g class="float" transform="translate(760 385)">
+      <circle r="16" fill="url(#gAccent)"/>
+      <path d="M-6 2 v4 h12 v-4 M-4 2 v-3 a6 6 0 0 1 12 0 v3" stroke="white" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+  </g>
+</svg>
+
               <!-- === /SVG === -->
               <img src="/assets/hero-placeholder.webp" alt="" width="900" height="450" loading="lazy" decoding="async" style="display:block;max-width:100%;height:auto;opacity:.001" />
             </div>
