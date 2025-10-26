@@ -50,24 +50,28 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet" />
   <link href="/css/style.css" rel="stylesheet" />
   <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
-  <style>
-    :root {
-      --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      --font-display: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
-    }
-    body { font-family: var(--font-primary);}
-    .font-display { font-family: var(--font-display);}
-    .modal-img-zoom {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(20,20,20,0.88);
-    }
-  </style>
-  <noscript><style>[data-aos]{opacity:1;transform:none}</style></noscript>
-</head>
 
+<style>
+  /* Fixed navbar offset & hero spacing */
+  :root { --nav-h: 64px; }
+  @media (min-width: 992px) { :root { --nav-h: 72px; } } /* desktop */
+
+  body { padding-top: var(--nav-h); }         /* dorong konten di bawah navbar */
+  .hero-section { padding-top: 24px; }        /* ruang ekstra di hero */
+
+  /*  Anchor offset: biar scroll ke #id nggak ketutup navbar */
+  [id] { scroll-margin-top: calc(var(--nav-h) + 12px); }
+
+  /* Nudge ilustrasi hero sedikit ke bawah di layar besar */
+  @media (min-width: 992px)  { .hero-illo { margin-top: 12px; } }  /* lg */
+  @media (min-width: 1200px) { .hero-illo { margin-top: 20px; } }  /* xl */
+  @media (min-width: 1400px) { .hero-illo { margin-top: 28px; } }  /* xxl */
+</style>
+
+<!-- Fallback AOS saat JS mati -->
+<noscript><style>[data-aos]{opacity:1 !important;transform:none !important}</style></noscript>
 <body>
+  
   <div class="loading-overlay" id="loadingOverlay" aria-hidden="true">
     <div class="loading-spinner" role="status" aria-label="Memuat"></div>
   </div>
