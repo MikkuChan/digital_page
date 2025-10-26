@@ -559,3 +559,111 @@ section + section {
   border-radius: 50%;
   padding: 5px 10px;
 }
+ /* ========= Contact Polished ========= */
+.contact-card {
+  border-radius: 20px;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(255,255,255,.75), rgba(255,255,255,.6));
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(15, 23, 42, .08);
+  box-shadow: 0 20px 50px rgba(2, 6, 23, .08);
+}
+
+/* header strip dengan gradient halus */
+.contact-card__header {
+  padding: 18px 22px;
+  background:
+    radial-gradient(120% 120% at 0% 0%, rgba(59,130,246,.15) 0%, rgba(16,185,129,.10) 35%, rgba(255,255,255,0) 70%),
+    linear-gradient(180deg, rgba(241,245,249,.8), rgba(241,245,249,.35));
+  border-bottom: 1px solid rgba(15, 23, 42, .06);
+}
+.brand-badge {
+  width: 44px; height: 44px; border-radius: 12px;
+  display: grid; place-items: center;
+  background: #fff; border: 1px solid rgba(2,6,23,.08);
+  box-shadow: 0 6px 16px rgba(2,6,23,.06);
+}
+.brand-badge img { width: 28px; height: 28px; object-fit: contain; }
+
+/* action buttons */
+.contact-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 16px 18px 6px;
+}
+.btn-contact {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  border-radius: 12px; padding: 12px 14px; font-weight: 700;
+  color: #fff; border: none;
+  box-shadow: 0 10px 24px rgba(2,6,23,.10);
+  transition: transform .15s ease, box-shadow .2s ease, opacity .2s;
+}
+.btn-contact i { font-size: 1.2rem; }
+.btn-contact:hover { transform: translateY(-1px); box-shadow: 0 14px 28px rgba(2,6,23,.14); }
+.btn-contact:active { transform: translateY(0); opacity: .9; }
+.btn-wa { background: linear-gradient(90deg, #22c55e, #16a34a); }
+.btn-tg { background: linear-gradient(90deg, #2563eb, #1d4ed8); }
+
+/* details list */
+.contact-details {
+  padding: 10px 18px 18px;
+  display: grid; gap: 12px;
+}
+.detail {
+  display: grid; grid-template-columns: 44px 1fr; align-items: start; gap: 12px;
+  padding: 12px; border-radius: 14px;
+  border: 1px solid rgba(15,23,42,.06);
+  background: rgba(255,255,255,.6);
+  transition: border-color .2s ease, background .2s ease, box-shadow .2s ease;
+}
+.detail:hover {
+  border-color: rgba(59,130,246,.28);
+  background: rgba(255,255,255,.9);
+  box-shadow: 0 6px 16px rgba(2,6,23,.06);
+}
+.detail .icon {
+  width: 44px; height: 44px; border-radius: 12px;
+  display: grid; place-items: center;
+  background: linear-gradient(180deg, rgba(59,130,246,.12), rgba(16,185,129,.12));
+  border: 1px solid rgba(59,130,246,.18);
+  color: #0f172a;
+}
+.detail .icon i { font-size: 20px; }
+.detail .label { font-weight: 700; margin-bottom: 2px; color: #0f172a; }
+.detail .value { color: #334155; }
+
+/* copy chips */
+.copy-chip {
+  display: inline-flex; align-items: center; gap: .35rem;
+  font-size: .78rem; padding: .22rem .55rem;
+  border-radius: .6rem; border: 1px solid rgba(148,163,184,.45);
+  background: #fff; color: #0f172a; cursor: pointer; user-select: none;
+  transition: background .15s ease, border-color .15s ease, transform .05s ease;
+}
+.copy-chip i { font-size: .95rem; }
+.copy-chip:hover { background: #f8fafc; border-color: rgba(148,163,184,.7); }
+.copy-chip:active { transform: translateY(1px); }
+
+/* toast */
+.copy-toast {
+  position: fixed; left: 50%; bottom: 18px;
+  transform: translateX(-50%) translateY(20px);
+  background: #0f172a; color: #e2e8f0;
+  padding: .55rem .9rem; border-radius: .6rem; font-size: .85rem;
+  box-shadow: 0 10px 26px rgba(2,6,23,.32);
+  opacity: 0; pointer-events: none;
+  transition: transform .2s ease, opacity .2s ease; z-index: 9999;
+}
+.copy-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* responsiveness */
+@media (max-width: 576px) {
+  .contact-actions { grid-template-columns: 1fr; }
+  .detail { grid-template-columns: 38px 1fr; }
+  .detail .icon { width: 38px; height: 38px; border-radius: 10px; }
+}
+@media (max-width: 400px) {
+  .btn-contact { padding: 10px 12px; font-size: .9rem; }
+  .btn-contact i { font-size: 1rem; }
+}
