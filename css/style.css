@@ -667,3 +667,13 @@ section + section {
   .btn-contact { padding: 10px 12px; font-size: .9rem; }
   .btn-contact i { font-size: 1rem; }
 }
+/* perbaikan desktop */
+:root { --nav-h: 64px; }              /* tinggi navbar default */
+@media (min-width: 992px){ :root{ --nav-h: 72px; } }  /* desktop */
+
+body{ padding-top: var(--nav-h); }     /* geser seluruh konten turun */
+.hero-section{ padding-top: 24px; }    /* sedikit ruang ekstra di hero (opsional) */
+
+/* agar scroll ke #features/tabs tidak ketutup navbar */
+[id]{ scroll-margin-top: calc(var(--nav-h) + 12px); }
+
