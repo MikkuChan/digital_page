@@ -64,6 +64,9 @@
   </script>
 </head>
 <body>
+  <!-- Animated Background Particles -->
+  <div class="particles-bg" id="particlesBg"></div>
+  
   <!-- Loading Screen -->
   <div class="loading-overlay" id="loadingOverlay">
     <div class="loading-spinner"></div>
@@ -114,76 +117,160 @@
     <section class="container py-5">
       <div class="row justify-content-center">
         <div class="col-lg-8 col-md-10">
+          <!-- Stats Bar -->
+          <div class="stats-bar mb-4">
+            <div class="row g-2 text-center">
+              <div class="col-4">
+                <div class="stat-item">
+                  <i class="bi bi-lightning-charge-fill text-warning"></i>
+                  <div class="stat-value" id="responseTime">⚡ Cepat</div>
+                  <div class="stat-label">Response Time</div>
+                </div>
+              </div>
+              <div class="col-4">
+                <div class="stat-item">
+                  <i class="bi bi-chat-dots-fill text-primary"></i>
+                  <div class="stat-value" id="totalChats">0</div>
+                  <div class="stat-label">Total Chat</div>
+                </div>
+              </div>
+              <div class="col-4">
+                <div class="stat-item">
+                  <i class="bi bi-check-circle-fill text-success"></i>
+                  <div class="stat-value">100%</div>
+                  <div class="stat-label">Gratis</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Main Chat Card -->
           <div class="chatgpt-card p-4 mb-4 shadow-lg rounded-4">
+            <!-- Floating Icons Decoration -->
+            <div class="floating-icon" style="top: 20px; right: 30px;">
+              <i class="bi bi-stars"></i>
+            </div>
+            <div class="floating-icon" style="bottom: 30px; left: 20px; animation-delay: 0.5s;">
+              <i class="bi bi-robot"></i>
+            </div>
+            
             <form id="chatForm" autocomplete="off">
-              <div class="mb-3">
-                <label for="textInput" class="fw-semibold font-display mb-2 d-flex align-items-center justify-content-between" style="font-size:1.1em;">
-                  <span><i class="bi bi-chat-square-text text-primary me-1"></i> Pesan ke ChatGPT</span>
-                  <span class="char-counter small text-muted" id="charCounter">0/2000</span>
+              <div class="mb-4">
+                <label for="textInput" class="fw-semibold font-display mb-2 d-flex align-items-center justify-content-between" style="font-size:1.15em;">
+                  <span>
+                    <i class="bi bi-chat-square-text-fill text-primary me-2"></i> 
+                    <span class="gradient-text">Pesan ke ChatGPT</span>
+                  </span>
+                  <span class="char-counter" id="charCounter">0/2000</span>
                 </label>
-                <textarea id="textInput" rows="3" maxlength="2000" class="form-control shadow-sm chatgpt-input" placeholder="Tulis pertanyaan atau pesan di sini..." required style="font-size:1.14em"></textarea>
-                <small class="text-muted d-block mt-1">
-                  <i class="bi bi-info-circle"></i> Tips: Tekan Enter untuk kirim, Shift+Enter untuk baris baru
-                </small>
+                <div class="input-group-enhanced">
+                  <textarea id="textInput" rows="4" maxlength="2000" class="form-control chatgpt-input" placeholder="Ketik pertanyaanmu di sini... Contoh: Jelaskan tentang AI, Buatkan puisi, dll." required></textarea>
+                  <div class="input-glow"></div>
+                </div>
+                <div class="input-hints mt-2">
+                  <small class="text-muted d-flex align-items-center gap-2">
+                    <i class="bi bi-lightbulb-fill text-warning"></i>
+                    <span><kbd>Enter</kbd> kirim | <kbd>Shift+Enter</kbd> baris baru</span>
+                  </small>
+                </div>
               </div>
               
-              <div class="mb-3">
-                <a class="text-primary small fw-semibold prompt-toggle" data-bs-toggle="collapse" href="#promptArea" role="button" aria-expanded="false" aria-controls="promptArea">
-                  <i class="bi bi-chevron-down small"></i> Tambah Prompt/Konteks (Opsional)
+              <div class="mb-4">
+                <a class="text-primary small fw-semibold prompt-toggle d-inline-flex align-items-center gap-1" data-bs-toggle="collapse" href="#promptArea" role="button" aria-expanded="false" aria-controls="promptArea">
+                  <i class="bi bi-chevron-right transition-icon"></i>
+                  <span>Pengaturan Lanjutan (Opsional)</span>
+                  <span class="badge bg-primary-subtle text-primary ms-2">Pro</span>
                 </a>
                 <div class="collapse" id="promptArea">
-                  <input type="text" class="form-control mt-2 chatgpt-input" id="promptInput" placeholder="Contoh: Jawab sebagai guru kimia, jelaskan dengan detail">
+                  <div class="advanced-settings mt-3 p-3 rounded-3">
+                    <label for="promptInput" class="form-label small fw-semibold">
+                      <i class="bi bi-gear-fill text-info"></i> Custom Prompt/Konteks
+                    </label>
+                    <input type="text" class="form-control chatgpt-input" id="promptInput" placeholder="Contoh: Jawab sebagai guru kimia yang ramah dan detail">
+                    <small class="text-muted d-block mt-1">
+                      <i class="bi bi-info-circle"></i> Atur cara ChatGPT menjawab pertanyaanmu
+                    </small>
+                  </div>
                 </div>
               </div>
               
-              <div class="row g-3 mb-3 align-items-end">
-                <div class="col-sm-7">
-                  <label class="mb-2 fw-semibold d-block" for="sessionInput" style="font-size:0.97em;">
-                    <i class="bi bi-key text-info"></i> Session ID 
-                    <span class="small text-muted d-block mt-1">ID unik untuk mengingat percakapanmu</span>
+              <div class="row g-3 mb-4 align-items-end">
+                <div class="col-md-7">
+                  <label class="mb-2 fw-semibold d-block" for="sessionInput" style="font-size:1em;">
+                    <i class="bi bi-key-fill text-info"></i> Session ID 
                   </label>
-                  <input type="text" class="form-control chatgpt-input" id="sessionInput" maxlength="40" placeholder="Contoh: 2F23XX8923GFA" required>
+                  <div class="input-group-enhanced">
+                    <input type="text" class="form-control chatgpt-input" id="sessionInput" maxlength="40" placeholder="ID Sesi Unik" required>
+                    <div class="input-glow"></div>
+                  </div>
+                  <small class="text-muted d-block mt-1">
+                    <i class="bi bi-shield-check"></i> Percakapanmu tersimpan dengan ID ini
+                  </small>
                 </div>
-                <div class="col-sm-5">
-                  <button type="button" id="generateSession" class="btn btn-outline-primary w-100 fw-semibold btn-hover-effect">
-                    <i class="bi bi-stars"></i> Generate ID
+                <div class="col-md-5">
+                  <button type="button" id="generateSession" class="btn btn-outline-primary w-100 fw-semibold btn-hover-effect py-3">
+                    <i class="bi bi-stars me-1"></i> Generate Otomatis
                   </button>
                 </div>
               </div>
               
               <div class="d-grid gap-2">
-                <button type="submit" class="btn btn-primary btn-lg px-4 py-3 fw-bold btn-submit-glow" id="askBtn">
-                  <i class="bi bi-send me-2"></i>Tanya ChatGPT Sekarang
+                <button type="submit" class="btn btn-primary btn-lg px-4 py-3 fw-bold btn-submit-glow position-relative" id="askBtn">
+                  <span class="btn-content">
+                    <i class="bi bi-send-fill me-2"></i>
+                    <span>Tanya ChatGPT Sekarang</span>
+                  </span>
+                  <span class="btn-shine"></span>
                 </button>
               </div>
             </form>
 
             <!-- Result Section -->
             <div class="mt-4 result-animation" id="resultSection" style="display:none;">
-              <div class="d-flex align-items-center gap-2 mb-3 flex-wrap">
-                <button class="btn btn-success btn-hover-effect" id="copyChat">
-                  <i class="bi bi-clipboard me-1"></i>Copy Jawaban
-                </button>
-                <button class="btn btn-outline-danger btn-hover-effect" id="clearChat">
-                  <i class="bi bi-trash3 me-1"></i>Hapus Chat
-                </button>
-                <span id="sessionTag" class="badge bg-gradient-info text-dark ms-auto px-3 py-2"></span>
+              <div class="result-header mb-3">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                  <div class="d-flex gap-2">
+                    <button class="btn btn-success btn-hover-effect btn-sm" id="copyChat">
+                      <i class="bi bi-clipboard me-1"></i>Copy
+                    </button>
+                    <button class="btn btn-outline-danger btn-hover-effect btn-sm" id="clearChat">
+                      <i class="bi bi-trash3 me-1"></i>Hapus
+                    </button>
+                    <button class="btn btn-outline-info btn-hover-effect btn-sm" id="shareChat">
+                      <i class="bi bi-share me-1"></i>Share
+                    </button>
+                  </div>
+                  <span id="sessionTag" class="badge bg-gradient-info px-3 py-2"></span>
+                </div>
               </div>
               
               <!-- Typing Indicator -->
               <div id="typingIndicator" class="typing-indicator mb-3" style="display:none;">
-                <div class="typing-dot"></div>
-                <div class="typing-dot"></div>
-                <div class="typing-dot"></div>
-                <span class="ms-2 small text-muted">ChatGPT sedang mengetik...</span>
+                <div class="typing-dots">
+                  <div class="typing-dot"></div>
+                  <div class="typing-dot"></div>
+                  <div class="typing-dot"></div>
+                </div>
+                <span class="ms-2 small fw-medium">ChatGPT sedang berpikir...</span>
               </div>
               
-              <div class="chatgpt-response-card rounded-4 shadow-sm p-4 mb-2" id="chatResult" style="font-size:1.15em;"></div>
+              <!-- Chat Result -->
+              <div class="chatgpt-response-card rounded-4 shadow-sm p-4 mb-3 position-relative" id="chatResult">
+                <div class="ai-avatar">
+                  <i class="bi bi-robot"></i>
+                </div>
+              </div>
               
-              <div class="mt-3 text-center">
-                <small class="text-muted">
-                  <i class="bi bi-shield-check text-success"></i> Percakapan tersimpan dengan Session ID kamu
-                </small>
+              <!-- Response Info -->
+              <div class="response-info d-flex align-items-center justify-content-between text-muted small">
+                <span>
+                  <i class="bi bi-clock-fill text-primary"></i> 
+                  <span id="responseTimeDisplay">Responded in 2.3s</span>
+                </span>
+                <span>
+                  <i class="bi bi-shield-check text-success"></i> 
+                  Aman & Terenkripsi
+                </span>
               </div>
             </div>
             
@@ -191,33 +278,83 @@
             <div id="errorSection" class="error-list mt-3" style="display:none;"></div>
           </div>
           
-          <!-- Info Cards -->
-          <div class="row g-3 mt-4">
-            <div class="col-md-4">
-              <div class="info-card p-3 rounded-3 h-100">
-                <div class="info-icon mb-2">
-                  <i class="bi bi-lightning-charge text-warning"></i>
+          <!-- Feature Highlights -->
+          <div class="features-grid mt-5">
+            <h5 class="text-center fw-bold mb-4">
+              <span class="gradient-text">Kenapa Pilih ChatGPT Kami?</span>
+            </h5>
+            <div class="row g-3">
+              <div class="col-md-3 col-6">
+                <div class="feature-card">
+                  <div class="feature-icon">
+                    <i class="bi bi-lightning-charge-fill"></i>
+                  </div>
+                  <h6 class="fw-bold mb-1">Super Cepat</h6>
+                  <small class="text-muted">Response dalam detik</small>
                 </div>
-                <h6 class="fw-bold mb-1">Respon Cepat</h6>
-                <small class="text-muted">Dapatkan jawaban dalam hitungan detik</small>
+              </div>
+              <div class="col-md-3 col-6">
+                <div class="feature-card">
+                  <div class="feature-icon">
+                    <i class="bi bi-chat-heart-fill"></i>
+                  </div>
+                  <h6 class="fw-bold mb-1">History Lengkap</h6>
+                  <small class="text-muted">Percakapan tersimpan</small>
+                </div>
+              </div>
+              <div class="col-md-3 col-6">
+                <div class="feature-card">
+                  <div class="feature-icon">
+                    <i class="bi bi-shield-fill-check"></i>
+                  </div>
+                  <h6 class="fw-bold mb-1">100% Aman</h6>
+                  <small class="text-muted">Data terenkripsi</small>
+                </div>
+              </div>
+              <div class="col-md-3 col-6">
+                <div class="feature-card">
+                  <div class="feature-icon">
+                    <i class="bi bi-gift-fill"></i>
+                  </div>
+                  <h6 class="fw-bold mb-1">Gratis Total</h6>
+                  <small class="text-muted">Tanpa biaya apapun</small>
+                </div>
               </div>
             </div>
-            <div class="col-md-4">
-              <div class="info-card p-3 rounded-3 h-100">
-                <div class="info-icon mb-2">
-                  <i class="bi bi-chat-heart text-danger"></i>
+          </div>
+
+          <!-- Usage Tips -->
+          <div class="tips-section mt-5">
+            <div class="tips-card p-4 rounded-4">
+              <h5 class="fw-bold mb-3 d-flex align-items-center gap-2">
+                <i class="bi bi-lightbulb-fill text-warning"></i>
+                <span class="gradient-text">Tips Maksimalkan ChatGPT</span>
+              </h5>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <div class="tip-item">
+                    <i class="bi bi-check-circle-fill text-success"></i>
+                    <span>Gunakan pertanyaan yang spesifik dan jelas</span>
+                  </div>
                 </div>
-                <h6 class="fw-bold mb-1">Percakapan Tersimpan</h6>
-                <small class="text-muted">History chat otomatis tersimpan per session</small>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="info-card p-3 rounded-3 h-100">
-                <div class="info-icon mb-2">
-                  <i class="bi bi-shield-check text-success"></i>
+                <div class="col-md-6">
+                  <div class="tip-item">
+                    <i class="bi bi-check-circle-fill text-success"></i>
+                    <span>Manfaatkan custom prompt untuk hasil lebih baik</span>
+                  </div>
                 </div>
-                <h6 class="fw-bold mb-1">Gratis 100%</h6>
-                <small class="text-muted">Tanpa biaya, tanpa registrasi</small>
+                <div class="col-md-6">
+                  <div class="tip-item">
+                    <i class="bi bi-check-circle-fill text-success"></i>
+                    <span>Simpan Session ID untuk lanjutkan percakapan</span>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="tip-item">
+                    <i class="bi bi-check-circle-fill text-success"></i>
+                    <span>Gunakan bahasa Indonesia untuk hasil optimal</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
