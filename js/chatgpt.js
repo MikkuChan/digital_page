@@ -1,1 +1,360 @@
-const _0x2ece21=_0x124d;function _0x124d(_0xb185fe,_0x100aa7){const _0x459da7=_0x459d();return _0x124d=function(_0x124da6,_0x1469b6){_0x124da6=_0x124da6-0xf8;let _0x4d3ed6=_0x459da7[_0x124da6];return _0x4d3ed6;},_0x124d(_0xb185fe,_0x100aa7);}(function(_0x395aa6,_0x11db00){const _0x53c365=_0x124d,_0x11563e=_0x395aa6();while(!![]){try{const _0x6aabc2=parseInt(_0x53c365(0xfe))/0x1*(parseInt(_0x53c365(0x103))/0x2)+parseInt(_0x53c365(0x128))/0x3*(parseInt(_0x53c365(0xfa))/0x4)+-parseInt(_0x53c365(0x124))/0x5*(-parseInt(_0x53c365(0x123))/0x6)+parseInt(_0x53c365(0x12c))/0x7+parseInt(_0x53c365(0x12e))/0x8+parseInt(_0x53c365(0x12a))/0x9+-parseInt(_0x53c365(0x102))/0xa;if(_0x6aabc2===_0x11db00)break;else _0x11563e['push'](_0x11563e['shift']());}catch(_0x396224){_0x11563e['push'](_0x11563e['shift']());}}}(_0x459d,0x6f23b));const API_CHATGPT=_0x2ece21(0x10f);function _0x459d(){const _0x5e1fa1=['<i\x20class=\x22bi\x20bi-clipboard-check\x22></i>\x20Disalin!','sessionTag','toUpperCase','errorSection','innerHTML','textInput','generateSession','textContent','https://api.ryzumi.vip/api/ai/chatgpt','none','<span\x20class=\x22spinner-border\x20spinner-border-sm\x20me-2\x22></span>Memproses...','innerText','Gagal\x20connect\x20ke\x20server\x20API.','Session:\x20','session','chatResult','writeText','json','block','&session=','disabled','<i\x20class=\x22bi\x20bi-clipboard\x20me-1\x22></i>Copy\x20Jawaban','result','value','substring','getElementById','askBtn','resultSection','6XWrizr','449620fEfGYd','<i\x20class=\x22bi\x20bi-send\x20me-2\x22></i>Tanya\x20ChatGPT','sessionInput','replace','22611qNnCVP','</div>','6302808wHeFpu','toString','3331566boWugX','preventDefault','991448JMrPYu','display','chatForm','68BDlrRm','success','slice','&prompt=','45ccRSqf','focus','onclick','style','17322920YsWZOB','29746ajxwuN','trim','onsubmit','promptInput'];_0x459d=function(){return _0x5e1fa1;};return _0x459d();}function randomSessionId(){const _0x443da0=_0x2ece21;return(Date['now']()[_0x443da0(0x12b)](0x24)+Math['random']()[_0x443da0(0x12b)](0x24)[_0x443da0(0x11f)](0x2,0xe))[_0x443da0(0x109)]()[_0x443da0(0x127)](/[^A-Z0-9]/g,'')[_0x443da0(0xfc)](0x0,0x10);}document[_0x2ece21(0x120)](_0x2ece21(0x10d))['onclick']=function(){const _0x41cffb=_0x2ece21;document[_0x41cffb(0x120)]('sessionInput')[_0x41cffb(0x11e)]=randomSessionId();},document[_0x2ece21(0x120)](_0x2ece21(0xf9))[_0x2ece21(0x105)]=async function(_0x85ab2e){const _0x38c6af=_0x2ece21;_0x85ab2e[_0x38c6af(0x12d)]();const _0x136c5f=document[_0x38c6af(0x120)](_0x38c6af(0x10c))[_0x38c6af(0x11e)]['trim'](),_0x15c9fc=document['getElementById'](_0x38c6af(0x106))[_0x38c6af(0x11e)][_0x38c6af(0x104)](),_0x1988eb=document[_0x38c6af(0x120)](_0x38c6af(0x126))[_0x38c6af(0x11e)]['trim']();if(!_0x136c5f){document['getElementById'](_0x38c6af(0x10c))[_0x38c6af(0xff)]();return;}if(!_0x1988eb){document[_0x38c6af(0x120)]('sessionInput')[_0x38c6af(0xff)]();return;}setLoading(!![]),document[_0x38c6af(0x120)](_0x38c6af(0x122))[_0x38c6af(0x101)][_0x38c6af(0xf8)]=_0x38c6af(0x110),document['getElementById'](_0x38c6af(0x10a))[_0x38c6af(0x101)][_0x38c6af(0xf8)]=_0x38c6af(0x110);let _0x2d04b4=API_CHATGPT+'?text='+encodeURIComponent(_0x136c5f)+_0x38c6af(0x11a)+encodeURIComponent(_0x1988eb);if(_0x15c9fc)_0x2d04b4+=_0x38c6af(0xfd)+encodeURIComponent(_0x15c9fc);try{const _0x33e3aa=await fetch(_0x2d04b4),_0x454026=await _0x33e3aa[_0x38c6af(0x118)]();setLoading(![]),_0x454026[_0x38c6af(0xfb)]&&_0x454026[_0x38c6af(0x11d)]?(document[_0x38c6af(0x120)](_0x38c6af(0x122))[_0x38c6af(0x101)][_0x38c6af(0xf8)]=_0x38c6af(0x119),document[_0x38c6af(0x120)](_0x38c6af(0x116))[_0x38c6af(0x112)]=_0x454026[_0x38c6af(0x11d)],document['getElementById'](_0x38c6af(0x108))[_0x38c6af(0x10e)]=_0x38c6af(0x114)+(_0x454026[_0x38c6af(0x115)]||_0x1988eb),document['getElementById']('errorSection')['style'][_0x38c6af(0xf8)]='none'):showError(_0x454026[_0x38c6af(0x11d)]||'Gagal\x20mendapatkan\x20jawaban\x20dari\x20ChatGPT!');}catch(_0x388283){setLoading(![]),showError(_0x38c6af(0x113));}};function setLoading(_0x211ee6){const _0x2514b9=_0x2ece21,_0x1364ad=document[_0x2514b9(0x120)](_0x2514b9(0x121));_0x211ee6?(_0x1364ad[_0x2514b9(0x11b)]=!![],_0x1364ad[_0x2514b9(0x10b)]=_0x2514b9(0x111)):(_0x1364ad[_0x2514b9(0x11b)]=![],_0x1364ad[_0x2514b9(0x10b)]=_0x2514b9(0x125));}document['getElementById']('copyChat')[_0x2ece21(0x100)]=function(){const _0x565de3=_0x2ece21,_0x5affb7=document[_0x565de3(0x120)]('chatResult')['innerText'];if(!_0x5affb7)return;navigator['clipboard'][_0x565de3(0x117)](_0x5affb7),this['innerHTML']=_0x565de3(0x107),setTimeout(()=>{const _0x4f8dd2=_0x565de3;this[_0x4f8dd2(0x10b)]=_0x4f8dd2(0x11c);},0x4b0);};function showError(_0x510285){const _0x3167c0=_0x2ece21;document[_0x3167c0(0x120)](_0x3167c0(0x122))[_0x3167c0(0x101)][_0x3167c0(0xf8)]=_0x3167c0(0x110),document[_0x3167c0(0x120)]('errorSection')[_0x3167c0(0x10b)]='<div\x20class=\x22alert\x20alert-danger\x20mb-2\x22>'+_0x510285+_0x3167c0(0x129),document['getElementById'](_0x3167c0(0x10a))[_0x3167c0(0x101)]['display']='block';}
+// ===========================
+// CHATGPT PAGE JAVASCRIPT
+// Enhanced with Better UX & Interactions
+// ===========================
+
+// --- API Configuration
+const API_CHATGPT = "https://api.ryzumi.vip/api/ai/chatgpt";
+const STORAGE_KEY = "chatgpt_last_session";
+
+// --- Initialize on Load
+document.addEventListener('DOMContentLoaded', function() {
+  initializeApp();
+  setupEventListeners();
+  loadLastSession();
+});
+
+// --- Initialize Application
+function initializeApp() {
+  // Auto-focus on text input
+  setTimeout(() => {
+    document.getElementById("textInput").focus();
+  }, 500);
+}
+
+// --- Setup Event Listeners
+function setupEventListeners() {
+  // Character counter for textarea
+  const textInput = document.getElementById("textInput");
+  const charCounter = document.getElementById("charCounter");
+  
+  textInput.addEventListener("input", function() {
+    const length = this.value.length;
+    const maxLength = this.getAttribute("maxlength");
+    charCounter.textContent = `${length}/${maxLength}`;
+    
+    // Warning colors
+    if (length > maxLength * 0.9) {
+      charCounter.classList.add("danger");
+      charCounter.classList.remove("warning");
+    } else if (length > maxLength * 0.7) {
+      charCounter.classList.add("warning");
+      charCounter.classList.remove("danger");
+    } else {
+      charCounter.classList.remove("warning", "danger");
+    }
+  });
+  
+  // Enter to submit (Shift+Enter for new line)
+  textInput.addEventListener("keydown", function(e) {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      document.getElementById("chatForm").dispatchEvent(new Event('submit'));
+    }
+  });
+  
+  // Generate Session ID
+  document.getElementById("generateSession").addEventListener("click", function() {
+    const newId = randomSessionId();
+    document.getElementById("sessionInput").value = newId;
+    showNotification("Session ID baru berhasil dibuat!", "success");
+    
+    // Animation effect
+    this.classList.add("btn-success");
+    setTimeout(() => {
+      this.classList.remove("btn-success");
+    }, 1000);
+  });
+  
+  // Copy Chat Button
+  document.getElementById("copyChat").addEventListener("click", copyToClipboard);
+  
+  // Clear Chat Button
+  document.getElementById("clearChat").addEventListener("click", clearChat);
+  
+  // Form Submit
+  document.getElementById("chatForm").addEventListener("submit", handleFormSubmit);
+}
+
+// --- Unique Session ID Generator
+function randomSessionId() {
+  return (Date.now().toString(36) + Math.random().toString(36).substring(2, 14))
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, '')
+    .slice(0, 16);
+}
+
+// --- Load Last Session from LocalStorage
+function loadLastSession() {
+  const lastSession = localStorage.getItem(STORAGE_KEY);
+  if (lastSession) {
+    document.getElementById("sessionInput").value = lastSession;
+  }
+}
+
+// --- Save Session to LocalStorage
+function saveSession(sessionId) {
+  localStorage.setItem(STORAGE_KEY, sessionId);
+}
+
+// --- Handle Form Submit
+async function handleFormSubmit(e) {
+  e.preventDefault();
+  
+  const text = document.getElementById("textInput").value.trim();
+  const prompt = document.getElementById("promptInput").value.trim();
+  const session = document.getElementById("sessionInput").value.trim();
+
+  // Validation
+  if (!text) {
+    showNotification("Pesan tidak boleh kosong!", "warning");
+    document.getElementById("textInput").focus();
+    return;
+  }
+  
+  if (!session) {
+    showNotification("Session ID harus diisi!", "warning");
+    document.getElementById("sessionInput").focus();
+    return;
+  }
+
+  // Save session to localStorage
+  saveSession(session);
+
+  // Show UI Loading States
+  setLoadingState(true);
+  hideResult();
+  hideError();
+  showTypingIndicator();
+
+  // Build API URL
+  let url = `${API_CHATGPT}?text=${encodeURIComponent(text)}&session=${encodeURIComponent(session)}`;
+  if (prompt) {
+    url += `&prompt=${encodeURIComponent(prompt)}`;
+  }
+
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+    
+    setLoadingState(false);
+    hideTypingIndicator();
+
+    if (data.success && data.result) {
+      displayResult(data.result, data.session || session);
+      showNotification("Berhasil mendapatkan jawaban!", "success");
+    } else {
+      showError(data.result || "Gagal mendapatkan jawaban dari ChatGPT. Silakan coba lagi.");
+    }
+  } catch (error) {
+    setLoadingState(false);
+    hideTypingIndicator();
+    showError("Gagal terhubung ke server. Periksa koneksi internet Anda dan coba lagi.");
+    console.error("API Error:", error);
+  }
+}
+
+// --- Display Result
+function displayResult(resultText, sessionId) {
+  const resultSection = document.getElementById("resultSection");
+  const chatResult = document.getElementById("chatResult");
+  const sessionTag = document.getElementById("sessionTag");
+  
+  chatResult.textContent = resultText;
+  sessionTag.textContent = `Session: ${sessionId}`;
+  
+  resultSection.style.display = "block";
+  
+  // Smooth scroll to result
+  setTimeout(() => {
+    resultSection.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }, 100);
+}
+
+// --- Hide Result Section
+function hideResult() {
+  document.getElementById("resultSection").style.display = "none";
+}
+
+// --- Show Error Message
+function showError(message) {
+  const errorSection = document.getElementById("errorSection");
+  errorSection.innerHTML = `
+    <div class="alert alert-danger d-flex align-items-center mb-2" role="alert">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i>
+      <div>${message}</div>
+    </div>
+  `;
+  errorSection.style.display = "block";
+  
+  // Smooth scroll to error
+  setTimeout(() => {
+    errorSection.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }, 100);
+}
+
+// --- Hide Error Section
+function hideError() {
+  document.getElementById("errorSection").style.display = "none";
+}
+
+// --- Show Typing Indicator
+function showTypingIndicator() {
+  document.getElementById("typingIndicator").style.display = "flex";
+}
+
+// --- Hide Typing Indicator
+function hideTypingIndicator() {
+  document.getElementById("typingIndicator").style.display = "none";
+}
+
+// --- Set Loading State for Submit Button
+function setLoadingState(isLoading) {
+  const btn = document.getElementById("askBtn");
+  
+  if (isLoading) {
+    btn.disabled = true;
+    btn.innerHTML = `
+      <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+      Memproses Permintaan...
+    `;
+  } else {
+    btn.disabled = false;
+    btn.innerHTML = `
+      <i class="bi bi-send me-2"></i>Tanya ChatGPT Sekarang
+    `;
+  }
+}
+
+// --- Copy to Clipboard
+function copyToClipboard() {
+  const chatText = document.getElementById("chatResult").textContent;
+  
+  if (!chatText || chatText.trim() === "") {
+    showNotification("Tidak ada teks untuk disalin!", "warning");
+    return;
+  }
+
+  navigator.clipboard.writeText(chatText).then(() => {
+    const btn = document.getElementById("copyChat");
+    const originalHTML = btn.innerHTML;
+    
+    btn.innerHTML = `<i class="bi bi-clipboard-check-fill"></i> Berhasil Disalin!`;
+    btn.classList.add("copied");
+    btn.classList.remove("btn-success");
+    btn.classList.add("btn-info");
+    
+    setTimeout(() => {
+      btn.innerHTML = originalHTML;
+      btn.classList.remove("copied", "btn-info");
+      btn.classList.add("btn-success");
+    }, 2000);
+    
+    showNotification("Jawaban berhasil disalin ke clipboard!", "success");
+  }).catch(err => {
+    showNotification("Gagal menyalin teks. Coba lagi.", "danger");
+    console.error("Copy error:", err);
+  });
+}
+
+// --- Clear Chat
+function clearChat() {
+  if (!confirm("Yakin ingin menghapus percakapan ini?")) {
+    return;
+  }
+  
+  document.getElementById("textInput").value = "";
+  document.getElementById("promptInput").value = "";
+  hideResult();
+  hideError();
+  
+  showNotification("Percakapan berhasil dihapus!", "info");
+  
+  // Reset character counter
+  document.getElementById("charCounter").textContent = "0/2000";
+  document.getElementById("charCounter").classList.remove("warning", "danger");
+  
+  // Focus back to input
+  document.getElementById("textInput").focus();
+}
+
+// --- Toast Notification System
+function showNotification(message, type = "info") {
+  // Remove existing notifications
+  const existing = document.querySelector(".custom-toast");
+  if (existing) {
+    existing.remove();
+  }
+  
+  const colors = {
+    success: "#10b981",
+    danger: "#ef4444",
+    warning: "#f59e0b",
+    info: "#3b82f6"
+  };
+  
+  const icons = {
+    success: "bi-check-circle-fill",
+    danger: "bi-x-circle-fill",
+    warning: "bi-exclamation-triangle-fill",
+    info: "bi-info-circle-fill"
+  };
+  
+  const toast = document.createElement("div");
+  toast.className = "custom-toast";
+  toast.style.cssText = `
+    position: fixed;
+    top: 100px;
+    right: 20px;
+    background: white;
+    padding: 16px 24px;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-left: 4px solid ${colors[type]};
+    animation: slideInRight 0.3s ease;
+    max-width: 400px;
+  `;
+  
+  toast.innerHTML = `
+    <i class="bi ${icons[type]}" style="color: ${colors[type]}; font-size: 1.3em;"></i>
+    <span style="color: #1f2937; font-weight: 500;">${message}</span>
+  `;
+  
+  document.body.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.style.animation = "slideOutRight 0.3s ease";
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
+// --- Add animation styles dynamically
+const style = document.createElement("style");
+style.textContent = `
+  @keyframes slideInRight {
+    from {
+      transform: translateX(400px);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes slideOutRight {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(400px);
+      opacity: 0;
+    }
+  }
+`;
+document.head.appendChild(style);
